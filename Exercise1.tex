@@ -1,0 +1,58 @@
+\documentclass[a4wide,12pt]{article} 
+\usepackage{a4wide}
+\usepackage{times}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{palatino}
+%include polycode.fmt 
+%options ghci
+
+\def\skip{\texttt{skip}}
+\def\eq{\;\; =  \;\;}
+\usepackage{amsmath, amsthm, amssymb}
+
+\begin{document}
+\author{Chris Eidhof, Rui S. Barbosa}
+\title{Assignment 1}
+
+\maketitle
+
+\section{Part 1}
+
+% TODO ask Jurriaan if he wants the bottom part of table 2.4 as well, or just
+% the $f_\ell$
+
+Our analysis for Strongly Live Variables is almost the same as the Live
+Variables analysise. We now only present the functions that have changed. We
+change our $gen$ function to take an extra argument $l$ of type $L$ which
+corresponds to the set strongly live variables at the exit of the block.
+
+$kill$ and $gen$ functions
+\begin{align*}
+kill_{SLV}([x:=a]^\ell) &  \eq \{x\} \\
+kill_{SLV}([\skip]^\ell) & \eq \emptyset\\
+kill_{SLV}([b]^\ell) &  \eq \emptyset \\
+\\
+gen_{SLV}([x:=a]^\ell,l) & \eq
+         \begin{cases}
+          FV(a) & \text{if $x \in l$} \\
+          \emptyset & \text{otherwise}
+         \end{cases} \\
+gen_{SLV}([\skip]^\ell,l) & \eq \emptyset\\
+gen_{SLV}([b]^\ell,l) & \eq FV(b)
+\end{align*}
+
+This means our $f_\ell$ also has to change:
+
+\[ f_\ell(l) \eq (l \setminus kill([B]^\ell)) \cup gen([B]^\ell, l) \;\; \text{where} \;\; [B]^\ell
+\in blocks(S_\star)
+\]
+
+In our analysis, $\iota$ will not be necessarily empty, it will represent the
+variables of interest. If it is empty, the only way to have intermediate
+non-empty variables of interest will be by using them in conditions.
+
+\end{document}
+
+
