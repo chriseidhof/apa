@@ -2,6 +2,7 @@ module Chaotic where
 
 import qualified Data.Set as S
 import Control.Monad.State
+import Data.Char (toLower)
 
 type Equation = [L] -> L
 type Variable = String
@@ -24,20 +25,42 @@ fixpoint f x = let step = f x in
 data Stmt = Ass Variable AExp Label
           | Skip Label
           | Seq Stmt Stmt
-          | If BExp Label Stmt Stmt 
+--          | If BExp Label Stmt Stmt 
           | While BExp Label Stmt
-          deriving Show
 data BExp = BVal Bool
-          | Not  BExp
-          | BOp BExp BOp BExp
+--           | Not  BExp
+--           | BOp BExp BOp BExp
           | ROp AExp ROp AExp
-          deriving Show
 data AExp = Var Variable
           | AVal Int
           | AOp AExp AOp AExp
-          deriving Show
 
 type StmtM = State Label Stmt
+
+instance Show Stmt where
+  show (Ass v e l) = block (v ++ " := " ++ show e) l
+  show (Skip l)    = block (textt "skip") l
+  show (Seq a b)   = show a ++ newline ++ show b
+  show (While c l b) = textt "while " ++ block (show c) l ++ newline ++ indent (show b)
+
+instance Show BExp where
+  show (BVal t)  = textt $ map toLower (show t)
+  show (ROp l o r) = unwords [show l, show o, show r]
+
+instance Show AExp where
+  show (Var v) = v
+  show (AVal i) = show i
+  show (AOp l o r) = unwords [show l, show o, show r]
+
+block :: String -> Label -> String
+block s l = "[" ++ s ++ "]^{" ++ show l ++ "}"
+
+textt s = "\\textt{" ++ s ++ "}"
+
+indent :: String -> String
+indent = unlines . map ("\\;\\;" ++) . lines
+
+newline = ";\\\\\n" 
 
 label :: (Label -> a) -> State Label a
 label f = do x <- get
@@ -80,7 +103,6 @@ prog = begin
 
 seqProgram :: [StmtM] -> StmtM
 seqProgram = (liftM (foldr1 Seq)) . sequence
-
 
 labelProgram :: StmtM -> Stmt
 labelProgram = flip evalState 1

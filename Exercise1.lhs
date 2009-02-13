@@ -7,6 +7,7 @@
 \usepackage{palatino}
 %include polycode.fmt 
 %options ghci
+%format  True = "something"
 
 \def\skip{\texttt{skip}}
 \def\eq{\;\; =  \;\;}
@@ -52,6 +53,24 @@ This means our $f_\ell$ also has to change:
 In our analysis, $\iota$ will not be necessarily empty, it will represent the
 variables of interest. If it is empty, the only way to have intermediate
 non-empty variables of interest will be by using them in conditions.
+
+\section{Part 2}
+
+\eval{5 == 5}
+
+% \begin{program}
+% & [r := 1]^{1}; \\
+% & [a := r * r]^{2}; \\
+% & \texttt{while }[y > 1]^{3}; \\
+% & ~\;\;[r := r * x]^{4}; \\
+% & ~\;\;[y := y - 1]^{5}
+% \end{program}
+
+% $ [r := 1]^{1};$ \\
+% $ [a := r * r]^{2};$ \\
+% $ \texttt{while }[y > 1]^{3};$ \\
+% $ ~\;\;[r := r * x]^{4};$ \\
+% $ ~\;\;[y := y - 1]^{5}$
 
 \end{document}
 
