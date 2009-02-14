@@ -4,7 +4,7 @@ import qualified Data.Set as S
 import Control.Monad.State
 import Data.Char (toLower)
 
-type Equations ([Equation], [Equation])
+type Equations = ([Equation], [Equation])
 type Equation = ([L], [L]) -> L -- (Entries, Exits)
 type Variable = String
 type FlowGraph = [(Label, Label)]
@@ -72,6 +72,9 @@ label f = do x <- get
              put (x + 1)
              return (f x)
 
+skip :: StmtM
+skip = label Skip
+
 (=:) :: String -> AExp -> StmtM
 v =: e = label (Ass v e)
 
@@ -104,7 +107,8 @@ prog = begin
         while (Var "y" >! AVal 1) [ 
                "r" =: Var "r" *! Var "x",
                "y" =: Var "y" -! AVal 1
-               ]
+               ],
+        skip
        ]
 
 seqProgram :: [StmtM] -> StmtM
