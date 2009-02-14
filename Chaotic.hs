@@ -16,6 +16,9 @@ prog = begin
         skip
        ]
 
+f :: Equations -> ([L], [L]) -> ([L], [L])
+f (en, ex) x = (map ($x) en, map ($x) ex)
+
 ref :: Label -> Stmt -> Stmt
 ref =  undefined
 equations :: FlowGraph -> Stmt -> Equations

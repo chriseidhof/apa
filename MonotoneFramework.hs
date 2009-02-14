@@ -2,9 +2,6 @@ module MonotoneFramework where
 
 import Types
 
-f :: Equations -> ([L], [L]) -> ([L], [L])
-f (en, ex) x = (map ($x) en, map ($x) ex)
-
 fixpoint f x = let step = f x in
                if step == x then x else fixpoint f step
 

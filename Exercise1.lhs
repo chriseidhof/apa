@@ -29,9 +29,6 @@
 
 \section{Part 1}
 
-% TODO ask Jurriaan if he wants the bottom part of table 2.4 as well, or just
-% the $f_\ell$
-
 Our analysis for Strongly Live Variables is almost the same as the Live
 Variables analysis. We now only present the changes made. We
 change our $gen$ function to take an extra argument $l$ of type $L$ which
@@ -132,7 +129,7 @@ THERE IS A PROBLEM HERE WITH OUR SOLUTION
 we should change something. in the case x,y,x := a,b,c the FV(a) should not be generated because attribution is done left to right.
 
 i guess the solution should be 
-\[gen([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) = \bigcup\{FV(a_i) | v_i \in l \wedge \forall j<i. v_i \neq v_j\}\]
+\[gen([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) = \bigcup\{FV(a_i) | v_i \in l \wedge \forall j: j< i . v_i \neq v_j\}\]
 
 rather than the one we had:
 
