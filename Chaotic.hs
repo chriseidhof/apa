@@ -26,7 +26,11 @@ f (en, ex) x = (appl en, appl ex)
 
 block :: Label -> Program -> Maybe Stmt
 block l b@(Ass _ _ l')    | l == l'   = Just b
+block l b@(MultAss _ l')  | l == l'   = Just b
+block l b@(Print _ l')    | l == l'   = Just b
 block l b@(Skip l')       | l == l'   = Just b
+block l b@(Continue l')   | l == l'   = Just b
+block l b@(Break l')      | l == l'   = Just b
 block l b@(Seq s1 s2)                 = block l s1 `mplus` block l s2
 block l b@(While _ l' s)  | l == l'   = Just b
                           | otherwise = block l s
@@ -34,7 +38,11 @@ block _ _                             = Nothing
 
 labels :: Program -> [Label]
 labels (Ass _ _ l)   = [l]
+labels (MultAss _ l) = [l]
+labels (Print _ l)   = [l]
 labels (Skip l)      = [l]
+labels (Continue l)  = [l]
+labels (Break l)     = [l]
 labels (Seq s1 s2)   = labels s1 ++ labels s2
 labels (While _ l s) = [l] ++ labels s
 
@@ -68,9 +76,12 @@ slvEntry l p r = (lv \\ killSlv bL) `S.union` genSlv bL r
 killSlv (Ass x _ _) = S.singleton x
 killSlv _           = S.empty
 
-genSlv (Ass x a l) r | x `S.member` (slvExit' l r) = freeVariables a 
-                     | otherwise                   = S.empty
+genSlv (Ass x a l) r       | x `S.member` (slvExit' l r) = freeVariables a 
+                           | otherwise       = S.empty
+-- genSlv (MultAss asgs _) r  = S.unions [freeVariables a | (_,a)<- lastToAss asgs]
+--               where lastToAss = foldr (\(x,a) acc -> if x `elem` (fst acc) then acc else ((x,a):acc)) []
 genSlv x           r = freeVariables x
+
 
 analyze :: Stmt -> [(Label, L)]
 analyze s = error "TODO"

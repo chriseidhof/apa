@@ -69,9 +69,11 @@ class FreeVariables a where
   freeVariables :: a -> L
 
 instance FreeVariables Stmt where
-  freeVariables (Ass _ a _)   = freeVariables a
-  freeVariables (While b _ _) = freeVariables b
-  freeVariables _             = S.empty
+  freeVariables (Ass _ a _)     = freeVariables a
+  --freeVariables (MultAss asgs _)= (map freeVariables.snd.unzip) asgs
+  freeVariables (Print a _)     = freeVariables a
+  freeVariables (While b _ _)   = freeVariables b
+  freeVariables _               = S.empty
 
 instance FreeVariables AExp where
   freeVariables (Var v)     = S.singleton v
@@ -80,6 +82,9 @@ instance FreeVariables AExp where
 
 instance FreeVariables BExp where
   freeVariables (ROp l _ r) = S.union (freeVariables l) (freeVariables r)
+--  freeVariables (BOp l _ r) = S.union (freeVariables l) (freeVariables r)
+--  freeVariables (Not b)     = freeVariables b
+  freeVariables (BVal b) = S.empty
 
 showlist :: (Show a) => [a] -> String
 showlist = (foldr1 (\x s -> x++","++s)).(map show) 
