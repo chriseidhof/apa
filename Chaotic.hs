@@ -3,6 +3,8 @@ module Chaotic where
 import qualified Data.Set as S
 import Control.Monad.State
 import Data.Char (toLower)
+import Data.List (union)
+import Prelude hiding (init)
 
 type Equations = ([Equation], [Equation])
 type Equation = ([L], [L]) -> L -- (Entries, Exits)
@@ -117,10 +119,33 @@ seqProgram = (liftM (foldr1 Seq)) . sequence
 labelProgram :: StmtM -> Stmt
 labelProgram = flip evalState 1
 
--- TODO
-flow      :: Stmt -> FlowGraph
-ref       :: Label -> Stmt -> Stmt
+flowR :: Stmt -> FlowGraph
+flowR s = [(l, l') | (l', l) <- flow s]
+
+flow :: Stmt -> FlowGraph
+flow (Ass _ _ _)       = []
+flow (Skip _)          = []
+flow (Seq s1 s2)       = unionL [flow s1, flow s2, [(l, init s2) | l <- final s1]]
+flow (While cond l s)  = unionL [flow s, [(l, init s)], [(l', l) | l' <- final s]]
+
+final :: Stmt -> [Label]
+final (Ass _ _ l)       = [l]
+final (Skip l)          = [l]
+final (Seq s1 s2)       = final s2
+final (While cond l s)  = [l]
+
+init :: Stmt -> Label
+init (Ass _ _ l)       = l
+init (Skip l)          = l
+init (Seq s1 s2)       = init s1
+init (While cond l s)  = l
+
+unionL = foldr1 union
+
+ref :: Label -> Stmt -> Stmt
+ref =  undefined
 equations :: FlowGraph -> Stmt -> Equations
+equations = undefined
 
 analyze :: Stmt -> [(Label, L)]
 analyze = error "TODO"
