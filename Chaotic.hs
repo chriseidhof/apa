@@ -38,29 +38,50 @@ labels (Skip l)      = [l]
 labels (Seq s1 s2)   = labels s1 ++ labels s2
 labels (While _ l s) = [l] ++ labels s
 
-equations :: FlowGraph -> Stmt -> Equations
-equations graph s = undefined --slvExit
+equations :: Program -> Equations
+equations p = (entries, exits)
+ where entries = map (\l -> slvEntry l p) (labels p)
+       exits   = map (\l -> slvExit  l p) (labels p)
 -- type Equation = ([L], [L]) -> L -- (Entries, Exits)
 
 iota = S.empty
 
 type Program = Stmt
+type IterationResult = ([L], [L])
 
-slvExit :: Label -> Program -> L -> L
-slvExit label p lv | label `elem` final p = lv
-slvExit label p lv | otherwise            = S.unions [slvEntry l' p lv | (l', l) <- flowR p]
+-- This looks in the previous definition
+slvExit' :: Label -> IterationResult -> L
+slvExit' l (_,vals) = vals !! (l - 1) -- TODO: this is ugly
 
-slvEntry :: Label -> Program -> L -> L
-slvEntry l p lV = (slvExit l p lV \\ killSlv bL) `S.union` genSlv bL lV
+slvEntry' :: Label -> IterationResult -> L
+slvEntry' l (vals,_) = vals !! (l - 1) -- TODO: this is ugly
+
+slvExit :: Label -> Program -> IterationResult -> L
+slvExit label p r | label `elem` final p = slvExit' label r
+slvExit label p r | otherwise            = S.unions [slvEntry' l' r | (l', l) <- flowR p]
+
+slvEntry :: Label -> Program -> IterationResult -> L
+slvEntry l p r = (lv \\ killSlv bL) `S.union` genSlv bL r
  where bL = fromJust $ block l p
+       lv = slvExit' l r
 
 killSlv (Ass x _ _) = S.singleton x
 killSlv _           = S.empty
 
-genSlv (Ass x a _) lv | x `S.member` lv = freeVariables a 
-                      | otherwise       = S.empty
-genSlv x           lv = freeVariables x
-
+genSlv (Ass x a l) r | x `S.member` (slvExit' l r) = freeVariables a 
+                     | otherwise                   = S.empty
+genSlv x           r = freeVariables x
 
 analyze :: Stmt -> [(Label, L)]
 analyze s = error "TODO"
+
+-- TESTING
+p = labelProgram prog
+i = (x, x) where x = map (iterationStart p) (labels p)
+step = f (equations p)
+test r = do let l = labels p
+            mapM_ (\lbl -> putStrLn $ (show (slvEntry' lbl r, slvExit' lbl r))) l
+
+iterationStart :: Program -> Label -> L
+iterationStart p l | l `elem` final p = S.singleton "a"
+                   | otherwise        = S.empty
