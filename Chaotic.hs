@@ -4,23 +4,28 @@ import qualified Data.Set as S
 import Control.Monad.State
 import Data.Char (toLower)
 
-type Equation = [L] -> L
+type Equations = ([Equation], [Equation])
+type Equation = ([L], [L]) -> L -- (Entries, Exits)
 type Variable = String
+type FlowGraph = [(Label, Label)]
 type L        = S.Set Variable
+type Label    = Int
+
 newtype BOp   = B (String, Bool -> Bool -> Bool)
 newtype ROp   = R (String, Int  -> Int  -> Bool)
 newtype AOp   = A (String, Int  -> Int  -> Int)
-type Label    = Int
 
 instance Show BOp where show (B x) = fst x
 instance Show ROp where show (R x) = fst x
 instance Show AOp where show (A x) = fst x
 
-f :: [Equation] -> [L] -> [L]
-f eqList x = map ($x) eqList
+f :: Equations -> ([L], [L]) -> ([L], [L])
+f (en, ex) x = (map ($x) en, map ($x) ex)
 
 fixpoint f x = let step = f x in
                if step == x then x else fixpoint f step
+
+
 
 data Stmt = Ass Variable AExp Label
           | Skip Label
@@ -67,6 +72,9 @@ label f = do x <- get
              put (x + 1)
              return (f x)
 
+skip :: StmtM
+skip = label Skip
+
 (=:) :: String -> AExp -> StmtM
 v =: e = label (Ass v e)
 
@@ -91,6 +99,7 @@ infixl 6 -!
 infixl 4 >!
 infixl 2 =:
 
+
 prog :: StmtM
 prog = begin
        ["r" =: AVal 1,
@@ -98,7 +107,8 @@ prog = begin
         while (Var "y" >! AVal 1) [ 
                "r" =: Var "r" *! Var "x",
                "y" =: Var "y" -! AVal 1
-               ]
+               ],
+        skip
        ]
 
 seqProgram :: [StmtM] -> StmtM
@@ -106,3 +116,11 @@ seqProgram = (liftM (foldr1 Seq)) . sequence
 
 labelProgram :: StmtM -> Stmt
 labelProgram = flip evalState 1
+
+-- TODO
+flow      :: Stmt -> FlowGraph
+ref       :: Label -> Stmt -> Stmt
+equations :: FlowGraph -> Stmt -> Equations
+
+analyze :: Stmt -> [(Label, L)]
+analyze = error "TODO"
