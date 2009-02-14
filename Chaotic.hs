@@ -67,6 +67,8 @@ killSlv _           = S.empty
 
 genSlv (Ass x a _) lv | x `S.member` lv = freeVariables a 
                       | otherwise       = S.empty
+genSlv (MultAss asgs _) lv  = S.unions [freeVarialbes a | (_,a)<- lastToAss asgs]
+              where lastToAss = foldr (\(x,a) acc -> if x `elem` (fst acc) then acc else ((x,a):acc)) []
 genSlv x           lv = freeVariables x
 
 
