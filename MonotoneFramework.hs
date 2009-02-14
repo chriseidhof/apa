@@ -1,6 +1,8 @@
 module MonotoneFramework where
 
 import Types
+import Prelude hiding (init)
+import Data.List (union)
 
 fixpoint f x = let step = f x in
                if step == x then x else fixpoint f step

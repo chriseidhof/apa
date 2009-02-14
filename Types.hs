@@ -32,10 +32,10 @@ data AExp = Var Variable
           | AOp AExp AOp AExp
 
 instance Show Stmt where
-  show (Ass v e l) = block (v ++ " := " ++ show e) l
-  show (Skip l)    = block (textt "skip") l
+  show (Ass v e l) = texBlock (v ++ " := " ++ show e) l
+  show (Skip l)    = texBlock (textt "skip") l
   show (Seq a b)   = show a ++ newline ++ show b
-  show (While c l b) = textt "while " ++ block (show c) l ++ newline ++ indent (show b)
+  show (While c l b) = textt "while " ++ texBlock (show c) l ++ newline ++ indent (show b)
 
 instance Show BExp where
   show (BVal t)  = textt $ map toLower (show t)
@@ -46,8 +46,8 @@ instance Show AExp where
   show (AVal i) = show i
   show (AOp l o r) = unwords [show l, show o, show r]
 
-block :: String -> Label -> String
-block s l = "[" ++ s ++ "]^{" ++ show l ++ "}"
+texBlock :: String -> Label -> String
+texBlock s l = "[" ++ s ++ "]^{" ++ show l ++ "}"
 
 textt s = "\\textt{" ++ s ++ "}"
 
@@ -55,3 +55,19 @@ indent :: String -> String
 indent = unlines . map ("\\;\\;" ++) . lines
 
 newline = ";\\\\\n" 
+
+class FreeVariables a where
+  freeVariables :: a -> L
+
+instance FreeVariables Stmt where
+  freeVariables (Ass _ a _)   = freeVariables a
+  freeVariables (While b _ _) = freeVariables b
+  freeVariables _             = S.empty
+
+instance FreeVariables AExp where
+  freeVariables (Var v)     = S.singleton v
+  freeVariables (AOp l _ r) = S.union (freeVariables l) (freeVariables r)
+  freeVariables _           = S.empty
+
+instance FreeVariables BExp where
+  freeVariables (ROp l _ r) = S.union (freeVariables l) (freeVariables r)
