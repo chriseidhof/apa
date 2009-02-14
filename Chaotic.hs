@@ -1,10 +1,10 @@
 module Chaotic where
 
 import Prelude hiding (init)
-import Control.Monad
 import Data.Set ((\\))
 import Data.Maybe (fromJust)
 import qualified Data.Set as S
+import qualified Data.Map as M
 import Program
 import Types
 import MonotoneFramework
@@ -20,49 +20,20 @@ prog = begin
         skip
        ]
 
-f :: Equations -> ([L], [L]) -> ([L], [L])
+f :: Equations -> IterationResult -> IterationResult
 f (en, ex) x = (appl en, appl ex)
- where appl = map ($x)
-
-block :: Label -> Program -> Maybe Stmt
-block l b@(Ass _ _ l')    | l == l'   = Just b
-block l b@(MultAss _ l')  | l == l'   = Just b
-block l b@(Print _ l')    | l == l'   = Just b
-block l b@(Skip l')       | l == l'   = Just b
-block l b@(Continue l')   | l == l'   = Just b
-block l b@(Break l')      | l == l'   = Just b
-block l b@(Seq s1 s2)                 = block l s1 `mplus` block l s2
-block l b@(While _ l' s)  | l == l'   = Just b
-                          | otherwise = block l s
-block _ _                             = Nothing
-
-labels :: Program -> [Label]
-labels (Ass _ _ l)   = [l]
-labels (MultAss _ l) = [l]
-labels (Print _ l)   = [l]
-labels (Skip l)      = [l]
-labels (Continue l)  = [l]
-labels (Break l)     = [l]
-labels (Seq s1 s2)   = labels s1 ++ labels s2
-labels (While _ l s) = [l] ++ labels s
+ where appl = M.map ($ x)
 
 equations :: Program -> Equations
-equations p = (entries, exits)
- where entries = map (\l -> slvEntry l p) (labels p)
-       exits   = map (\l -> slvExit  l p) (labels p)
--- type Equation = ([L], [L]) -> L -- (Entries, Exits)
+equations p = (M.fromAscList entries, M.fromAscList exits)
+ where entries = map (\l -> (l, slvEntry l p)) (labels p)
+       exits   = map (\l -> (l, slvExit  l p)) (labels p)
 
-iota = S.empty
-
-type Program = Stmt
-type IterationResult = ([L], [L])
-
--- This looks in the previous definition
 slvExit' :: Label -> IterationResult -> L
-slvExit' l (_,vals) = vals !! (l - 1) -- TODO: this is ugly
+slvExit' l (_,vals)  = fromJust $ M.lookup l vals
 
 slvEntry' :: Label -> IterationResult -> L
-slvEntry' l (vals,_) = vals !! (l - 1) -- TODO: this is ugly
+slvEntry' l (vals,_) = fromJust $ M.lookup l vals
 
 slvExit :: Label -> Program -> IterationResult -> L
 slvExit label p r | label `elem` final p = slvExit' label r
@@ -88,7 +59,7 @@ analyze s = error "TODO"
 
 -- TESTING
 p = labelProgram prog
-i = (x, x) where x = map (iterationStart p) (labels p)
+i = (x, x) where x = M.fromAscList $ map (\l -> (l, iterationStart p l)) (labels p)
 step = f (equations p)
 test r = do let l = labels p
             mapM_ (\lbl -> putStrLn $ (show (slvEntry' lbl r, slvExit' lbl r))) l
