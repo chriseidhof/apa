@@ -70,7 +70,7 @@ class FreeVariables a where
 
 instance FreeVariables Stmt where
   freeVariables (Ass _ a _)     = freeVariables a
-  --freeVariables (MultAss asgs _)= (map freeVariables.snd.unzip) asgs
+  freeVariables (MultAss asgs _)= S.unions $ map (freeVariables . snd) asgs
   freeVariables (Print a _)     = freeVariables a
   freeVariables (While b _ _)   = freeVariables b
   freeVariables _               = S.empty
