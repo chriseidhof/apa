@@ -43,17 +43,17 @@ init (While cond l s)  = l
 
 unionL = foldr1 union
 
-block :: Label -> Program -> Maybe Stmt
-block l b@(Ass _ _ l')    | l == l'   = Just b
-block l b@(MultAss _ l')  | l == l'   = Just b
-block l b@(Print _ l')    | l == l'   = Just b
-block l b@(Skip l')       | l == l'   = Just b
-block l b@(Continue l')   | l == l'   = Just b
-block l b@(Break l')      | l == l'   = Just b
-block l b@(Seq s1 s2)                 = block l s1 `mplus` block l s2
-block l b@(While _ l' s)  | l == l'   = Just b
-                          | otherwise = block l s
-block _ _                             = Nothing
+block :: Program -> Label -> Maybe Stmt
+block  b@(Ass _ _ l')   l  | l == l'   = Just b
+block  b@(MultAss _ l') l  | l == l'   = Just b
+block  b@(Print _ l')   l  | l == l'   = Just b
+block  b@(Skip l')      l  | l == l'   = Just b
+block  b@(Continue l')  l  | l == l'   = Just b
+block  b@(Break l')     l  | l == l'   = Just b
+block  b@(Seq s1 s2)    l              = block s1 l `mplus` block s2 l
+block  b@(While _ l' s) l  | l == l'   = Just b
+                           | otherwise = block s l
+block _ _                              = Nothing
 
 labels :: Program -> [Label]
 labels (Ass _ _ l)   = [l]
