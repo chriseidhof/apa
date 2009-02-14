@@ -62,7 +62,7 @@ p = labelProgram prog
 i = (x, x) where x = M.fromAscList $ map (\l -> (l, iterationStart p l)) (labels p)
 step = f (equations p)
 test r = do let l = labels p
-            mapM_ (\lbl -> putStrLn $ (show (slvEntry' lbl r, slvExit' lbl r))) l
+            mapM_ (\lbl -> putStrLn $ (show lbl ++ ": " ++ (unwords $ S.toList $ slvEntry' lbl r) ++ " | " ++ (unwords $ S.toList $ slvExit' lbl r))) l
 
 iterationStart :: Program -> Label -> L
 iterationStart p l | l `elem` final p = S.singleton "a"
