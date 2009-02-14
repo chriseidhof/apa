@@ -25,14 +25,18 @@ final (Ass _ _ l)       = [l]
 final (MultAss _ l)     = [l]
 final (Print _ l)       = [l]
 final (Skip l)          = [l]
+--final (Continue _)
+--final (Break _)
 final (Seq s1 s2)       = final s2
 final (While cond l s)  = [l]
 
 init :: Stmt -> Label
 init (Ass _ _ l)       = l
-init (Skip l)          = l
 init (MultAss _ l)     = l
 init (Print _ l)       = l
+init (Skip l)          = l
+--init (Continue _)
+--init (Break _)
 init (Seq s1 s2)       = init s1
 init (While cond l s)  = l
 
