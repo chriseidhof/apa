@@ -19,7 +19,11 @@ instance Show ROp where show (R x) = fst x
 instance Show AOp where show (A x) = fst x
 
 data Stmt = Ass Variable AExp Label
+          | MultAss [(Variable,AExp)] Label
+          | Print AExp Label
           | Skip Label
+          | Continue Label
+          | Break Label
           | Seq Stmt Stmt
 --          | If BExp Label Stmt Stmt 
           | While BExp Label Stmt
@@ -33,7 +37,12 @@ data AExp = Var Variable
 
 instance Show Stmt where
   show (Ass v e l) = block (v ++ " := " ++ show e) l
+  show (MultAss asgs l) =  let (v,a) = (unzip asgs)
+                           in  block (showlist v ++ " := " ++ showlist a) l
+  show (Print a l)    = block (textt "print" ++ show a) l 
   show (Skip l)    = block (textt "skip") l
+  show (Continue l)    = block (textt "continue") l
+  show (Break l)    = block (textt "break") l 
   show (Seq a b)   = show a ++ newline ++ show b
   show (While c l b) = textt "while " ++ block (show c) l ++ newline ++ indent (show b)
 
@@ -55,3 +64,6 @@ indent :: String -> String
 indent = unlines . map ("\\;\\;" ++) . lines
 
 newline = ";\\\\\n" 
+
+showlist :: (Show a) => [a] -> String
+showlist = (foldr1 (\x s -> x++","++s)).(map show) 
