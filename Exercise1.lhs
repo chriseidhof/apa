@@ -121,21 +121,30 @@ results. Thus, we are not required to consider $\iota \neq \emptyset$ from now o
 
 \subsection{Simultaneous Assignements}
 
-%The meaning of multiple assignments is pretty straightforward. Each 
+The meaning of multiple assignments ($[v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell$) is
+pretty straightforward: all expressions in the right hand side are evaluated and
+then each of them is assigned to the corresponding variable on the left hand side, in left to right order.
 
-THERE IS A PROBLEM HERE WITH OUR SOLUTION
-(until END this is not final)
+Clearly, as with simple assignements, the $kill$
+function gives the variables which are assigned to, meaning those are not live before the block.
 
-we should change something. in the case x,y,x := a,b,c the FV(a) should not be generated because attribution is done left to right.
+On the other hand, the
+$gen$ function gives all the variables required to be strongly live before the block. 
+As a first guess, we could include all the
+free variables used in expressions assigned to variables which are strongly live after the block, closely following the 
+single assignement case. However, this solution is not optimal in the case where the $v_i$ are not pairwise distinct.
+For example, considering the block $[x,y,x := a,b,c]^\ell$) with $x$ and $y$ strongly live after it, the variables in expression
+$a$ need not be considered strongly live before the block, as the attribution $x:=a$ will be immediately overwritten
+by $x:=c$ (recall that attributions are done in left to right order).
 
-i guess the solution should be 
-\[gen([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) = \bigcup\{FV(a_i) | v_i \in l \wedge \forall j: j< i . v_i \neq v_j\}\]
+We extend the $kill$ and $gen$ functions in the following manner:
 
-rather than the one we had:
+\begin{align*}
+kill_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell) &  \eq \bigcup\{\{v_i\} | 1 \leq i\leq n\} \\
+\\
+gen_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) & \eq \bigcup\{FV(a_i) | v_i \in l \wedge \forall j : j<i. v_j \neq v_i\}
+\end{align*}
 
-\[gen([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) = \bigcup\{FV(a_i) | v_i \in l\}\]
-
-END
 
 \subsection{Break and Continue}
 The meaning of this constructs inside while loops is just what we are used to: $\break$ jumps immediatly off the loop whilst

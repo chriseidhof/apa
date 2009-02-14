@@ -13,8 +13,20 @@ label f = do x <- get
 skip :: StmtM
 skip = label Skip
 
+continue :: StmtM
+continue = label Continue
+
+break :: StmtM
+break = label Break
+
 (=:) :: String -> AExp -> StmtM
 v =: e = label (Ass v e)
+
+(==:) :: [String] -> [AExp] -> StmtM
+v ==: e = label (MultAss (zip v e))
+
+print :: AExp -> StmtM
+print a = label (Print a)
 
 while :: BExp -> [StmtM] -> StmtM
 while cond body = do w <- label (While cond) 
