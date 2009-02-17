@@ -32,9 +32,10 @@
 Our analysis for Strongly Live Variables is almost the same as the Live
 Variables analysis. We now only present the changes made. We
 change our $gen$ function to take an extra argument $l$ of type $L$ which
-corresponds to the set of strongly live variables at the exit of the block.
-This is needed because variable's strong liveliness before being used in an assignment block
-depends on whether the assignmed variable is strongly live at the exit of that block.
+corresponds to the set of strongly live variables at the exit of the corresponding block.
+This is needed because the strong liveliness of a variable before
+being used in an assignment block
+depends on whether the assigned variable is strongly live at the exit of that block.
 
 $kill$ and $gen$ functions
 \begin{align*}
@@ -67,13 +68,19 @@ are what we call the variables of interest at the end of the program. Clearly,
 those varialbes need to be considered live at the exit of all final blocks, so that we can always inspect their values. 
 When $\iota$ is empty, the only way to have intermediate
 non-empty sets of strongly live variables will be by using them in conditional expressions (which control the
-flow of the program). In that case, we are not be interested in any output from the program.
+flow of the program). In that case, we are not interested in any output from the program.
 
 
 \section{Part 2}
 
+DESCRIBE THE HASKELL MODULE(S)
 
+To demonstrate the Strong Live Variable Analysis, we will use our \haskell program
+to perform chaotic iteration on the following simple example program
 
+(is it possible to evaluate an haskell expr that gives tex 
+and use that tex or do we need to use the format directive? 
+i will look on the documentation and ask andres)
 % \begin{program}
 % & [r := 1]^{1}; \\
 % & [a := r * r]^{2}; \\
@@ -87,6 +94,8 @@ flow of the program). In that case, we are not be interested in any output from 
 % $ \texttt{while }[y > 1]^{3};$ \\
 % $ ~\;\;[r := r * x]^{4};$ \\
 % $ ~\;\;[y := y - 1]^{5}$
+
+
 
 \section{Part 3}
 
@@ -119,6 +128,12 @@ gen_{SLV}([\print a]^\ell,l) & \eq FV(a)
 Note that the new construct provides the program with a new capability of outputing
 results. Thus, we are not required to consider $\iota \neq \emptyset$ from now on.
 
+In fact, we just need to print the so called variables of interest at the end of our program.
+Adding $print r$ or $print y$ at the end of program \ref{exprog1}, 
+we get the exact same results we add before.
+
+EXAMPLE PROgrAM and results WIth PRINT
+
 \subsection{Simultaneous Assignements}
 
 The meaning of multiple assignments ($[v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell$) is
@@ -145,6 +160,12 @@ kill_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell) &  \eq \bigcup\{\{v_i\} | 1 
 gen_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) & \eq \bigcup\{FV(a_i) | v_i \in l \wedge \forall j : j<i. v_j \neq v_i\}
 \end{align*}
 
+To demonstrate the use of this construct, let us consider a slightly different version of
+\ref{exprog1}, where some assignments have been grouped togheter. Also, some new (dummy)
+assignments were added to illustrate the situation when multiple assignments to the same
+variable occur.
+
+EXAMPLE PROGRAM
 
 \subsection{Break and Continue}
 The meaning of this constructs inside while loops is just what we are used to: $\break$ jumps immediatly off the loop whilst
