@@ -100,6 +100,8 @@ to perform chaotic iteration on the following simple example program
 (is it possible to evaluate an haskell expr that gives tex 
 and use that tex or do we need to use the format directive? 
 i will look on the documentation and ask andres)
+
+
 % \begin{program}
 % & [r := 1]^{1}; \\
 % & [a := r * r]^{2}; \\
