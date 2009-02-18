@@ -20,6 +20,7 @@ prog = begin
         skip
        ]
 
+
 f :: Equations -> IterationResult -> IterationResult
 f (en, ex) x = (appl en, appl ex)
  where appl = M.map ($ x)

@@ -1,0 +1,6 @@
+
+
+analyse :: Analyser lat -> Program -> IterationResult
+analyse analyser = chaotic_solving . equations . analyser 
+
+
