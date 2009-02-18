@@ -5,6 +5,9 @@
 \usepackage{url}
 \usepackage{enumerate}
 \usepackage{palatino}
+
+\usepackage{prooftree}
+
 %include polycode.fmt 
 %options ghci
 %format  True = "something"
@@ -13,7 +16,13 @@
 
 \def\eq{\;\; =  \;\;}
 \def\N{\mathbb{N}}
+\def\Z{\mathbb{Z}}
+
 \def\pset#1{\mathcal{P}(#1)}
+\def\A#1{\mathcal{A}[\hspace{-1pt}[#1]\hspace{-1pt}])}
+
+\def\const#1{\mathopen{\langle}#1\mathclose{\rangle}} % <a,b,...z>
+\def\pair#1{\const{#1}}
 
 \def\Stmt  {\mathbf{Stmt}}
 \def\Lab   {\mathbf{Lab}}
@@ -311,6 +320,58 @@ gen_{SLV} ([\cont]^\ell,l) \eq  gen_{SLV} ([\break]^\ell,l) & \eq  \emptyset
 %
 
 EXAMPLE
+
+\begin{table}\label{semantics}
+\caption{Modifications to the Operational Semantics}
+{\small
+\begin{eqnarray*}
+\pair{print}\;\; &  
+ \pair{\print a, \sigma = (\eta,out)} \longrightarrow (\eta, snoc(out,\A{a}\eta))\; &\\
+& & \\
+\pair{multass}\;\; &  
+ \pair{x_1,\ldots,x_n := a_1,\ldots,a_n, \sigma = (\eta,out)} \longrightarrow
+ (\eta[x_1\mapsto \A{a_1}\eta]\ldots[x_n\mapsto \A{a_n}\eta] , out)\; &\\
+& & \\
+\pair{cont\_fire}\;\; &  
+ \pair{\cont, \sigma} \longrightarrow [\sigma]^{continue}   \; &\\
+&  & \\
+\pair{break\_fire}\;\; &  
+ \pair{\break, \sigma} \longrightarrow [\sigma]^{break}   \; &\\
+&  & \\
+\pair{cont\_prop}\;\; & 
+\begin{prooftree}
+\pair{S_1,\sigma} \longrightarrow [\sigma']^{continue}
+\justifies
+\pair{S_1 ; S_2,\sigma} \longrightarrow [\sigma']^{continue}
+\thickness=0.08em
+\end{prooftree}\\
+& & \\
+\pair{break\_prop}\;\; & 
+\begin{prooftree}
+\pair{S_1,\sigma} \longrightarrow [\sigma']^{break}
+\justifies
+\pair{S_1 ; S_2,\sigma} \longrightarrow [\sigma']^{break}
+%\thickness=0.08em
+\end{prooftree}\\
+& & \\
+\pair{cont\_catch}\;\; & 
+\begin{prooftree}
+\pair{S_1,\sigma} \longrightarrow [\sigma']^{continue}
+\justifies
+\pair{\while [b]^\ell \do S,\sigma} \longrightarrow \pair{\while [b]^\ell \do S,\sigma'}
+\thickness=0.08em
+\end{prooftree}\\
+&  & \\
+\pair{break\_catch}\;\; & 
+\begin{prooftree}
+\pair{S_1,\sigma} \longrightarrow [\sigma']^{break}
+\justifies
+\pair{\while [b]^\ell \do S,\sigma} \longrightarrow \sigma
+\thickness=0.08em
+\end{prooftree}\\
+\end{eqnarray*}
+}
+\end{table}
 
 \end{document}
 
