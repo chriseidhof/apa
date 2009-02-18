@@ -105,6 +105,22 @@ i will look on the documentation and ask andres)
 % $ ~\;\;[r := r * x]^{4};$ \\
 % $ ~\;\;[y := y - 1]^{5}$
 
+Our iteration stabilizes after 6 iterations:
+
+$\begin{array}{rccccccc}
+SLV_{entry}(1) & \emptyset&\emptyset&\emptyset&\{y\}&\{y\}&\{x,y\}&\{x,y\} \\ 
+SLV_{exit}(1) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{entry}(2) & \emptyset&\emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{exit}(2) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{entry}(3) & \emptyset&\{y\}&\{y\}&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{exit}(3) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{entry}(4) & \emptyset&\emptyset&\emptyset&\{r,x,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{exit}(4) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{entry}(5) & \emptyset&\emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{exit}(5) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
+SLV_{entry}(6) & \emptyset&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\} \\ 
+SLV_{exit}(6) & \{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}
+\end{array}$
 
 
 \section{Part 3}
@@ -309,7 +325,6 @@ gen_{SLV} ([\cont]^\ell,l) \eq  gen_{SLV} ([\break]^\ell,l) & \eq  \emptyset
 %\[flow(\texttt{while}[b]^\ell \texttt{do} S) = flow(S) \cup \{(l,init(S))\} \cup \{(l',l) | l' \in final(S) \cup continues(S)\}\]
 %
 
-EXAMPLE
 
 \end{document}
 
