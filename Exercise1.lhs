@@ -6,7 +6,6 @@
 \usepackage{enumerate}
 \usepackage{palatino}
 %include polycode.fmt 
-%options ghci
 %format  True = "something"
 
 \usepackage{amsmath,amsthm,amssymb}
