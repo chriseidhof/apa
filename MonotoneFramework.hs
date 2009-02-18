@@ -8,6 +8,7 @@ import Control.Monad
 fixpoint f x = let step = f x in
                if step == x then x else fixpoint f step
 
+
 flowR :: Stmt -> FlowGraph
 flowR s = [(l, l') | (l', l) <- flow s]
 
@@ -64,3 +65,4 @@ labels (Continue l)  = [l]
 labels (Break l)     = [l]
 labels (Seq s1 s2)   = labels s1 ++ labels s2
 labels (While _ l s) = [l] ++ labels s
+

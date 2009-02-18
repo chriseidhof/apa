@@ -4,14 +4,18 @@ import Data.Char (toLower)
 import qualified Data.Set as S
 import qualified Data.Map as M
 
+
 type Equations       = (M.Map Label Equation, M.Map Label Equation)
 type Equation        = IterationResult -> L
 type Variable        = String
 type FlowGraph       = [(Label, Label)]
+
 type L               = S.Set Variable
 type Label           = Int
 type Program         = Stmt
 type IterationResult = (M.Map Label L, M.Map Label L) -- (Entries, Exits)
+
+
 
 newtype BOp   = B (String, Bool -> Bool -> Bool)
 newtype ROp   = R (String, Int  -> Int  -> Bool)
