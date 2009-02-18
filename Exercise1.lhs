@@ -213,7 +213,7 @@ a $\cont$ statement \emph{restarts} the while loop execution (including testing 
 If found outside a while loop, these constructs cause the program to halt in a error state.
 
 The formal semantics could be given in a way ressembling exception handling in Java (where while loops take
-the rôle of catch), as we briefly explain. These constructs
+the r\^{o}le of catch), as we briefly explain. These constructs
 would cause execution to halt in a new kind of state
 enclosing the information of the \emph{then current} state along with an annotation of the reason
 for halting ($\break$ or $\cont$). 
