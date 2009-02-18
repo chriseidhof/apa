@@ -63,9 +63,9 @@ instance Show AExp where
   show (AOp l o r) = unwords [show l, show o, show r]
 
 texBlock :: String -> Label -> String
-texBlock s l = "[" ++ s ++ "]^{" ++ show l ++ "}"
+texBlock s l = "\\lbrack " ++ s ++ " \\rbrack^{" ++ show l ++ "}"
 
-textt s = "\\textt{" ++ s ++ "}"
+textt s = "\\texttt{" ++ s ++ "}"
 
 indent :: String -> String
 indent = unlines . map ("\\;\\;" ++) . lines

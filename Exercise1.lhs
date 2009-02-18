@@ -41,6 +41,9 @@
 
 \def\haskell{\textsc{Haskell}}
 
+\def\program#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
+\def\Tiny{\fontsize{3pt}{3pt}\selectfont}
+
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
 \title{Data Flow Assignment I \\ Automatic Program Analysis}
@@ -100,6 +103,7 @@ to perform chaotic iteration on the following simple example program
 (is it possible to evaluate an haskell expr that gives tex 
 and use that tex or do we need to use the format directive? 
 i will look on the documentation and ask andres)
+<<<<<<< HEAD:Exercise1.lhs
 
 
 % \begin{program}
@@ -109,6 +113,24 @@ i will look on the documentation and ask andres)
 % & ~\;\;[r := r * x]^{4}; \\
 % & ~\;\;[y := y - 1]^{5}
 % \end{program}
+=======
+\program{\input{program1.tex}}
+
+% \program{
+% [r := 1]^{1};
+% }% \\
+% [a := r * r]^{2};\\
+% \texttt{while }[y > 1]^{3};\\
+% \;\;[r := r * x]^{4};\\
+% \;\;[y := y - 1]^{5} ;\\
+% [\texttt{skip}]^{6}
+% }
+
+% \fbox{\begin{minipage}{0.8\textwidth}$\begin{array}{l} 
+% hi
+% \end{array}$\end{minipage}}
+
+>>>>>>> be57eb5a9616955eec978639bff01546f32d23a5:Exercise1.lhs
 
 % $ [r := 1]^{1};$ \\
 % $ [a := r * r]^{2};$ \\
@@ -118,21 +140,11 @@ i will look on the documentation and ask andres)
 
 Our iteration stabilizes after 6 iterations:
 
-$\begin{array}{rccccccc}
-SLV_{entry}(1) & \emptyset&\emptyset&\emptyset&\{y\}&\{y\}&\{x,y\}&\{x,y\} \\ 
-SLV_{exit}(1) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{entry}(2) & \emptyset&\emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{exit}(2) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{entry}(3) & \emptyset&\{y\}&\{y\}&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{exit}(3) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{entry}(4) & \emptyset&\emptyset&\emptyset&\{r,x,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{exit}(4) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{entry}(5) & \emptyset&\emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{exit}(5) & \emptyset&\emptyset&\{r,y\}&\{r,y\}&\{r,x,y\}&\{r,x,y\}&\{r,x,y\} \\ 
-SLV_{entry}(6) & \emptyset&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\} \\ 
-SLV_{exit}(6) & \{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}&\{r\}
-\end{array}$
+\input{result1y.tex}
 
+\Tiny
+\input{result1r.tex}
+\normalsize
 
 \section{Part 3}
 
