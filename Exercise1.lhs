@@ -7,7 +7,8 @@
 \usepackage{palatino}
  
 \usepackage{prooftree}
- 
+
+%include lhs2tex.fmt 
  
 \usepackage{amsmath,amsthm,amssymb}
  
@@ -30,9 +31,9 @@
 \def\skip {\texttt{skip}\ }
 \def\while{\texttt{while}\ }
 \def\do {\texttt{do}\ }
-\def\ifc {\texttt{if}\ }
-\def\then {\texttt{then}\ }
-\def\elsec {\texttt{else}\ }
+\def\ifl {\texttt{if}\ }
+\def\thenl {\texttt{then}\ }
+\def\elsel {\texttt{else}\ }
 \def\print{\texttt{print}\ }
 \def\cont {\texttt{continue}\ }
 \def\break{\texttt{break}\ }
@@ -292,7 +293,7 @@ continuesOf([\print a]^\ell) & \eq \emptyset \\
 continuesOf([\cont]^\ell) & \eq \{\ell\} \\
 continuesOf([\break]^\ell) & \eq \emptyset \\
 continuesOf(S_1;S_2) & \eq continuesOf(S_1) \cup continuesOf(S_2) \\
-continuesOf(\ifc [b]^\ell \then S_1 \elsec S_2) & \eq continuesOf(S_1) \cup continuesOf(S_2) \\
+continuesOf(\ifl [b]^\ell \thenl S_1 \elsel S_2) & \eq continuesOf(S_1) \cup continuesOf(S_2) \\
 continuesOf(\while [b]^\ell \do S) & \eq \emptyset \\
 \\
 breaksOf & \; : \; \Stmt \to \pset{\Lab} \\
@@ -303,7 +304,7 @@ breaksOf([\print a]^\ell) & \eq \emptyset \\
 breaksOf([\cont]^\ell) & \eq \emptyset \\
 breaksOf([\break]^\ell) & \eq \{\ell\} \\
 breaksOf(S_1;S_2) & \eq breaksOf(S_1) \cup breaksOf(S_2) \\
-breaksOf(\ifc [b]^\ell \then S_1 \elsec S_2) & \eq breaksOf(S_1) \cup breaksOf(S_2) \\
+breaksOf(\ifl [b]^\ell \thenl S_1 \elsel S_2) & \eq breaksOf(S_1) \cup breaksOf(S_2) \\
 breaksOf(\while [b]^\ell \do S) & \eq \emptyset
 \end{align*}
  
