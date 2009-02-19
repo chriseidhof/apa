@@ -134,6 +134,8 @@ Our iteration stabilizes after 6 iterations:
 \input{result1r.tex}
 \normalsize
  
+
+
 \section{Part 3}
  
 We start by adding the new labelled constructs to the abstract syntax of the language:
@@ -155,7 +157,8 @@ of the $labels$ function given in the book stays valid.
 \end{align*}
  
  
-Then, for each of those constructs, we describe its semantics as well as the modification that need to be done
+Then, for each of those constructs, we give a description of its semantics (the actual rules may be found
+in table \ref{semantics}) and explain the modification that need to be done
 to the monotone framework, particularly the functions defining the flow control
 ($init$,$final$ and $flow$) as well as the $gen_{SLV}$ and $kill_{SLV}$ functions
 which define our analysis. We also give some example
