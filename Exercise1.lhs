@@ -8,8 +8,6 @@
  
 \usepackage{prooftree}
  
-%include polycode.fmt
-%format True = "something"
  
 \usepackage{amsmath,amsthm,amssymb}
  
@@ -225,7 +223,7 @@ Therefore, we extend the $kill$ and $gen$ functions in the following manner:
 \begin{align*}
 kill_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell) & \eq \bigcup\{\{v_i\} | 1 \leq i\leq n\} \\
 \\
-gen_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) & \eq \bigcup\{FV(a_i) | v_i \in l \wedge \forall j : j<i\,.\, v_j \neq v_i\}
+gen_{SLV}([v_1,\ldots,v_n := a_1,\ldots,a_n]^\ell,l) & \eq \bigcup\{FV(a_i) | v_i \in l \wedge \neg \exists j : j>i \,.\, v_j = v_i\}
 \end{align*}
  
 To demonstrate the use of this construct, let us consider a slightly different version of

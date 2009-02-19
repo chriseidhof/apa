@@ -1,7 +1,7 @@
-%.tex: %.lhs result1y.tex result1r.tex program1.tex
-	lhs2Tex -o $@ $<
+## %.tex: %.lhs result1y.tex result1r.tex program1.tex
+## 	lhs2Tex -o $@ $<
 
-%.pdf: %.tex
+%.pdf: %.lhs result1y.tex result1r.tex program1.tex
 	latexmk -pdf $<
 
 result1y.tex: Chaotic.hs
