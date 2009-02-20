@@ -43,8 +43,17 @@
 \def\haskell{\textsc{Haskell}}
  
 \def\program#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
+
+\def\restabR#1#2{\begin{table}\begin{center}\caption{#1}\begin{sideways}\input{#2}\end{sideways}\end{center}\end{table}}
+
+\def\restab#1#2{\begin{table}\begin{center}\caption{#1}\input{#2}\end{center}\end{table}}
+
+
+
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
+
+
  
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
@@ -142,17 +151,27 @@ to perform chaotic iteration on the following simple example program
  
 Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
  
+\restabR{Strongly Live Variable Analysis with $\iota = \{r\}$}{resultr.tex}
+
 \begin{table}
-\caption{Strongly Live Variable Analysis with $\iota = r$}
-\begin{sideways}
-\tiny
-\input{resultr.tex}
-\end{sideways}
-\end{table}
-\begin{table}
-\caption{Strongly Live Variable Analysis with $\iota = y$}
+\caption{Strongly Live Variable Analysis with $\iota = \{y\}$}
 \begin{sideways}
 \input{resulty.tex}
+\end{sideways}
+\end{table}
+
+
+\begin{table}
+\caption{Strongly Live Variable Analysis with $\iota = \{a\}$}
+\begin{sideways}
+\input{resulta.tex}
+\end{sideways}
+\end{table}
+
+\begin{table}
+\caption{Strongly Live Variable Analysis with $\iota = \emptyset$}
+\begin{sideways}
+\input{resultempty.tex}
 \end{sideways}
 \end{table}
  
