@@ -245,7 +245,7 @@ We will consider that to be a error terminating program. Our framework will not 
 the top-level $\break$ and $\cont$ statements to be part of the final statements of
 a program. That means that we do not care about the values of the variables of interest
 if the program terminates in that way. This will do no harm because these errors could be easily
-avoided and a program with those top level construct could be discarded as invalid.
+avoided and a program with those top level construct could be statically outruled (it is just simple syntactic check).
 On the other hand, this assumption will facilitate the definition of
 the flow related functions: for example, when considering that a $\cont$ statement is not
 a final statement of $S_1$, then the definition of $flow(S_1;S_2)$ will not consider the flow

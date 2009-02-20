@@ -9,6 +9,7 @@ import DataFlowAnalyser
 import Analysis
 import TableOutput
 
+import WhileFlow
 import MonotoneFramework
 
 prog :: StmtM
@@ -88,7 +89,9 @@ progbc2 = begin
 showSLV iota = resultToTable ("SLV",True,"exit","entry") .
                scan_analyze (stronglivevariables iota) . labelProgram
 
-showLV       = resultToTable ("SLV",True,"exit","entry") .
+showLV       = resultToTable ("LV",True,"exit","entry") .
                scan_analyze livevariables . labelProgram
 
 
+showAE = resultToTable ("AE",False,"entry","exit") .
+         scan_analyze availableexpressions . labelProgram

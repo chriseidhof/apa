@@ -46,8 +46,11 @@ may (ioter,tf_sets)  = usplit (fromSet.ioter , \p stmt -> fromSet.(tf_sets p stm
 
 --intersection
 must :: (Ord a) => (Program -> S.Set a,Program -> (Stmt -> S.Set a -> S.Set a)) -> MeasureGen (SetIL a)
-must (ioter,tf_sets)  = usplit (fromSet.ioter , \p stmt -> fromSet.(tf_sets p stmt).toSet)
+must (ioter,tf_sets)  = usplit (fromSet.ioter , \p stmt -> topProtect (fromSet.(tf_sets p stmt).toSet) )
    --UNSAFE toSet application
+
+topProtect f Top = Top
+topProtect f x   = f x
 
 -- when our lattice is made of sets, gen and kill functions are a common pattern
 
@@ -65,7 +68,7 @@ depgenkill (gen,kill) = \bl x -> (x \\ kill bl x) `S.union` gen bl x
 availableexpressions = createDataFlowAnalyser forward  (must (iotaAE,\p->genkill (genAE,killAE p)) ) 
 iotaAE   = const S.empty
 killAE = killVB
-gen (Ass x a _) = S.filter (not.(x`S.member`).freeVariables) (freeArithmeticalExpressions a)
+genAE (Ass x a _) = S.filter (not.(x`S.member`).freeVariables) (freeArithmeticalExpressions a)
 genAE blk = freeArithmeticalExpressions blk
 
 reachingdefinitions    = createDataFlowAnalyser forward  (may  (iotaRD,\p->genkill(genRD,killRD p) ))
@@ -84,8 +87,10 @@ killRD p _                = S.empty
 verybusyexpressions    = createDataFlowAnalyser backward (must (iotaVB,\p->genkill(genVB,killVB p) ))
 iotaVB   = const S.empty 
 genVB blk = freeArithmeticalExpressions blk
+
 killVB p (Ass x a l) = S.filter (\a'->x `S.member` freeVariables a') (allArithmeticalExpressions p)
 killVB p (MultAss asgs l) = S.unions [killVB p (Ass x a l) | (x,a)<-asgs]
+killVB _ _                = S.empty
 
 livevariables          = createDataFlowAnalyser backward  (may  (iotaLV,\p-> genkill(genLV,killLV)) )
 iotaLV p =  S.empty
