@@ -15,7 +15,7 @@ progmassr.tex: *.hs
 	$(chaotic) "labelProgram (progmass \"r\")" > $@
 
 progbc.tex: *.hs
-	$(chaotic) "labelProgram progbc" > $@
+	$(chaotic) "labelProgram (progbc \"r\")" > $@
 
 progbc2.tex: *.hs
 	$(chaotic) "labelProgram progbc2" > $@

@@ -214,11 +214,11 @@ Note that the $\print$ construct provides the program with a new capability of c
 results to the outside. Thus, we are not required to consider $\iota \neq \emptyset$ from now on.
 We simply need to print the so called variables of interest at the end of our program.
 For example, replacing the $\skip$ by  $[\print r]$ at the end of program \ref{exprog1},
-we get the results in Table \ref{resultr_prt}. They are the same as Table 
+we get the results in Table \ref{resultr_prt}. They are the same as Table \ref{resultr}
  
 \program{\input{progprtr.tex}}
 
-\restabR{Strongly Live Variable Analysis with $\iota = \{\}$ and $\print$}{resultr_prt.tex}
+\restabR{Strongly Live Variable Analysis with $\iota = \{\}$ and $\print$}{resultr_prt.tex}[resultr_prt]
  
 \subsection{Simultaneous Assignements}
  
@@ -261,15 +261,7 @@ variable occur.
 
 If we now do Strongly Live Variable Analysis on this program, we get the results in Table \ref{resultr_mass}.
 
-\begin{table}
-\label{resultr_mass}
-\caption{Strongly Live Variable Analysis with $\iota = r$ and multiple assignments}
-\begin{sideways}
-\input{resultr_mass.tex}
-\end{sideways}
-\end{table}
-
-
+\restabR{Strongly Live Variable Analysis with $\iota = r$ and multiple assignments}{resultr_mass.tex}[resultr_mass]
  
 \subsection{Break and Continue}
 The meaning of these constructs inside while loops is just what we are used to:

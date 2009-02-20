@@ -59,9 +59,9 @@ instance Show Stmt where
   show (Continue l)     = texBlock (textt "continue") l
   show (Break l)        = texBlock (textt "break") l 
   show (Seq a b)        = show a ++ newline ++ show b
-  show (If c l t e)     = textt "if"   ++ texBlock (show c) l ++ newline ++ 
-                          textt "then" ++ newline ++ indent (show t) ++
-                          textt "else" ++ newline ++ indent (show e) 
+  show (If c l t e)     = textt "if"   ++ texBlock (show c) l ++ newline' ++ 
+                          textt "then" ++ newline' ++ indent (show t) ++ newline' ++
+                          textt "else" ++ newline' ++ indent (show e) 
   show (While c l b)    = textt "while " ++ texBlock (show c) l ++ newline ++ indent (show b)
 
 instance Show BExp where
@@ -84,6 +84,7 @@ indent :: String -> String
 indent = unlines . map ("\\;\\;" ++) . lines
 
 newline = ";\\\\\n" 
+newline' = "\\\\\n"
 
 showlist :: (Show a) => [a] -> String
 showlist = (foldr1 (\x s -> x++","++s)).(map show) 
