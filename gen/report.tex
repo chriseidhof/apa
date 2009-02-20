@@ -87,7 +87,7 @@ variables of interest.
 By now, there are no means for a program
 to communicate its results besides the inspection of some variables when execution halts: those variables
 are what we call the variables of interest at the end of the program. Clearly,
-those varialbes need to be considered live at the exit of all final blocks, so that we can always inspect their values.
+those variables need to be considered live at the exit of all final blocks, so that we can always inspect their values.
 When $\iota$ is empty, the only way to have intermediate
 non-empty sets of strongly live variables will be by using them in conditional expressions (which control the
 flow of the program). In that case, we are not interested in any output from the program.
@@ -112,7 +112,7 @@ As an example, the definition of SLV will read as:
 
 {\small
 \begin{verbatim}
-stronglivevariables i  = createDataFlowAnalyser backward  (may (const i,\p->depgenkill(genSLV,const.killSLV)))
+stronglivevariables i  = createDataFlowAnalyser backward (may (const i,const $ depgenkill (genSLV , const . killSLV)))
 \end{verbatim}
 }
 
