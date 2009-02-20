@@ -101,7 +101,7 @@ to perform chaotic iteration on the following simple example program
 (is it possible to evaluate an haskell expr that gives tex
 and use that tex or do we need to use the format directive?
 i will look on the documentation and ask andres)
-\program{\input{program1.tex}}
+\program{\input{prog.tex}}
  
 Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
  

@@ -137,6 +137,7 @@ the intermediate results in a $TeX$ table.
 To demonstrate the Strong Live Variable Analysis, we will use this \haskell program
 to perform chaotic iteration on the following simple example program
 
+\label{exprog1}
 \program{\input{prog.tex}}
  
 Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
@@ -186,8 +187,8 @@ programs in order to demonstrate the resulting analysis.
 \subsection{Print}
  
 Informally, the semantics of this construct will be to write the value of arithmetic expression $a$ to an output
-stream $Z^\star$. When defining the formal semantics, we could an extra component to the state corresponding to the
-list of values \emph{so far} printed.
+stream $Z^\star$. When defining the formal semantics, we will add an extra component to the state corresponding to the
+list of values printed so far.
  
 This new construct has no effect on the flow control of the program. Hence, the related functions are
 defined just as for the other simple statements (assignments and $\skip$).
@@ -228,8 +229,7 @@ flow ([v_1,\ldots,v_n = a_1,\ldots,a_n]^\ell) & \eq \emptyset
 \end{align*}
  
 Clearly, as with simple assignements, the $kill$
-function gives the variables which are assigned to in $\ell$,
-meaning that those variables are not live before the block.
+function just enumerates the variables which are assigned to in $\ell$.
  
 On the other hand, the
 $gen$ function needs to give all the variables required to be strongly live before the block.
@@ -251,8 +251,20 @@ To demonstrate the use of this construct, let us consider a slightly different v
 \ref{exprog1}, where some assignments have been grouped togheter. Also, some new (dummy)
 assignments were added to illustrate the situation when multiple assignments to the same
 variable occur.
- 
-EXAMPLE PROGRAM
+
+\program{\input{progmassr.tex}}
+
+If we now do Strongly Live Variable Analysis on this program, we get the results in Table \ref{resultr_mass}.
+
+\begin{table}
+\label{resultr_mass}
+\caption{Strongly Live Variable Analysis with $\iota = r$ and multiple assignments}
+\begin{sideways}
+\input{resultr_mass.tex}
+\end{sideways}
+\end{table}
+
+
  
 \subsection{Break and Continue}
 The meaning of this constructs inside while loops is just what we are used to:
