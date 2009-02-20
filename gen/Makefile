@@ -1,8 +1,8 @@
 chaotic = ghc Test.hs -e
 programs = prog progprt progmass progbc progbc2
-results = resulty.tex resultr.tex resulta.tex resultempty.tex result_lv.tex resultr_prt.tex resultr_mass.tex result_bc.tex result_bc_ae.tex 
+results = resulty.tex resultr.tex resulta.tex resultempty.tex result1_lv.tex resultr_prt.tex resultr_mass.tex result_bc.tex result_bc_ae.tex 
 
-%.pdf: %.tex $(programs) $(examples)
+%.pdf: %.tex $(examples)
 	pdflatex $<
 
 prog.tex: *.hs
@@ -48,4 +48,3 @@ result_bc.tex: *.hs
 
 result_bc_ae.tex: *.hs
 	$(chaotic) "showAE progbc2" > $@
-
