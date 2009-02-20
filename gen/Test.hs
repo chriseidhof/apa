@@ -89,6 +89,7 @@ progbc2 = begin
 showSLV iota = resultToTable ("SLV",True,"exit","entry") .
                scan_analyze (stronglivevariables iota) . labelProgram
 
+
 showLV       = resultToTable ("LV",True,"exit","entry") .
                scan_analyze livevariables . labelProgram
 
