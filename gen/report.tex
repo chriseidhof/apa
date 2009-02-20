@@ -213,10 +213,12 @@ gen_{SLV}([\print a]^\ell,l) & \eq FV(a)
 Note that the $\print$ construct provides the program with a new capability of conveying
 results to the outside. Thus, we are not required to consider $\iota \neq \emptyset$ from now on.
 We simply need to print the so called variables of interest at the end of our program.
-For example, adding $[\print r]$ or $[\print y]$ at the end of program \ref{exprog1},
-we get the exact same results we got before.
+For example, replacing the $\skip$ by  $[\print r]$ at the end of program \ref{exprog1},
+we get the results in Table \ref{resultr_prt}. They are the same as Table 
  
 \program{\input{progprtr.tex}}
+
+\restabR{Strongly Live Variable Analysis with $\iota = \{\}$ and $\print$}{resultr_prt.tex}
  
 \subsection{Simultaneous Assignements}
  
