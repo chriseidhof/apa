@@ -1,5 +1,5 @@
 chaotic = ghc Test.hs -e
-examples = result1y.tex result1r.tex result1r_prt.tex result1r_mass.tex result1empty.tex program1.tex 
+examples = result1y.tex result1r.tex result1r_prt.tex result1r_mass.tex result1empty.tex program1.tex result_bc.tex
 
 %.pdf: %.tex $(examples)
 	pdflatex -pdf $<
@@ -17,7 +17,8 @@ result1r_mass.tex: *.hs
 	$(chaotic) "showSLV S.empty (progmass \"r\")" > $@
 
 
-
+result_bc.tex: *.hs
+	$(chaotic) "showSLV S.empty (progbc \"r\")" > $@
 
 
 result1empty.tex: *.hs

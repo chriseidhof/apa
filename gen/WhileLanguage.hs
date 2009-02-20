@@ -59,7 +59,7 @@ instance Show Stmt where
   show (Seq a b)        = show a ++ newline ++ show b
   show (If c l t e)     = textt "if"   ++ texBlock (show c) l ++ newline ++ 
                           textt "then" ++ newline ++ indent (show t) ++
-                          textt "else" ++ newline ++ indent (show t) 
+                          textt "else" ++ newline ++ indent (show e) 
   show (While c l b)    = textt "while " ++ texBlock (show c) l ++ newline ++ indent (show b)
 
 instance Show BExp where
