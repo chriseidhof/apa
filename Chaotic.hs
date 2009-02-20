@@ -10,7 +10,18 @@ import Program
 import Types
 import MonotoneFramework
  
-prog2 :: StmtM
+prog1, prog2 :: StmtM
+prog1 = begin
+        ["r" =: AVal 1,
+         "a" =: Var "r" *! Var "r",
+         while (Var "y" >! AVal 1) [
+                "r" =: Var "r" *! Var "x",
+                "t" =: Var "y",
+                "y" =: Var "t" -! AVal 1
+                ],
+         skip
+        ]
+
 prog2 = begin
         ["r" =: AVal 1,
          "a" =: Var "r" *! Var "r",
@@ -23,16 +34,6 @@ prog2 = begin
         ]
  
        
-prog1 = begin
-        ["r" =: AVal 1,
-         "a" =: Var "r" *! Var "r",
-         while (Var "y" >! AVal 1) [
-                "r" =: Var "r" *! Var "x",
-                "t" =: Var "y",
-                "y" =: Var "t" -! AVal 1
-                ],
-         skip
-        ]
  
  
 f :: Equations -> IterationResult -> IterationResult
@@ -115,9 +116,9 @@ takeWhileChanging (x:y:ys) | otherwise = x:(takeWhileChanging (y:ys))
 allEqual [] = True
 allEqual (x:xs) = all (== x) xs
  
-section2 iota = do putStrLn "$\\begin{array}{llccccccccccccccccccccc}"
-                   putStrLn $ formatTable . table p $ S.empty -- S.singleton iota
-                   putStrLn "\\end{array}$"
+section2 pr iota = do putStrLn "$\\begin{array}{llccccccccccccccccccccc}"
+                      putStrLn $ formatTable . table (labelProgram pr) $ S.singleton iota
+                      putStrLn "\\end{array}$"
  
 main = section2
  

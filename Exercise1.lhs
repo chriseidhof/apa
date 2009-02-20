@@ -154,7 +154,7 @@ programs in order to demonstrate the resulting analysis.
 \subsection{Print}
  
 Informally, the semantics of this construct will be to write the value of arithmetic expression $a$ to an output
-stream. If defining the formal semantics, we could add an extra parameter to the state corresponding to the
+stream $Z^\star$. When defining the formal semantics, we could an extra component to the state corresponding to the
 list of values \emph{so far} printed.
  
 This new construct has no effect on the flow control of the program. Hence, the related functions are
@@ -165,7 +165,7 @@ final([\print a]^\ell) & = \{\ell\} \\
 flow([\print a]^\ell) & = \emptyset
 \end{align*}
  
-From the Strongly Live Variable's Analysis point of view, the most import thing is
+From the Strongly Live Variables Analysis point of view, the most import thing is
 the added constraint that all the variables used in expression $a$ need to be
 considered (strongly) live when entering the $[\print a]^\ell$ block. Hence, the $gen$ and $kill$ are extended in this way:
 \begin{align*}
@@ -180,7 +180,7 @@ We simply need to print the so called variables of interest at the end of our pr
 For example, adding $[\print r]$ or $[\print y]$ at the end of program \ref{exprog1},
 we get the exact same results we got before.
  
-EXAMPLE PROgrAM and results WIth PRINT
+\program{\input{program2.tex}}
  
 \subsection{Simultaneous Assignements}
  
