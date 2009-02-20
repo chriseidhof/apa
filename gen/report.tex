@@ -146,13 +146,13 @@ Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
 \caption{Strongly Live Variable Analysis with $\iota = r$}
 \begin{sideways}
 \tiny
-\input{result1r.tex}
+\input{resultr.tex}
 \end{sideways}
 \end{table}
 \begin{table}
 \caption{Strongly Live Variable Analysis with $\iota = y$}
 \begin{sideways}
-\input{result1y.tex}
+\input{resulty.tex}
 \end{sideways}
 \end{table}
  
@@ -213,7 +213,7 @@ We simply need to print the so called variables of interest at the end of our pr
 For example, adding $[\print r]$ or $[\print y]$ at the end of program \ref{exprog1},
 we get the exact same results we got before.
  
-\program{\input{progprt.tex}}
+\program{\input{progprtr.tex}}
  
 \subsection{Simultaneous Assignements}
  
@@ -352,23 +352,11 @@ gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
 \end{align*}
  
  
-%THERE IS ALSO A PROBLEM HERE
-%(until END these lines are not final)
-%
-%because when we had a program with
-%$[\cont]^{\ell1};[x:=2]^{\ell2}$
-%(where this were in a while loop) we also considered the flow edge $(\ell1,\ell2)$ which should not
-%really be there. To avoid passing an extra parameter (a context) to the flow function the solution
-%could probably be one of the the following:
-%
-%1.
-%we define the flow of a while loop, we catch continues and breaks removing and adding the appropriate edges.
-%\[flow(\texttt{while}[b]^\ell \texttt{do} S) = flow(S) \cup \{(l,init(S))\} \cup \{(l',l) | l' \in final(S) \cup continues(S)\}) \setminus \{(s,l')| ((s \in continues(S)\cup breaks(S)) and l' \in Blocks(S)\}\]
-%
-%2. we consider $final([continue]^\ell) = \emptyset$ instead of $l$. In this case, however, the semantics outside a loop would be different: a program would halt immediately.
-%\[flow(\texttt{while}[b]^\ell \texttt{do} S) = flow(S) \cup \{(l,init(S))\} \cup \{(l',l) | l' \in final(S) \cup continues(S)\}\]
-%
- 
+\program{\input{progbc}}
+
+
+\program{\input{progbc2}}
+
 
 
 TODO: explain eta
