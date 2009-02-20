@@ -1,11 +1,8 @@
 chaotic = ghc Test.hs -e
-examples = result1y.tex result1r.tex result1a.tex result1empty.tex program1.tex program2.tex 
+examples = result1y.tex result1r.tex result1r_prt.tex result1r_mass.tex result1empty.tex program1.tex 
 
-Exercise1-test.pdf: %.lhs $(examples)
-	latexmk -pdf Exercise1.lhs
-
-%.pdf: %.lhs $(examples)
-	latexmk -pdf $<
+%.pdf: %.tex $(examples)
+	pdflatex -pdf $<
 
 result1y.tex: *.hs
 	$(chaotic) "showSLV (S.singleton (V \"y\")) prog" > $@
@@ -13,11 +10,19 @@ result1y.tex: *.hs
 result1r.tex: *.hs
 	$(chaotic) "showSLV (S.singleton (V \"r\")) prog" > $@
 
-result1a.tex: *.hs
-	$(chaotic) "showSLV (S.singleton (V \"a\")) prog" > $@
+result1r_prt.tex: *.hs
+	$(chaotic) "showSLV S.empty (progprt \"r\")" > $@
+
+result1r_mass.tex: *.hs
+	$(chaotic) "showSLV S.empty (progmass \"r\")" > $@
+
+
+
+
 
 result1empty.tex: *.hs
 	$(chaotic) "showSLV S.empty prog" > $@
+
 
 result2r.tex: *.hs
 	$(chaotic) "section2 prog2 \"r\"" > $@

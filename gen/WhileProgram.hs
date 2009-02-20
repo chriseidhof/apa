@@ -58,6 +58,10 @@ a *! b = AOp a (A ("*", (*) )) b
 (-!) :: AExp -> AExp -> AExp
 a -! b = AOp a (A ("-", (-) )) b
 
+(+!) :: AExp -> AExp -> AExp
+a +! b = AOp a (A ("+", (+) )) b
+
+
 infixl 7 *!
 infixl 6 -!
 infixl 4 >!
