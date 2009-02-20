@@ -38,17 +38,24 @@
 \def\elsel {\texttt{else}\ }
 \def\print{\texttt{print}\ }
 \def\cont {\texttt{continue}\ }
-\def\break{\texttt{break}\ }
+\def\breakc{\texttt{break}\ }
  
 \def\haskell{\textsc{Haskell}}
  
+\newcounter{Progenvcount}
+\setcounter{Progenvcount}{0}
+\newenvironment{progenv}
+                {\stepcounter{Progenvcount} \noindent {\bf Program \arabic{Progenvcount}.}\\
+                 $\begin{array}{ll}}
+                {\end{array}$ \\~\\ }
+
 \def\program#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
 
 \def\restabR#1#2[#3]{\begin{table}\label{#3}\begin{center}\caption{#1}\begin{sideways}\input{#2}\end{sideways}\end{center}\end{table}}
 
 \def\restab#1#2[#3]{\begin{table}\label{#3}\begin{center}\caption{#1}\input{#2}\end{center}\end{table}}
 
-
+\def\programnew#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
@@ -146,9 +153,12 @@ the intermediate results in a $TeX$ table.
 To demonstrate the Strong Live Variable Analysis, we will use this \haskell program
 to perform chaotic iteration on the following simple example program
 
-\label{exprog1}
 \program{\input{prog.tex}}
+
+\programnew{prog.tex}[prog]
  
+trying ro ref program number \ref{prog}.
+
 Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
  
 \restabR{Strongly Live Variable Analysis with $\iota = \{r\}$}{resultr.tex}[resultr]
@@ -167,7 +177,7 @@ We start by adding the new labelled constructs to the abstract syntax of the lan
  ~ |\;\; & [\print a]^\ell \\
  ~ |\;\; & [x_1,\ldots,x_n := a_1,\ldots,a_n]^\ell , n \in \N \\
  ~ |\;\; & [\cont]^\ell \\
- ~ |\;\; & [\break]^\ell
+ ~ |\;\; & [\breakc]^\ell
 \end{align*}
  
 We also extend the $blocks$ function accordingly in a pretty straightforward manner. The definition
@@ -176,7 +186,7 @@ of the $labels$ function given in the book stays valid.
  blocks([\print a]^\ell) & \eq \{[\print a]^\ell\} \\
  blocks([x_1,\ldots,x_n := a_1,\ldots,a_n]^\ell) & \eq \{[x_1,\ldots,x_n := a_1,\ldots,a_n]^\ell\} \\
  blocks([\cont]^\ell) & \eq \{[\cont]^\ell\} \\
- blocks([\break]^\ell) & \eq \{[\break]^\ell\}
+ blocks([\breakc]^\ell) & \eq \{[\breakc]^\ell\}
 \end{align*}
  
  
@@ -271,7 +281,7 @@ If we now do Strongly Live Variable Analysis on this program, we get the results
  
 \subsection{Break and Continue}
 The meaning of these constructs inside while loops is just what we are used to:
-a $\break$ statement cause the program to jump immediately off the loop whilst
+a $\breakc$ statement cause the program to jump immediately off the loop whilst
 a $\cont$ statement \emph{restarts} the while loop execution (including testing the condition).
 If the constructs are found outside of a while loop, the compiler/interpreter should give an error before doing the analysis (it is a simple syntactic check).
  
@@ -279,7 +289,7 @@ The formal semantics could be given in a way resembling exception handling in Ja
 the r\^{o}le of catch), as we briefly explain. These constructs
 would cause execution to halt in a new kind of state
 enclosing the information of the \emph{then current} state along with an annotation of the reason
-for halting ($\break$ or $\cont$).
+for halting ($\breakc$ or $\cont$).
 We would then need several rules to deal with those halting states.
 Firstly, we would need to propagate the halting states unchanged through consecutive statements:
 sequencing ($;$) with another statement would ignore that second statement and enclosing
@@ -287,13 +297,13 @@ if-then-else constructs would also propagate the halting state (for this second 
 rule suffices). Finally, the way to deal with $\while$ should also change. A possibility
 would be to change the $[wh_1]$ rule so that it takes a look similar to that of $[seq_1]$.
 Then, if the body statement results in a $\cont$-annotated state, the annotation would be dropped
-and the while loop restarted. If the state was $\break$-annotated, the annotation would also be
+and the while loop restarted. If the state was $\breakc$-annotated, the annotation would also be
 dropped but the while loop would be considered finished.
  
 It is worth noticing that if a computation ends in an annotated state and there is
 no enclosing while loop, the program itself as a whole would end in that kind of state.
 We will consider that to be a error terminating program. Our framework will not consider
-the top-level $\break$ and $\cont$ statements to be part of the final statements of
+the top-level $\breakc$ and $\cont$ statements to be part of the final statements of
 a program. That means that we do not care about the values of the variables of interest
 if the program terminates in that way. 
 On the other hand, this assumption will facilitate the definition of
@@ -301,12 +311,12 @@ the flow related functions: for example, when considering that a $\cont$ stateme
 a final statement of $S_1$, then the definition of $flow(S_1;S_2)$ will not consider the flow
 from the $\cont$ statement to $init(S_2)$, just like one would expect. We then need to account
 for the existence of these constructs in the definition of the flow information functions
-for $\while$ statements (as well as the $\break$ and $\cont$, of course).
+for $\while$ statements (as well as the $\breakc$ and $\cont$, of course).
 Those definitions now read:
 \begin{align*}
-init ([\cont]^\ell) &\eq \ell & init ([\break]^\ell) &\eq \ell \\
-final([\cont]^\ell) &\eq \emptyset & final([\break]^\ell) &\eq \emptyset \\
-flow ([\cont]^\ell) &\eq \emptyset & flow ([\break]^\ell) &\eq \emptyset
+init ([\cont]^\ell) &\eq \ell & init ([\breakc]^\ell) &\eq \ell \\
+final([\cont]^\ell) &\eq \emptyset & final([\breakc]^\ell) &\eq \emptyset \\
+flow ([\cont]^\ell) &\eq \emptyset & flow ([\breakc]^\ell) &\eq \emptyset
 \end{align*}
 \begin{eqnarray*}
 init (\while [b]^\ell \do S) &\eq& \ell \\
@@ -316,7 +326,7 @@ flow (\while [b]^\ell \do S) &\eq& \{(l,init(S))\} \cup flow(S) \\
                             & & \cup\; \{(l',l) | l' \in continuesOf(S)\}
 \end{eqnarray*}
 where $continuesOf$ and $breaksOf$ functions are auxiliary functions which map a given program statement
-to the labels of its top level (not nested in a $\while$) $\cont$ and $\break$ statements, respectively:
+to the labels of its top level (not nested in a $\while$) $\cont$ and $\breakc$ statements, respectively:
  
 \begin{align*}
 continuesOf & \; : \; \Stmt \to \pset{\Lab} \\
@@ -325,7 +335,7 @@ continuesOf([\skip]^\ell) & \eq \emptyset \\
 continuesOf([x_1,\ldots,x_:=a_1,\ldots,a_n]^\ell) & \eq \emptyset \\
 continuesOf([\print a]^\ell) & \eq \emptyset \\
 continuesOf([\cont]^\ell) & \eq \{\ell\} \\
-continuesOf([\break]^\ell) & \eq \emptyset \\
+continuesOf([\breakc]^\ell) & \eq \emptyset \\
 continuesOf(S_1;S_2) & \eq continuesOf(S_1) \cup continuesOf(S_2) \\
 continuesOf(\ifl [b]^\ell \thenl S_1 \elsel S_2) & \eq continuesOf(S_1) \cup continuesOf(S_2) \\
 continuesOf(\while [b]^\ell \do S) & \eq \emptyset \\
@@ -336,7 +346,7 @@ breaksOf([\skip]^\ell) & \eq \emptyset \\
 breaksOf([x_1,\ldots,x_:=a_1,\ldots,a_n]^\ell) & \eq \emptyset \\
 breaksOf([\print a]^\ell) & \eq \emptyset \\
 breaksOf([\cont]^\ell) & \eq \emptyset \\
-breaksOf([\break]^\ell) & \eq \{\ell\} \\
+breaksOf([\breakc]^\ell) & \eq \{\ell\} \\
 breaksOf(S_1;S_2) & \eq breaksOf(S_1) \cup breaksOf(S_2) \\
 breaksOf(\ifl [b]^\ell \thenl S_1 \elsel S_2) & \eq breaksOf(S_1) \cup breaksOf(S_2) \\
 breaksOf(\while [b]^\ell \do S) & \eq \emptyset
@@ -349,9 +359,9 @@ are just like $\skip$ as they do not change the state of the data whatsoever (in
 semantics informally presented above, the state was frozen with an annotation and then de-annotated
 when execution restarts at the right program point. Thus, we have:
 \begin{align*}
-kill_{SLV}([\cont]^\ell) \eq kill_{SLV}([\break]^\ell) & \eq \emptyset \\
+kill_{SLV}([\cont]^\ell) \eq kill_{SLV}([\breakc]^\ell) & \eq \emptyset \\
 \\
-gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
+gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\breakc]^\ell,l) & \eq \emptyset
 \end{align*}
  
 We can now analyze two example programs. First, we will do Strongly Live Variable Analysis on the following program:
@@ -362,7 +372,7 @@ The results are in Table \ref{result_bc}.
 
 \begin{table}
 \label{result_bc}
-\caption{Strongly Live Variable Analysis with $\break$ and $\cont$}
+\caption{Strongly Live Variable Analysis with $\breakc$ and $\cont$}
 \begin{sideways}
 \input{result_bc.tex}
 \end{sideways}
@@ -393,7 +403,7 @@ In our operation semantics, we now also have an out variable that captures what 
  \pair{\cont, \sigma} \longrightarrow [\sigma]^{continue} \; &\\
 & & \\
 \pair{break\_fire}\;\; &
- \pair{\break, \sigma} \longrightarrow [\sigma]^{break} \; &\\
+ \pair{\breakc, \sigma} \longrightarrow [\sigma]^{break} \; &\\
 & & \\
 \pair{cont\_prop}\;\; &
 \begin{prooftree}
