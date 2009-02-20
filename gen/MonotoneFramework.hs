@@ -9,6 +9,10 @@ import WhileTypes
 import SemiLattice
 
 data MonotoneFramework lat = MF FlowInfo (MeasureInfo lat)
+    deriving Show
+instance Show (a->b) where
+  show f = "function"
+
 type FlowInfo = ([Label],FlowGraph,[Label])
 type MeasureInfo lat = (lat,M.Map Label (lat->lat))
 

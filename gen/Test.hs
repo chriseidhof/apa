@@ -7,6 +7,9 @@ import WhileProgram
 import DataFlowAnalyser
 import Analysis
 
+
+import MonotoneFramework
+
 prog :: StmtM
 prog = begin
        ["r" =: AVal 1,
@@ -19,4 +22,7 @@ prog = begin
         skip
        ]
 
+mf = ( (stronglivevariables S.empty) (labelProgram prog))
+sv = seedEqs mf
+eqs = equations mf
 
