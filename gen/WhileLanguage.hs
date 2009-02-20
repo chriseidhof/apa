@@ -16,9 +16,17 @@ newtype BOp   = B (String, Bool -> Bool -> Bool)
 newtype ROp   = R (String, Int  -> Int  -> Bool)
 newtype AOp   = A (String, Int  -> Int  -> Int)
 
+instance Eq AOp where
+   A (x,_) == A (y,_) = x==y
+instance Ord AOp where
+   A (x,_) `compare` A (y,_) = x`compare`y
+
+
+
 data AExp = Var Variable
           | AVal Int
           | AOp AExp AOp AExp
+     deriving (Eq,Ord)
 data BExp = BVal Bool
           | Not  BExp
           | BOp  BExp BOp BExp
@@ -144,4 +152,31 @@ instance FreeVariables BExp where
   freeVariables (Not b)     = freeVariables b
   freeVariables (BOp l _ r) = S.union (freeVariables l) (freeVariables r)
   freeVariables (ROp l _ r) = S.union (freeVariables l) (freeVariables r)
+
+----arithmetic expressions
+class FreeAExp a where
+  freeArithmeticalExpressions :: a -> S.Set AExp
+
+instance FreeAExp Stmt where
+  freeArithmeticalExpressions (Ass _ a _)     = freeArithmeticalExpressions a
+  freeArithmeticalExpressions (MultAss asgs _)= S.unions $ map (freeArithmeticalExpressions . snd) asgs
+  freeArithmeticalExpressions (Print a _)     = freeArithmeticalExpressions a
+  freeArithmeticalExpressions _               = S.empty
+
+allArithmeticalExpressions (Seq s1 s2)       = allArithmeticalExpressions s1 `S.union` allArithmeticalExpressions s2 
+allArithmeticalExpressions (If b _ s1 s2)   = freeArithmeticalExpressions b `S.union`
+                                              allArithmeticalExpressions s1 `S.union` allArithmeticalExpressions s2
+allArithmeticalExpressions (While b _ s)   = freeArithmeticalExpressions b `S.union`allArithmeticalExpressions s 
+allArithmeticalExpressions x = freeArithmeticalExpressions x
+
+instance FreeAExp AExp where
+  freeArithmeticalExpressions ae@(AOp l _ r) = S.singleton ae `S.union` (freeArithmeticalExpressions l) `S.union` (freeArithmeticalExpressions r)
+  freeArithmeticalExpressions _           = S.empty
+
+instance FreeAExp BExp where
+  freeArithmeticalExpressions (BVal b) = S.empty
+  freeArithmeticalExpressions (Not b)     = freeArithmeticalExpressions b
+  freeArithmeticalExpressions (BOp l _ r) = S.union (freeArithmeticalExpressions l) (freeArithmeticalExpressions r)
+  freeArithmeticalExpressions (ROp l _ r) = S.union (freeArithmeticalExpressions l) (freeArithmeticalExpressions r)
+
 

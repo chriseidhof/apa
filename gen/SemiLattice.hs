@@ -2,8 +2,6 @@ module SemiLattice where
 
 import qualified Data.Set as S
 
-
-
 class SemiLattice l where
   bottom :: l
   (\/)   :: l -> l -> l  
@@ -42,18 +40,33 @@ instance (Eq l, SemiLattice l) => PartialOrder l where
 
 ---- Set SemiLattices
 
-newtype SetUL a = SetUL (S.Set a)
+class SetLike s where
+   fromSet :: (Ord a) => S.Set a -> s a
+   toSet   :: (Ord a) => s a     -> S.Set a
+
+--there is something really unsatisfactory here
+--but I feel we would need dependent types...
+
+data SetUL a = SetUL{unSetUL:: S.Set a}        deriving (Eq,Show)
+data SetIL a = SetIL{unSetIL:: S.Set a} | Top  deriving (Eq,Show)
+
+instance SetLike SetUL where
+    fromSet   = SetUL 
+    toSet     = unSetUL
+instance SetLike SetIL where
+    fromSet   = SetIL
+    toSet Top = error "toSet applied to Top"
+    toSet x   = unSetIL x
+     ---this is a partial function
 
 instance (Ord a) => SemiLattice (SetUL a) where
-  bottom               = SetUL S.empty
-  SetUL s1 \/ SetUL s2 = SetUL (s1 `S.union` s2)
-
-
-data SetIL a = Top | SubSet (S.Set a)
+  bottom   = fromSet S.empty
+  s1 \/ s2 = fromSet (toSet s1 `S.union` toSet s2) 
 
 instance (Ord a) => SemiLattice (SetIL a) where
-   bottom      = Top 
-   Top \/ s    = s
-   s   \/ Top  = s
-   (SubSet s1) \/ (SubSet s2) = SubSet (s1 `S.intersection` s2)
+  bottom   = Top
+  Top\/ s  = s
+  s  \/Top = s
+  s1 \/ s2 = fromSet (toSet s1 `S.intersection` toSet s2) 
+
 

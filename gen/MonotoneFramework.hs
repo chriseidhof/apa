@@ -3,6 +3,7 @@ module MonotoneFramework where
 import Data.Maybe (fromJust)
 import qualified Data.Set as S
 import qualified Data.Map as M
+import Aux
 
 import WhileTypes
 import SemiLattice
@@ -43,10 +44,13 @@ closed_val :: Label -> IterationResult lat -> lat
 closed_val l  = fromJust . M.lookup l . snd
 
 opened_eq :: (SemiLattice lat) => MonotoneFramework lat -> Label -> Equation lat 
-opened_eq mf label r  = join [closed_val l' r | (l', l) <- edges mf] \/ st
+opened_eq mf label r  = join [closed_val l' r | (l', label) <- edges mf] \/ st
           where st | label `elem` extremes mf = iota mf
                    | otherwise                = bottom
 
 closed_eq :: MonotoneFramework lat -> Label -> Equation lat
 closed_eq mf label = transf mf label . opened_val label
 
+seedEqs :: (SemiLattice lat)=> MonotoneFramework lat -> IterationResult lat
+seedEqs mf = let bottomvector = M.fromAscList $ map (id`split`const bottom) (vertices mf)
+             in (bottomvector,bottomvector)

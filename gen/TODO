@@ -2,8 +2,8 @@ Analyser.hs
 Chaotic.hs
 MonotoneFramework.hs
 ProgramAnalysisSolver
-SemiLattice.hs        NOT SATISFACTORY
-WhileFlow.hs          DONE
-WhileLanguage.hs      DONE
-WhileProgram.hs       DONE
-WhileTypes.hs         DONE
+SemiLattice.hs         NOT SATISFACTORY
+WhileFlow.hs           DONE
+WhileLanguage.hs       DONE
+WhileProgram.hs        DONE
+WhileTypes.hs          DONE
