@@ -46,7 +46,7 @@ instance Show Stmt where
   show (Ass v e l) = texBlock (v ++ " := " ++ show e) l
   show (MultAss asgs l) =  let (v,a) = (unzip asgs)
                            in  texBlock (showlist v ++ " := " ++ showlist a) l
-  show (Print a l)    = texBlock (textt "print" ++ show a) l 
+  show (Print a l)    = texBlock (textt "print " ++ show a) l 
   show (Skip l)    = texBlock (textt "skip") l
   show (Continue l)    = texBlock (textt "continue") l
   show (Break l)    = texBlock (textt "break") l 

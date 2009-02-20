@@ -5,6 +5,7 @@
 \usepackage{url}
 \usepackage{enumerate}
 \usepackage{palatino}
+\usepackage{rotating}
  
 \usepackage{prooftree}
 
@@ -94,8 +95,6 @@ flow of the program). In that case, we are not interested in any output from the
  
 \section{Part 2}
  
-DESCRIBE THE HASKELL MODULE(S)
- 
 To demonstrate the Strong Live Variable Analysis, we will use our \haskell program
 to perform chaotic iteration on the following simple example program
  
@@ -104,34 +103,23 @@ and use that tex or do we need to use the format directive?
 i will look on the documentation and ask andres)
 \program{\input{program1.tex}}
  
-% \program{
-% [r := 1]^{1};
-% }% \\
-% [a := r * r]^{2};\\
-% \texttt{while }[y > 1]^{3};\\
-% \;\;[r := r * x]^{4};\\
-% \;\;[y := y - 1]^{5} ;\\
-% [\texttt{skip}]^{6}
-% }
+Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
  
-% \fbox{\begin{minipage}{0.8\textwidth}$\begin{array}{l}
-% hi
-% \end{array}$\end{minipage}}
- 
- 
-% $ [r := 1]^{1};$ \\
-% $ [a := r * r]^{2};$ \\
-% $ \texttt{while }[y > 1]^{3};$ \\
-% $ ~\;\;[r := r * x]^{4};$ \\
-% $ ~\;\;[y := y - 1]^{5}$
- 
-Our iteration stabilizes after 6 iterations:
- 
+% \begin{sideways}
+% \caption{Strongly Live Variable Analysis with $\iota = y$}
+\begin{table}
+\caption{Strongly Live Variable Analysis with $\iota = y$}
+\begin{sideways}
 \input{result1y.tex}
+\end{sideways}
+\end{table}
+% \end{sideways}
  
-\Tiny
-\input{result1r.tex}
-\normalsize
+% \begin{sideways}
+% \begin{table}
+% \input{result1r.tex}
+% \end{table}
+% \end{sideways}
  
 
 
@@ -265,7 +253,7 @@ avoided and a program with those top level construct could be discarded as inval
 On the other hand, this assumption will facilitate the definition of
 the flow related functions: for example, when considering that a $\cont$ statement is not
 a final statement of $S_1$, then the definition of $flow(S_1;S_2)$ will not consider the flow
-from the $\cont$ statement to $init(S_1)$, just like one would expect. We then need to account
+from the $\cont$ statement to $init(S_2)$, just like one would expect. We then need to account
 for the existence of these constructs in the definition of the flow information functions
 for $\while$ statements (as well as the $\break$ and $\cont$, of course).
 Those definitions now read:
@@ -338,11 +326,17 @@ gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
 %\[flow(\texttt{while}[b]^\ell \texttt{do} S) = flow(S) \cup \{(l,init(S))\} \cup \{(l',l) | l' \in final(S) \cup continues(S)\}\]
 %
  
+
+
+TODO: explain eta
  
 \begin{table}\label{semantics}
 \caption{Modifications to the Operational Semantics}
 {\small
 \begin{eqnarray*}
+\text{state} & \sigma = (\eta, out) \in (Var \to \Z) \times \Z^\star & \\
+& & \\
+& & \\
 \pair{print}\;\; &
  \pair{\print a, \sigma = (\eta,out)} \longrightarrow (\eta, snoc(out,\A{a}\eta))\; &\\
 & & \\
@@ -374,7 +368,7 @@ gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
 & & \\
 \pair{cont\_catch}\;\; &
 \begin{prooftree}
-\pair{S_1,\sigma} \longrightarrow [\sigma']^{continue}
+\pair{S,\sigma} \longrightarrow [\sigma']^{continue}
 \justifies
 \pair{\while [b]^\ell \do S,\sigma} \longrightarrow \pair{\while [b]^\ell \do S,\sigma'}
 \thickness=0.08em
@@ -382,7 +376,7 @@ gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
 & & \\
 \pair{break\_catch}\;\; &
 \begin{prooftree}
-\pair{S_1,\sigma} \longrightarrow [\sigma']^{break}
+\pair{S,\sigma} \longrightarrow [\sigma']^{break}
 \justifies
 \pair{\while [b]^\ell \do S,\sigma} \longrightarrow \sigma
 \thickness=0.08em

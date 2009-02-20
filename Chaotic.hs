@@ -1,4 +1,4 @@
-haotic where
+module Chaotic where
  
 import Prelude hiding (init)
 import Data.Set ((\\))
@@ -10,8 +10,8 @@ import Program
 import Types
 import MonotoneFramework
  
-prog1 :: StmtM
-prog1 = begin
+prog2 :: StmtM
+prog2 = begin
         ["r" =: AVal 1,
          "a" =: Var "r" *! Var "r",
          while (Var "y" >! AVal 1) [
@@ -23,7 +23,7 @@ prog1 = begin
         ]
  
        
-prog2 = begin
+prog1 = begin
         ["r" =: AVal 1,
          "a" =: Var "r" *! Var "r",
          while (Var "y" >! AVal 1) [
@@ -116,7 +116,7 @@ allEqual [] = True
 allEqual (x:xs) = all (== x) xs
  
 section2 iota = do putStrLn "$\\begin{array}{llccccccccccccccccccccc}"
-                   putStrLn $ formatTable . table p $ S.singleton iota
+                   putStrLn $ formatTable . table p $ S.empty -- S.singleton iota
                    putStrLn "\\end{array}$"
  
 main = section2
