@@ -1,0 +1,60 @@
+\documentclass[a4wide,12pt]{article}
+\usepackage{a4wide}
+\usepackage{times}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{palatino}
+ 
+
+%include lhs2tex.fmt 
+ 
+\usepackage{amsmath,amsthm,amssymb}
+ 
+\def\eq{\;\; = \;\;}
+\def\N{\mathbb{N}}
+\def\Z{\mathbb{Z}}
+ 
+\def\pset#1{\mathcal{P}(#1)}
+\def\A#1{\mathcal{A}[\hspace{-1pt}[#1]\hspace{-1pt}])}
+ 
+\def\const#1{\mathopen{\langle}#1\mathclose{\rangle}} % <a,b,...z>
+\def\pair#1{\const{#1}}
+ 
+\def\Stmt {\mathbf{Stmt}}
+\def\Lab {\mathbf{Lab}}
+\def\Blocks{\mathbf{Blocks}}
+\def\Var {\mathbf{Var}}
+ 
+ 
+\def\skip {\texttt{skip}\ }
+\def\while{\texttt{while}\ }
+\def\do {\texttt{do}\ }
+\def\ifl {\texttt{if}\ }
+\def\thenl {\texttt{then}\ }
+\def\elsel {\texttt{else}\ }
+\def\print{\texttt{print}\ }
+\def\cont {\texttt{continue}\ }
+\def\break{\texttt{break}\ }
+ 
+\def\haskell{\textsc{Haskell}}
+ 
+\def\program#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
+\def\Tiny{\fontsize{3pt}{3pt}\selectfont}
+ 
+\begin{document}
+\author{Chris Eidhof, Rui S. Barbosa}
+\title{Data Flow Assignment I \\ Automatic Program Analysis}
+ 
+\maketitle
+ 
+\section{Part 1}
+
+
+\input{result1a.tex}
+\input{result1r.tex}
+\input{result1y.tex}
+\input{result1empty.tex}
+
+\end{document}
+ 
