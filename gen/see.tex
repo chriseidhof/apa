@@ -5,6 +5,7 @@
 \usepackage{url}
 \usepackage{enumerate}
 \usepackage{palatino}
+\usepackage{rotating}
  
 
 %include lhs2tex.fmt 
@@ -35,7 +36,6 @@
 \def\elsel {\texttt{else}\ }
 \def\print{\texttt{print}\ }
 \def\cont {\texttt{continue}\ }
-\def\break{\texttt{break}\ }
  
 \def\haskell{\textsc{Haskell}}
  
@@ -50,11 +50,29 @@
  
 \section{Part 1}
 
-
-\input{result1a.tex}
+\begin{sideways}
 \input{result1r.tex}
+\end{sideways}
+
+\newpage
+
+\begin{sideways}
+\input{../result1r.tex}
+\end{sideways}
+
+\newpage
+
+\begin{sideways}
 \input{result1y.tex}
-\input{result1empty.tex}
+\end{sideways}
+
+\newpage
+
+\begin{sideways}
+\input{../result1y.tex}
+\end{sideways}
+
+\newpage
 
 \end{document}
  

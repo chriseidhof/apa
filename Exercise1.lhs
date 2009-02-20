@@ -105,24 +105,20 @@ i will look on the documentation and ask andres)
  
 Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
  
-% \begin{sideways}
-% \caption{Strongly Live Variable Analysis with $\iota = y$}
+\begin{table}
+\caption{Strongly Live Variable Analysis with $\iota = r$}
+\begin{sideways}
+\tiny
+\input{result1r.tex}
+\end{sideways}
+\end{table}
 \begin{table}
 \caption{Strongly Live Variable Analysis with $\iota = y$}
 \begin{sideways}
 \input{result1y.tex}
 \end{sideways}
 \end{table}
-% \end{sideways}
  
-% \begin{sideways}
-% \begin{table}
-% \input{result1r.tex}
-% \end{table}
-% \end{sideways}
- 
-
-
 \section{Part 3}
  
 We start by adding the new labelled constructs to the abstract syntax of the language:

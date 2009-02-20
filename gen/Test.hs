@@ -4,12 +4,10 @@ import qualified Data.Set as S
 
 import WhileLanguage
 import WhileProgram
+import WhileTypes
 import DataFlowAnalyser
 import Analysis
 import TableOutput
-
-import MonotoneFramework
-import Chaotic
 
 prog :: StmtM
 prog = begin
