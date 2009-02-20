@@ -267,12 +267,12 @@ If we now do Strongly Live Variable Analysis on this program, we get the results
 
  
 \subsection{Break and Continue}
-The meaning of this constructs inside while loops is just what we are used to:
-a $\break$ statement cause the program to jump immediatly off the loop whilst
+The meaning of these constructs inside while loops is just what we are used to:
+a $\break$ statement cause the program to jump immediately off the loop whilst
 a $\cont$ statement \emph{restarts} the while loop execution (including testing the condition).
-If found outside a while loop, these constructs cause the program to halt in a error state.
+If the constructs are found outside of a while loop, the compiler/interpreter should give an error before doing the analysis (it is a simple syntactic check).
  
-The formal semantics could be given in a way ressembling exception handling in Java (where while loops take
+The formal semantics could be given in a way resembling exception handling in Java (where while loops take
 the r\^{o}le of catch), as we briefly explain. These constructs
 would cause execution to halt in a new kind of state
 enclosing the information of the \emph{then current} state along with an annotation of the reason
@@ -284,7 +284,7 @@ if-then-else constructs would also propagate the halting state (for this second 
 rule suffices). Finally, the way to deal with $\while$ should also change. A possibility
 would be to change the $[wh_1]$ rule so that it takes a look similar to that of $[seq_1]$.
 Then, if the body statement results in a $\cont$-annotated state, the annotation would be dropped
-and the while loop reinitiated. If the state was $\break$-annotated, the annotation would also be
+and the while loop restarted. If the state was $\break$-annotated, the annotation would also be
 dropped but the while loop would be considered finished.
  
 It is worth noticing that if a computation ends in an annotated state and there is
@@ -292,8 +292,7 @@ no enclosing while loop, the program itself as a whole would end in that kind of
 We will consider that to be a error terminating program. Our framework will not consider
 the top-level $\break$ and $\cont$ statements to be part of the final statements of
 a program. That means that we do not care about the values of the variables of interest
-if the program terminates in that way. This will do no harm because these errors could be easily
-avoided and a program with those top level construct could be statically outruled (it is just simple syntactic check).
+if the program terminates in that way. 
 On the other hand, this assumption will facilitate the definition of
 the flow related functions: for example, when considering that a $\cont$ statement is not
 a final statement of $S_1$, then the definition of $flow(S_1;S_2)$ will not consider the flow
