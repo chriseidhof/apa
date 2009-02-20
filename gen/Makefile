@@ -1,41 +1,51 @@
 chaotic = ghc Test.hs -e
-examples = result1y.tex result1r.tex result1r_prt.tex result1r_mass.tex result1empty.tex program1.tex result_bc.tex result1ae.tex result1y_lv.tex
+programs = prog progprt progmass progbc progbc2
+results = resulty.tex resultr.tex resulta.tex resultempty.tex result_lv.tex resultr_prt.tex resultr_mass.tex result_bc.tex result_bc_ae.tex 
 
-%.pdf: %.tex $(examples)
-	pdflatex -pdf $<
+%.pdf: %.tex $(programs) $(examples)
+	pdflatex $<
 
-result1y.tex: *.hs
+prog.tex: *.hs
+	$(chaotic) "labelProgram prog" > $@
+
+progprt.tex: *.hs
+	$(chaotic) "labelProgram progprt" > $@
+
+progmass.tex: *.hs
+	$(chaotic) "labelProgram progmass" > $@
+
+progbc.tex: *.hs
+	$(chaotic) "labelProgram progbc" > $@
+
+progbc2.tex: *.hs
+	$(chaotic) "labelProgram progbc2" > $@
+
+
+resulty.tex: *.hs
 	$(chaotic) "showSLV (S.singleton (V \"y\")) prog" > $@
 
-result1r.tex: *.hs
+resultr.tex: *.hs
 	$(chaotic) "showSLV (S.singleton (V \"r\")) prog" > $@
 
-result1y_lv.tex: *.hs
+resulta.tex: *.hs
+	$(chaotic) "showSLV (S.singleton (V \"a\")) prog" > $@
+
+resultempty.tex: *.hs
+	$(chaotic) "showSLV S.empty prog" > $@
+
+result1_lv.tex: *.hs
 	$(chaotic) "showLV prog" > $@
 
-result1r_prt.tex: *.hs
+resultr_prt.tex: *.hs
 	$(chaotic) "showSLV S.empty (progprt \"r\")" > $@
 
-result1r_mass.tex: *.hs
+resultr_mass.tex: *.hs
 	$(chaotic) "showSLV S.empty (progmass \"r\")" > $@
 
 
 result_bc.tex: *.hs
 	$(chaotic) "showSLV S.empty (progbc \"r\")" > $@
 
-
-result1empty.tex: *.hs
-	$(chaotic) "showSLV S.empty prog" > $@
-
-result1ae.tex: *.hs
+result_bc_ae.tex: *.hs
 	$(chaotic) "showAE progbc2" > $@
 
-
-result2r.tex: *.hs
-	$(chaotic) "section2 prog2 \"r\"" > $@
-
-program1.tex: *.hs
-	$(chaotic) "labelProgram prog1" > $@
-
-program2.tex: *.hs
-	$(chaotic) "labelProgram prog2" > $@
