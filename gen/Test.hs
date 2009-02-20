@@ -59,7 +59,7 @@ progbc v = begin
                               "y" =: var "a" *! var "a"
                            ])
                         ],
-                 skip
+                 WhileProgram.print (var v)
                 ]
 
 progbc2 :: StmtM
