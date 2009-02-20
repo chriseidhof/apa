@@ -117,7 +117,7 @@ allEqual [] = True
 allEqual (x:xs) = all (== x) xs
  
 section2 pr iota = do putStrLn "$\\begin{array}{llccccccccccccccccccccc}"
-                      putStrLn $ formatTable . table (labelProgram pr) $ S.singleton iota
+                      putStrLn $ formatTable . table (labelProgram pr) $ maybe S.empty S.singleton iota
                       putStrLn "\\end{array}$"
  
 main = section2

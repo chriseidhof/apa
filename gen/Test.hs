@@ -9,6 +9,8 @@ import DataFlowAnalyser
 import Analysis
 import TableOutput
 
+import MonotoneFramework
+
 prog :: StmtM
 prog = begin
        ["r" =: AVal 1,

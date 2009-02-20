@@ -36,7 +36,7 @@ flow (Skip _)          = [ ]
 flow (Continue _)      = [ ]
 flow (Break _)         = [ ]
 flow (Seq s1 s2)       = concat [ flow s1, flow s2, [(l, init s2) | l <- final s1] ]
-flow (If c l s1 s2)    = concat [ flow s1, flow s2, [(l, init s2),(l,init s2)]     ]
+flow (If c l s1 s2)    = concat [ flow s1, flow s2, [(l, init s1),(l,init s2)]     ]
 flow (While cond l s)  = concat [ flow s, [(l, init s)], [(l', l) | l' <- final s], [(l',l) | l' <- continuesOf s] ]
 
 flowR :: Stmt -> FlowGraph
@@ -61,8 +61,8 @@ breaksOf (Print _ _)       = [ ]
 breaksOf (Skip _)          = [ ]
 breaksOf (Continue _)      = [ ]
 breaksOf (Break l)         = [l]
-breaksOf (Seq s1 s2)       = continuesOf s1 ++ continuesOf s2 
-breaksOf (If c _ s1 s2)    = continuesOf s1 ++ continuesOf s2
+breaksOf (Seq s1 s2)       = breaksOf s1 ++ breaksOf s2 
+breaksOf (If c _ s1 s2)    = breaksOf s1 ++ breaksOf s2
 breaksOf (While cond l s)  = [ ]
 
 
