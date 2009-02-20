@@ -149,7 +149,7 @@ to perform chaotic iteration on the following simple example program
 \label{exprog1}
 \program{\input{prog.tex}}
  
-Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
+Chaotic iteration of course stabilizes for all different values for $\iota$:
  
 \restabR{Strongly Live Variable Analysis with $\iota = \{r\}$}{resultr.tex}[resultr]
 
@@ -158,6 +158,11 @@ Our iteration stabilizes at the 9th iteration if we take $y$ as our $\iota$:
 \restab{Strongly Live Variable Analysis with $\iota = \{a\}$}{resulta.tex}[resulta]
 
 \restab{Strongly Live Variable Analysis with $\iota = \emptyset$}{resultempty.tex}[resultempty]
+
+We have also done Live Variable Analysis on the same program, yielding the results in Table \ref{result_lv}:
+
+\restab{Live Variable Analysis}{result1_lv.tex}[result_lv]
+
  
 \section{Part 3}
  
