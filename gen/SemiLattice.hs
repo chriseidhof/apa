@@ -1,6 +1,8 @@
+{-# LANGUAGE FlexibleInstances #-}
 module SemiLattice where
 
 import qualified Data.Set as S
+import Data.List
 
 class SemiLattice l where
   bottom :: l
@@ -9,32 +11,32 @@ class SemiLattice l where
 join :: (SemiLattice l) => [l] -> l
 join = foldr (\/) bottom 
 
-
+--don't delete...might be useful after all
 --there is already a class PartialOrd but its implementation is not
 --really satisfactory because it treats in a non needed special manner imcomparable elements
-class PartialOrder a where 
-  --minimal definition
-  lte:: a -> a -> Bool
-  --functions
-  cmp :: a -> a -> Maybe Ordering
-  gte :: a -> a -> Bool
-  eq  :: a -> a -> Bool
-  slt :: a -> a -> Bool
-  sgt :: a -> a -> Bool
-  cmp a b | a `lte` b && b `lte` a = Just EQ
-          | a `lte` b              = Just LT
-          | b `lte` a              = Just GT
-          | otherwise              = Nothing   
-  a `gte` b = b `lte` a
-  a `eq`  b = cmp a b == Just EQ
-  a `slt` b = cmp a b == Just LT    
-  a `sgt` b = cmp a b == Just GT
-
-(<<=) :: (PartialOrder a) => a -> a -> Bool
-(<<=) = lte
-
-instance (Eq l, SemiLattice l) => PartialOrder l where
-   l1 `lte` l2 = l1 \/ l2 == l2
+--class PartialOrder a where 
+--  --minimal definition
+--  lte:: a -> a -> Bool
+--  --functions
+--  cmp :: a -> a -> Maybe Ordering
+--  gte :: a -> a -> Bool
+--  eq  :: a -> a -> Bool
+--  slt :: a -> a -> Bool
+--  sgt :: a -> a -> Bool
+--  cmp a b | a `lte` b && b `lte` a = Just EQ
+--          | a `lte` b              = Just LT
+--          | b `lte` a              = Just GT
+--          | otherwise              = Nothing   
+--  a `gte` b = b `lte` a
+--  a `eq`  b = cmp a b == Just EQ
+--  a `slt` b = cmp a b == Just LT    
+--  a `sgt` b = cmp a b == Just GT
+--
+--(<<=) :: (PartialOrder a) => a -> a -> Bool
+--(<<=) = lte
+--
+--instance (Eq l, SemiLattice l) => PartialOrder l where
+--   l1 `lte` l2 = l1 \/ l2 == l2
 
 -- Some SemiLattices
 
@@ -47,8 +49,8 @@ class SetLike s where
 --there is something really unsatisfactory here
 --but I feel we would need dependent types...
 
-data SetUL a = SetUL{unSetUL:: S.Set a}        deriving (Eq,Show)
-data SetIL a = SetIL{unSetIL:: S.Set a} | Top  deriving (Eq,Show)
+data SetUL a = SetUL{unSetUL:: S.Set a}        deriving (Eq)
+data SetIL a = SetIL{unSetIL:: S.Set a} | Top  deriving (Eq)
 
 instance SetLike SetUL where
     fromSet   = SetUL 
@@ -69,4 +71,17 @@ instance (Ord a) => SemiLattice (SetIL a) where
   s  \/Top = s
   s1 \/ s2 = fromSet (toSet s1 `S.intersection` toSet s2) 
 
+--show
+
+instance (Show a,Ord a) => Show (SetUL a) where
+   show = setToTeX show.toSet 
+instance (Show a,Ord a) => Show (SetIL a) where
+   show Top       = "\\top"
+   show (SetIL s) = setToTeX show s
+
+
+
+setToTeX showelemfun s = let x = commas s
+                         in if null x then "\\emptyset" else "\\{" ++ x ++ "\\}"
+    where commas = intercalate "," . map showelemfun . S.toList
 

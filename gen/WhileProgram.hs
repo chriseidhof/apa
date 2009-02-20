@@ -15,11 +15,15 @@ label f = do x <- get
 begin :: [StmtM] -> StmtM
 begin = seqProgram
 
+
+var :: String -> AExp
+var = Var . V
+
 (=:) :: String -> AExp -> StmtM
-v =: e = label (Ass v e)
+v =: e = label (Ass (V v) e)
 
 (==:) :: [String] -> [AExp] -> StmtM
-v ==: e = label (MultAss (zip v e))
+v ==: e = label (MultAss (zip (map V v) e))
 
 print :: AExp -> StmtM
 print a = label (Print a)

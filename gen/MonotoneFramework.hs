@@ -9,9 +9,6 @@ import WhileTypes
 import SemiLattice
 
 data MonotoneFramework lat = MF FlowInfo (MeasureInfo lat)
-    deriving Show
-instance Show (a->b) where
-  show f = "function"
 
 type FlowInfo = ([Label],FlowGraph,[Label])
 type MeasureInfo lat = (lat,M.Map Label (lat->lat))
@@ -48,7 +45,7 @@ closed_val :: Label -> IterationResult lat -> lat
 closed_val l  = fromJust . M.lookup l . snd
 
 opened_eq :: (SemiLattice lat) => MonotoneFramework lat -> Label -> Equation lat 
-opened_eq mf label r  = join [closed_val l' r | (l', label) <- edges mf] \/ st
+opened_eq mf label r  = join [closed_val l' r | (l', l) <- edges mf, l==label] \/ st
           where st | label `elem` extremes mf = iota mf
                    | otherwise                = bottom
 

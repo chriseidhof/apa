@@ -49,7 +49,7 @@ instance Show ROp where show (R x) = fst x
 instance Show AOp where show (A x) = fst x
 
 instance Show Stmt where
-  show (Ass v e l)      = texBlock (v ++ " := " ++ show e) l
+  show (Ass v e l)      = texBlock (show v ++ " := " ++ show e) l
   show (MultAss asgs l) =  let (v,a) = (unzip asgs)
                            in  texBlock (showlist v ++ " := " ++ showlist a) l
   show (Print a l)      = texBlock (textt "print" ++ show a) l 
@@ -69,7 +69,7 @@ instance Show BExp where
   show (ROp l o r) = unwords [show l, show o, show r]
 
 instance Show AExp where
-  show (Var v)     = v
+  show (Var v)     = show v
   show (AVal i)    = show i
   show (AOp l o r) = unwords [show l, show o, show r]
 
