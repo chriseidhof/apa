@@ -340,26 +340,37 @@ breaksOf(\while [b]^\ell \do S) & \eq \emptyset
 \end{align*}
  
 We presented above the changes made on the definition of the flow of the program.
-These definitions can be used in all monotone frameworks. As for what concerns specifically
-the Strongly Live Variable analysis, these constructs are easy to handle. Actually, they
+These definitions can be used in all monotone frameworks. Regarding
+the Strongly Live Variable analysis, these constructs are easy to handle. They
 are just like $\skip$ as they do not change the state of the data whatsoever (in the
-semantics informally presented above, the state was freezen with an annotation and then de-annotated
-when execution restarts at the right program point. Thus, we have simply:
+semantics informally presented above, the state was frozen with an annotation and then de-annotated
+when execution restarts at the right program point. Thus, we have:
 \begin{align*}
 kill_{SLV}([\cont]^\ell) \eq kill_{SLV}([\break]^\ell) & \eq \emptyset \\
 \\
 gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\break]^\ell,l) & \eq \emptyset
 \end{align*}
  
+We can now analyze two example programs. First, we will do Strongly Live Variable Analysis on the following program:
  
-\program{\input{progbc}}
+\program{\input{progbc.tex}}
+
+The results are in Table \ref{result_bc}.
+
+\begin{table}
+\label{result_bc}
+\caption{Strongly Live Variable Analysis with $\break$ and $\cont$}
+\begin{sideways}
+\input{result_bc.tex}
+\end{sideways}
+\end{table}
 
 
-\program{\input{progbc2}}
+\program{\input{progbc2.tex}}
 
 
 
-TODO: explain eta
+In our operation semantics, we now also have an out variable that captures what has been printed so far. It is just a list of $Z$, and when doing a $\print a$ we append $a$ to that list.
  
 \begin{table}\label{semantics}
 \caption{Modifications to the Operational Semantics}
