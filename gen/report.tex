@@ -265,7 +265,7 @@ If we now do Strongly Live Variable Analysis on this program, we get the results
  
 \subsection{Break and Continue}
 The meaning of these constructs inside while loops is just what we are used to:
-a $\break$ statement cause the program to jump immediately off the loop whilst
+a $\break$ statement cause the program to jump immediately out of the loop whilst
 a $\cont$ statement \emph{restarts} the while loop execution (including testing the condition).
 If the constructs are found outside of a while loop, the compiler/interpreter should give an error before doing the analysis (it is a simple syntactic check).
  
