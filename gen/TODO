@@ -1,9 +1,4 @@
-Analyser.hs
-Chaotic.hs
-MonotoneFramework.hs
-ProgramAnalysisSolver
-SemiLattice.hs         NOT SATISFACTORY
-WhileFlow.hs           DONE
-WhileLanguage.hs       DONE
-WhileProgram.hs        DONE
-WhileTypes.hs          DONE
+> test all 5 analysis (particularly SLV and RD) and get corret results
+
+> interact with the Table output part
+
