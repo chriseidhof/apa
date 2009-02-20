@@ -114,7 +114,7 @@ As an example, the definition of SLV will read as:
 
 {\small
 \begin{verbatim}
-stronglivevariables i  = createDataFlowAnalyser backward (may (const i,const $ depgenkill (genSLV , const . killSLV)))
+stronglivevariables i  = createDataFlowAnalyser backward (may (const i, const $ depgenkill (genSLV , const . killSLV)))
 \end{verbatim}
 }
 
