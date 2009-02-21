@@ -16,7 +16,7 @@ prog :: StmtM
 prog = begin
        ["r" =: AVal 1,
         "a" =: var "r" *! var "r",
-        while (var "y" >! AVal 1) [ 
+        while (var "y" >! AVal 0) [ 
                "r" =: var "r" *! var "x",
                "t" =: var "y",
                "y" =: var "t" -! AVal 1
@@ -28,7 +28,7 @@ progprt :: String -> StmtM
 progprt v = begin
             ["r" =: AVal 1,
              "a" =: var "r" *! var "r",
-             while (var "y" >! AVal 1) [ 
+             while (var "y" >! AVal 0) [ 
                     "r" =: var "r" *! var "x",
                     "t" =: var "y",
                     "y" =: var "t" -! AVal 1
@@ -40,7 +40,7 @@ progmass :: String -> StmtM
 progmass v = begin
                 ["r" =: AVal 1,
                  "a" =: var "r" *! var "r",
-                 while (var "y" >! AVal 1) [ 
+                 while (var "y" >! AVal 0) [ 
                         ["y","r","y"] ==: [var "a" +! AVal 1,var "r" *! var "x", var "y" -! AVal 1]
                         ],
                  WhileProgram.print (var v)

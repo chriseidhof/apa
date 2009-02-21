@@ -1,6 +1,6 @@
 chaotic = ghc Test.hs -e
 programs = prog.tex progprtr.tex progmassr.tex progbc.tex progbc2.tex
-results = resulty.tex resultr.tex resulta.tex resultempty.tex result1_lv.tex resultr_prt.tex resultr_mass.tex result_bc.tex result_bc_ae.tex 
+results = resulty.tex resultr.tex resulta.tex resultempty.tex result_lv.tex resultr_prt.tex resultr_mass.tex result_bc.tex result_bc_ae.tex 
 
 %.pdf: %.tex $(programs) $(results)
 	pdflatex $<
@@ -33,7 +33,7 @@ resulta.tex: *.hs
 resultempty.tex: *.hs
 	$(chaotic) "showSLV S.empty prog" > $@
 
-result1_lv.tex: *.hs
+result_lv.tex: *.hs
 	$(chaotic) "showLV prog" > $@
 
 resultr_prt.tex: *.hs

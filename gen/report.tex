@@ -12,7 +12,7 @@
 %include lhs2tex.fmt 
  
 \usepackage{amsmath,amsthm,amssymb}
-
+\allowdisplaybreaks[0]
  
 \def\eq{\;\; = \;\;}
 \def\N{\mathbb{N}}
@@ -45,17 +45,41 @@
 \newcounter{Progenvcount}
 \setcounter{Progenvcount}{0}
 \newenvironment{progenv}
-                {\stepcounter{Progenvcount} \noindent {\bf Program \arabic{Progenvcount}.}\\
+                {\refstepcounter{Progenvcount} \nopagebreak
+                 \bigskip\hrule\nopagebreak\medskip\noindent
+                 {\bf Program \arabic{Progenvcount}.} \nopagebreak\vspace{0.3cm} \nopagebreak \\ \nopagebreak
+                  \nopagebreak
                  $\begin{array}{ll}}
-                {\end{array}$ \\~\\ }
+                {\end{array}$ \bigskip\hrule\bigskip\bigskip }
 
-\def\program#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
 
-\def\restabR#1#2[#3]{\begin{table}\label{#3}\begin{center}\caption{#1}\begin{sideways}\input{#2}\end{sideways}\end{center}\end{table}}
+%\def\programold#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
 
-\def\restab#1#2[#3]{\begin{table}\label{#3}\begin{center}\caption{#1}\input{#2}\end{center}\end{table}}
+\def\restabR#1#2[#3]{
+\begin{table}
+{\scriptsize
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
 
-\def\programnew#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
+\def\restabRtiny#1#2[#3]{
+\begin{table}
+{\tiny
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
+
+
+\def\restab#1#2[#3]{
+\begin{table}
+\caption{#1}\label{#3}
+\begin{center}\input{#2}\end{center}
+\end{table}}
+
+
+\def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
@@ -67,8 +91,8 @@
 \title{Data Flow Assignment I \\ Automatic Program Analysis}
  
 \maketitle
- 
-\section{Part 1}
+
+\section{~}
  
 Our analysis for Strongly Live Variables is almost the same as the Live
 Variables analysis. We now only present the changes made.
@@ -116,7 +140,7 @@ As we shall see, the print statement
 to be introduced later will change this situation, as it will allow for
 a program to communicate to the outside at any point of execution. 
  
-\section{Part 2}
+\section{~}
  
 We developed some modules in \haskell\ which allow us to define and perform
 data flow analysis on \textsc{While} programs. To define an analysis,
@@ -158,12 +182,12 @@ and an unlabeled program, performs the strong live variable analysis and display
 the intermediate results in a \TeX\ table.
 
 
-To demonstrate the Strong Live Variable Analysis, we will use this \haskell program
+To demonstrate the Strongly Live Variable Analysis, we will use this \haskell program
 to perform chaotic iteration on the following simple example program
 
-\program{\input{prog.tex}}
+\newpage
+\program{prog.tex}[prog]
 
-\programnew{prog.tex}[prog]
  
 Tables \ref{resultr}, \ref{resulty}, \ref{resulta} and \ref{resultempty}
 display a trace of the chaotic iteration algorithm for several different values
@@ -174,7 +198,7 @@ used our module to perform (regular) Live Variable Analysis on
 the same program, obtaining the results in Table \ref{result_lv}.
 
  
-\restabR{Strongly Live Variable Analysis on Program \ref{prog} with $\iota = \{r\}$}{resultr.tex}[resultr]
+\restabRtiny{Strongly Live Variable Analysis on Program \ref{prog} with $\iota = \{r\}$}{resultr.tex}[resultr]
 
 \restab{Strongly Live Variable Analysis on Program \ref{prog} with $\iota = \{y\}$}{resulty.tex}[resulty]
 
@@ -182,7 +206,7 @@ the same program, obtaining the results in Table \ref{result_lv}.
 
 \restab{Strongly Live Variable Analysis on Program \ref{prog} with $\iota = \emptyset$}{resultempty.tex}[resultempty]
 
-\restab{Live Variable Analysis on Program \ref{prog}}{result1_lv.tex}[result_lv]
+\restab{Live Variable Analysis on Program \ref{prog}}{result_lv.tex}[result_lv]
 
 We can easily observe that the results of the SLV analysis significantly vary depending on $\iota$. 
 If we are interested in knowing the value of $r$ in the end (by the way, that would be the power
@@ -200,7 +224,7 @@ to be considered live at a point are those which carry values that will eventual
 to determine the trace of execution (that will be used in a while or if condition). As we can observe,
 the SLV analysis is able to detect that only the variable $y$ (and, between statements $5$ and $6$, 
 the variable $t$) will be ever used to determine the flow of the program. Actually, the number of iterations of the while loop that will be done depends only on the value of $y$ at the start of the program
-(thus $SLV_entry(1) = \{y\}$). The regular live variable analysis is not able to detect this.
+(thus $SLV_{entry}(1) = \{y\}$). The regular live variable analysis is not able to detect this.
 For example, the variable $x$ will be live at the entry of the
 while loop, because its value will be used to change the value of $r$ in the execution of the body.
 However, it is a faint variables in this case, because the value of $r$ will never be used:
@@ -209,7 +233,7 @@ except in assignments to other variables ($a$ and $r$ itself) which are just fai
 The other cases for $\iota$ are similar and we will not discuss them.
 
 
-\section{Part 3}
+\section{~}
  
 We start by adding the new labelled constructs to the abstract syntax of the language:
 \begin{align*}
@@ -271,14 +295,14 @@ We simply need to print the so called variables of interest at the end of our pr
 Of course, we can do that anywhere else, thus giving the possibility of inserting
 variables of interest at any point.
 For example, replacing the $\skip$ by  $[\print r]$ at the end of program \ref{prog}
-(obtaining Program \ref{progprtr.tex}),
+(obtaining Program \ref{progprtr}),
 we get the results in Table \ref{resultr_prt}. Those are (almost) the
 same as in Table \ref{resultr}, the only difference being that, after the $\print$ statement,
 $r$ is not alive in this case (which is clearly expectable).
  
-\programnew{progprtr.tex}[progprtr]
+\program{progprtr.tex}[progprtr]
 
-\restabR{Strongly Live Variable Analysis on Program \ref{progprtr} (print statement) with $\iota = \emptyset$}{resultr_prt.tex}[resultr_prt]
+\restabRtiny{Strongly Live Variable Analysis on Program \ref{progprtr} (print statement) with $\iota = \emptyset$}{resultr_prt.tex}[resultr_prt]
  
 \subsection{Simultaneous Assignements}
  
@@ -318,7 +342,7 @@ To demonstrate the use of this construct, let us again consider a slightly modif
 assignment was added to illustrate the situation when multiple assignments to the same
 variable occur.
 
-\programnew{progmassr.tex}[progmassr]
+\program{progmassr.tex}[progmassr]
 
 Performing Strongly Live Variable Analysis on this program yields
 the results on Table \ref{resultr_mass}.
@@ -419,10 +443,10 @@ gen_{SLV} ([\cont]^\ell,l) \eq gen_{SLV} ([\breakc]^\ell,l) & \eq \emptyset
  
 We can now analyze two example programs. First, we will do Strongly Live Variable Analysis on the following program:
  
-\programnew{progbc}[progbc]
+\program{progbc}[progbc]
 
 
-\restabR{Strongly Live Variable Analysis on Program \ref{progbc} (with $\breakc$ and $\cont$)}{result_bc}[result_bc]
+\restabRtiny{Strongly Live Variable Analysis on Program \ref{progbc} (with $\breakc$ and $\cont$)}{result_bc}[result_bc]
 
 The results are in Table \ref{result_bc}.
 First of all, we can notice that there are certain unacessible program points (namely those immediately
@@ -448,7 +472,8 @@ top) at the accessible points, which amounts to nothing. In the example program,
 We will also consider a second program, on which we will perform
 Available Expression Analyses (again using our \haskell\ modules).
 
-\programnew{progbc2.tex}[progbc2]
+\newpage
+\program{progbc2.tex}[progbc2]
 
 
 \restabR{Available Expression Analysis with $\breakc$ and $\cont$}{result_bc_ae}[result_bc_ae]
