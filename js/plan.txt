@@ -1,0 +1,4 @@
+Soft Typing for Javascript
+
+* Create a test-suite of examples and desired outcomes
+* http://hackage.haskell.org/packages/archive/WebBits/0.11.0/doc/html/WebBits-JavaScript-Syntax.html#t%3AStatement

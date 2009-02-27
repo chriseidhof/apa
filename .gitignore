@@ -1,0 +1,6 @@
+*.aux
+*.bak
+*.log
+*/*.aux
+*/*.bak
+*/*.log
