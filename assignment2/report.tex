@@ -7,11 +7,40 @@
 \usepackage{palatino}
 \usepackage{rotating}
  
-\usepackage{prooftree}
+%\usepackage{prooftree}
 
-%include lhs2tex.fmt 
- 
-\usepackage{amsmath,amsthm,amssymb}
+\usepackage{amsmath, amsthm, amssymb}
+
+\theoremstyle{definition}
+\newtheorem{defi}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{conj}{Conjecture}
+\newtheorem*{prob}{Problem}
+\newtheorem*{question}{Question}
+\theoremstyle{plain}
+\newtheorem{theo}{Theorem}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{lemma}[theo]{Lemma}
+\newtheorem{cor}[theo]{Corolary}
+\newtheorem*{theo*}{Theorem}
+\newtheorem*{prop*}{Proposition}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{cor*}{Corolary}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\def\qed{\begin{flushright} $\Box$ \end{flushright}}
+
+\newenvironment{prf}
+                {\vspace{-2mm} \noindent {\bf Proof.}}
+                {\par \nopagebreak \qed }
+\newenvironment{namedprf}[1]
+                {\noindent {\bf Proof (#1).}}
+                {\par \nopagebreak \qed }
+
+
+\def\logequiv{\Leftrightarrow}
+
 \allowdisplaybreaks[0]
  
 \def\eq{\;\; = \;\;}
@@ -31,14 +60,14 @@
  
  
 \def\skip {\texttt{skip}\ }
-\def\while{\texttt{while}\ }
-\def\do {\texttt{do}\ }
+\def\whilel{\texttt{while}\ }
+\def\dol {\texttt{do}\ }
 \def\ifl {\texttt{if}\ }
 \def\thenl {\texttt{then}\ }
 \def\elsel {\texttt{else}\ }
-\def\print{\texttt{print}\ }
-\def\cont {\texttt{continue}\ }
-\def\breakc{\texttt{break}\ }
+\def\printl{\texttt{print}\ }
+\def\contl {\texttt{continue}\ }
+\def\breakl{\texttt{break}\ }
  
 \def\haskell{\textsc{Haskell}}
  
@@ -93,7 +122,92 @@
 \maketitle
 
 \section{~}
- 
+
+\[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_star \cup \{?\})}\]
+\[reach \models RD^{\subset}(S)\]
+
+In what follows, $N$ will stand for $reach_{entry}$ and $X$ for $reach_{exit}$. 
+
+
+\begin{theo}
+Let $S$ be a label consistent program and $reach \models RD^{\subset}(S)$. Then:
+\begin{enumerate}
+\item If $\pair{S,\sigma, tr} \to \pair{S', \sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim N(init(S'))$
+\item If $\pair{S,\sigma, tr} \to \pair{\sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim X(init(S))$
+\end{enumerate}
+\end{theo}
+\begin{proof}
+The proof of this theorem goes by induction on the tree used to establish
+the transition (computation step) according to the rules of the instrumented operational semantics.
+
+Case $[ass]$:
+
+We have $\pair{[x := a]^\ell, \sigma, tr} \to \pair{\sigma[x\mapsto\A{a}\sigma], tr:(x,l)}$
+and $tr \sim N(\ell)$. 
+
+
+From the constraints,
+
+
+\[X(\ell) \supseteq (N(\ell) \setminus \{(x,l')|l' \in \Lab_\star^?\}) \cup \{(x,l)\}\]
+
+
+
+
+Case $[skip]$:
+
+We have $\pair{[\skip]^\ell, \sigma, tr} \to \pair{\sigma, tr}$
+and $tr \sim N(\ell)$. 
+From the constraints we have
+\[X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+Hence, by \ref{lemmasq}, $tr \sim X(\ell)$.
+
+Case $[seq1]$:
+
+We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S'_1;S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
+For the rule to apply, we also have $\pair{S_1,\sigma,tr} \to \pair{S'_1,\sigma',tr'}$.
+As $S_1$ is a subprogram of $S_1;S_2$, by Lemma \ref{lemmasubp},
+we can say that $reach \models RD^{\subset}(S_1)$. Also, $init(S_1;S_2) = init(S_1)$, so we have
+$tr \sim N(S_1)$ and we can then apply the induction hypothesis, giving $tr' \sim  N(init(S'_1))$.
+As $init(S'_1) = init(S'_1;S_2)$, we conclue $tr' \sim N(init(S'_1;S_2))$ as required.
+
+Case $[seq2]$:
+
+We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
+The antecedent of the rule is $\pair{S_1,\sigma,tr} \to \pair{\sigma',tr'}$.
+By the same reason as in the previous case, we can apply the induction hypothesis, obtaining
+$tr \sim X(init(S_1))$. By definition of flow, $\forall l. l \in final(S_1). \;(l,init(S_2) \in flow(S_1,S_2)$
+By Lemma 2.14 from the book, $final(S_1) = \{init(S_1\}$ (because computation ended in one step). Thus,
+$(init(S_1),init(S_1)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
+
+Case $[if1]$:
+
+We have $\pair{\ifl [b]^\ell \thenl S_1 \elsel S_2,\sigma,tr} \to \pair{S1,\sigma,tr}$ and $tr \sim N(\ell)$.
+From the constraints in $RD^{\subset}$, 
+\[ X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(l,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
+to conclude $tr \sim N(init(S1))$.
+
+Case $[if2]$:
+
+The proof is the same as in the previous case, exchanging $S_1$ and $S_2$.
+
+Case $[wh1]$:
+
+We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{S_b;\whilel [b]^\ell \dol S_b,\sigma,tr}$ and $tr \sim N(\ell)$.
+Again, from the constraints, we have
+\[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+As before, $(l,init(S_b)) \in flow(S)$. Hence, as in the previous case, Lemmas \ref{lemmasq} and \ref{lemmaflow} give
+$tr \sim N(init(S_b))$.
+
+Case $[wh2]$:
+
+We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{\sigma,tr}$ and $tr \sim N(\ell)$.
+The constraints give
+\[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
+
+\end{proof}
 
 \section{~}
  
