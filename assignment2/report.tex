@@ -113,6 +113,7 @@
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
 
+\def\rdsub{RD^\subseteq(S_\star)}
 
  
 \begin{document}
@@ -120,6 +121,89 @@
 \title{Data Flow Assignment II \\ Automatic Program Analysis}
  
 \maketitle
+
+\section{~}
+
+We extend our lattice to take the context into account
+\begin{align}
+\hat{L} & = \Delta \to L
+\end{align}
+
+We start by lifting the regular transfer function $f_l$ to $\hat{f_l}$ just
+like in the book (todo ref):
+
+\begin{align}
+\hat{f_l} & : \hat{L} \to \hat {L}
+\hat{f_l} (\hat{l}) = f_l \circ \hat{l}
+\end{align}
+
+Now we still need to give the cases for \texttt{proc} and \texttt{call}. For
+\texttt{proc} we give two transfer functions:
+
+\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+
+Both $f_{l_n}$ and $f_{l_x}$ are the identity function. All the hard work is
+done in the procedure calls:
+
+Given $\{l_c, l_n, l_x, l_r\} \subset IF$ and a call with a corresponding
+procedure:
+
+\begin{align}
+\texttt{[call p (a, z)]$^{l_c}_{l_r}$}\\
+\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+\end{align}
+
+\section{Lemma 2.15}
+
+Our variant of Lemma 2.15 reads: Consider a label consistent program $S_\star$.
+If $reach \models RD^=(S_\star)$ then $reach \models \rdsub$. The
+least solution of $RD^=(S_\star)$ coincides with the least solution of $\rdsub$.
+
+Proof: todo
+
+\section{Lemma 2.16}
+
+If we would substitute $RD$ for $LV$ and $reach$ for $live$, we end up with the
+following variant of Lemma 2.16:
+
+If $reach \models RD^\subseteq(S_1)$ (with $S_1$ being label consistent) and
+$flow(S_1) \supseteq flow(S_2)$ and $blocks(S_1) \supseteq blocks(S_2)$ then
+$reach \models RD^\subseteq(S_2)$ (with $S_2$ being label consistent).
+
+However, in our case, this does not hold.  Because the $RD_{entry}(l)$ function
+creates a $(x, ?)$ entry for every $x \in FV(S_\star)$, it might be the case
+that $FV(S_2) \subset FV(S_1)$ which gives us a problem when we take a look at
+the definition of the relation $\sim$:
+
+\begin{align}
+tr \sim Y \text{\ \ iff\ \ } \forall x \in DOM(tr): (x, SRD(tr)(x)) \in Y
+\end{align}
+
+It is straightforward to see that if $S_1$ contains a variable $x$ that $S_2$ does
+not contain the domain of $reach$ will stay the same but there will not be an
+entry for $x$ in $Y$. Therefore, we TODO
+
+\section{Corollary 2.18}
+
+We now present a variant of Corollary 2.18 for reaching definitions.
+
+If $reach \models RD^\subseteq(S)$ (for $S$ being label consistent) and
+if $\pair{S,\sigma} \to \pair{S', \sigma'}$ then also $reach \models RD^\subseteq(S')$.
+
+\section{~}
+ 
+\begin{align}
+f^1_{l_r} (v) & = (v \setminus \{x, z\}) \cup (y \mid z \in v) \\
+f^2_{l_r, l_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
+\end{align}
+
+This means that 
+
+\begin{align}
+\widehat{f^1_{l_r}} (\hat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\hat{l}(\delta') \mid \delta = l_r :_k \delta' \}\\
+\widehat{f^2_{l_r, l_c}} (\hat{l'}, \hat{l}) (\delta) & = f^2_{l_r, l_c} (\hat{l'}(\delta), \hat{l}(l_r :_k \delta))
+\end{align}
+
 
 \section{~}
 
@@ -208,8 +292,6 @@ The constraints give
 Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 
 \end{proof}
-
-\section{~}
  
  
 \end{document}
