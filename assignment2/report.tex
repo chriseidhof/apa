@@ -124,36 +124,8 @@
 
 \section{~}
 
-We extend our lattice to take the context into account
-\begin{align}
-\hat{L} & = \Delta \to L
-\end{align}
 
-We start by lifting the regular transfer function $f_l$ to $\hat{f_l}$ just
-like in the book (todo ref):
-
-\begin{align}
-\hat{f_l} & : \hat{L} \to \hat {L}
-\hat{f_l} (\hat{l}) = f_l \circ \hat{l}
-\end{align}
-
-Now we still need to give the cases for \texttt{proc} and \texttt{call}. For
-\texttt{proc} we give two transfer functions:
-
-\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
-
-Both $f_{l_n}$ and $f_{l_x}$ are the identity function. All the hard work is
-done in the procedure calls:
-
-Given $\{l_c, l_n, l_x, l_r\} \subset IF$ and a call with a corresponding
-procedure:
-
-\begin{align}
-\texttt{[call p (a, z)]$^{l_c}_{l_r}$}\\
-\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
-\end{align}
-
-\section{Lemma 2.15}
+\subsection{Lemma 2.15}
 
 Our variant of Lemma 2.15 reads: Consider a label consistent program $S_\star$.
 If $reach \models RD^=(S_\star)$ then $reach \models \rdsub$. The
@@ -161,7 +133,7 @@ least solution of $RD^=(S_\star)$ coincides with the least solution of $\rdsub$.
 
 Proof: todo
 
-\section{Lemma 2.16}
+\subsection{Lemma 2.16}
 
 If we would substitute $RD$ for $LV$ and $reach$ for $live$, we end up with the
 following variant of Lemma 2.16:
@@ -183,38 +155,25 @@ It is straightforward to see that if $S_1$ contains a variable $x$ that $S_2$ do
 not contain the domain of $reach$ will stay the same but there will not be an
 entry for $x$ in $Y$. Therefore, we TODO
 
-\section{Corollary 2.18}
+\subsection{Corollary 2.18}
 
 We now present a variant of Corollary 2.18 for reaching definitions.
 
 If $reach \models RD^\subseteq(S)$ (for $S$ being label consistent) and
 if $\pair{S,\sigma} \to \pair{S', \sigma'}$ then also $reach \models RD^\subseteq(S')$.
 
-\section{~}
- 
-\begin{align}
-f^1_{l_r} (v) & = (v \setminus \{x, z\}) \cup (y \mid z \in v) \\
-f^2_{l_r, l_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
-\end{align}
-
-This means that 
-
-\begin{align}
-\widehat{f^1_{l_r}} (\hat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\hat{l}(\delta') \mid \delta = l_r :_k \delta' \}\\
-\widehat{f^2_{l_r, l_c}} (\hat{l'}, \hat{l}) (\delta) & = f^2_{l_r, l_c} (\hat{l'}(\delta), \hat{l}(l_r :_k \delta))
-\end{align}
 
 
-\section{~}
+\subsection{~}
 
 \[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_star \cup \{?\})}\]
-\[reach \models RD^{\subset}(S)\]
+\[reach \models RD^{\subseteq}(S)\]
 
 In what follows, $N$ will stand for $reach_{entry}$ and $X$ for $reach_{exit}$. 
 
 
 \begin{theo}
-Let $S$ be a label consistent program and $reach \models RD^{\subset}(S)$. Then:
+Let $S$ be a label consistent program and $reach \models RD^{\subseteq}(S)$. Then:
 \begin{enumerate}
 \item If $\pair{S,\sigma, tr} \to \pair{S', \sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim N(init(S'))$
 \item If $\pair{S,\sigma, tr} \to \pair{\sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim X(init(S))$
@@ -251,7 +210,7 @@ Case $[seq1]$:
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S'_1;S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
 For the rule to apply, we also have $\pair{S_1,\sigma,tr} \to \pair{S'_1,\sigma',tr'}$.
 As $S_1$ is a subprogram of $S_1;S_2$, by Lemma \ref{lemmasubp},
-we can say that $reach \models RD^{\subset}(S_1)$. Also, $init(S_1;S_2) = init(S_1)$, so we have
+we can say that $reach \models RD^{\subseteq}(S_1)$. Also, $init(S_1;S_2) = init(S_1)$, so we have
 $tr \sim N(S_1)$ and we can then apply the induction hypothesis, giving $tr' \sim  N(init(S'_1))$.
 As $init(S'_1) = init(S'_1;S_2)$, we conclue $tr' \sim N(init(S'_1;S_2))$ as required.
 
@@ -267,7 +226,7 @@ $(init(S_1),init(S_1)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(i
 Case $[if1]$:
 
 We have $\pair{\ifl [b]^\ell \thenl S_1 \elsel S_2,\sigma,tr} \to \pair{S1,\sigma,tr}$ and $tr \sim N(\ell)$.
-From the constraints in $RD^{\subset}$, 
+From the constraints in $RD^{\subseteq}$, 
 \[ X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(l,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
 to conclude $tr \sim N(init(S1))$.
@@ -293,7 +252,96 @@ Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 
 \end{proof}
  
+\section{Part 2}
+
+\subsection{~}
+
+For our data flow equations, we use the definition in the book for $A$ as
+described in section 2.5.3.
+
+We extend our lattice to take the context into account
+\begin{align}
+\widehat{L} & = \Delta \to L = \Delta \to \pset{\Var_\star}
+\end{align}
+
+We start by lifting the regular transfer function $f_l$ to $\widehat{f_l}$ just
+like in the book (todo ref):
+
+\begin{align}
+\widehat{f_l} & : \widehat{L} \to \widehat {L} \\
+\widehat{f_l} (\widehat{l}) & = f_l \circ \widehat{l}
+\end{align}
+
+Now we still need to give the cases for \texttt{proc} and \texttt{call}. For
+\texttt{proc} we give two transfer functions:
+
+\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+
+Both $f_{l_n}$ and $f_{l_x}$ are the identity function. All the hard work is
+done in the procedure calls:
+
+Given $(l_c, l_n, l_x, l_r) \in IF$ and a call with a corresponding
+procedure:
+
+\begin{align}
+\texttt{[call p (a, z)]$^{l_c}_{l_r}$}\\
+\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+\end{align}
  
+\begin{align}
+f^1_{l_r} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
+f^2_{l_r, l_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
+\end{align}
+
+Now we are ready to give the context-sensitive functions for call strings with
+unbounded length.
+
+\begin{align}
+\widehat{f^1_{l_r}} (\widehat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\widehat{l}(\delta') \mid \delta = l_r : \delta' \} \\
+\widehat{f^2_{l_r, l_c}} (\widehat{l'}, \widehat{l}) (\delta) & = f^2_{l_r, l_c} (\widehat{l'}(\delta), \widehat{l}(l_r : \delta))
+\end{align}
+
+When doing call strings of bounded length $k$, we replace our $cons$-operator by
+$:_k$ which is defined as following:
+
+\begin{align}
+x :_k xs = take\ k\ (x : xs)
+\end{align}
+
+Now we can use our previous definitions with $:$ replaced by $:_k$:
+
+\begin{align}
+\widehat{f^1_{l_r}} (\widehat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\widehat{l}(\delta') \mid \delta = l_r :_k \delta' \} \\
+\widehat{f^2_{l_r, l_c}} (\widehat{l'}, \widehat{l}) (\delta) & = f^2_{l_r, l_c} (\widehat{l'}(\delta), \widehat{l}(l_r :_k \delta))
+\end{align}
+
+\subsection{Example}
+TODO
+
+\begin{table}
+$
+\begin{array}{lllllllllllllllllllllllllllllllllllll}
+\  & [11, 11] & [9, 11] & [7, 11] & [3] & [11, 3] & [9, 3] & [7, 3] & [11, 9] & [9, 9 & [7, 9] & [\,] \\
+N(1)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & x  \\
+N(2)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & x, y \\
+N(3)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset \\
+N(4)  & z, y   & z, y   & \emptyset & z, y   & z, y   & z, y   & \emptyset & z, y   & z, y   & \emptyset & \emptyset \\
+N(5)  & z, y   & z, y   & \emptyset & z, y   & z, y   & z, y   & \emptyset & z, y   & z, y   & \emptyset & \emptyset \\ 
+N(6)  &    y   &    y   & \emptyset &    y   &    y   &    y   & \emptyset &    y   & y      & \emptyset & \emptyset \\
+N(7)  &    y   &    y   & \emptyset & \emptyset & \emptyset &    y   & \emptyset &    y   & y      & \emptyset & \emptyset \\
+N(8)  & z, y   & z, y   & \emptyset & z, y   & z, y   & z, y   & \emptyset & z, y   & z, y   & \emptyset & \emptyset \\
+N(9)  & z, y   & z, y   & \emptyset & z, y   & z, y   & z, y   & \emptyset & z, y   & z, y   & \emptyset & \emptyset \\
+N(10) & z, y   & z, y   & \emptyset & z, y   & z, y   & z, y   & \emptyset & z, y   & z, y   & \emptyset & \emptyset \\
+N(11) &    y   &    y   & \emptyset & \emptyset & \emptyset &    y   & \emptyset &    y   & y      & \emptyset & \emptyset \\
+N(12) &    y   &    y   & \emptyset & \emptyset & \emptyset &    y   & \emptyset &    y   & y      & \emptyset & \emptyset \\
+N(13) & \emptyset & \emptyset & y, u   & \emptyset & \emptyset & \emptyset & y, u   & \emptyset & \emptyset & y, u   & \emptyset \\
+N(14) & \emptyset & \emptyset & y, u   & \emptyset & \emptyset & \emptyset & y, u   & \emptyset & \emptyset & y, u   & \emptyset \\
+N(15) & \emptyset & \emptyset & y      & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & y      & \emptyset \\
+N(16) & \emptyset & \emptyset & y      & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & y      & \emptyset
+\end{array}
+$
+\end{table}
+
 \end{document}
  
   
