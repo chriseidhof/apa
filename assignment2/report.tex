@@ -159,8 +159,8 @@ The constraints we generate for a program $S$ are:
 
 \begin{align} 
 \label{def_constr}
-RD^{\subseteq}(S) = & \; \{X(l) \supseteq N(l) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
-\cup & \; \{N(l) \supseteq X(l') \mid (l', l) \in flow(S) \}
+RD^{\subseteq}(S) = & \; \{X(\ell) \supseteq N(\ell) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
+\cup & \; \{N(\ell) \supseteq X(\ell') \mid (\ell', \ell) \in flow(S) \}
 \end{align}
 
 \begin{lemma}
@@ -180,7 +180,7 @@ We now present a variant of Corollary 2.18 for reaching definitions.
 \begin{lemma}
 \label{lem218}
 If $reach \models RD^\subseteq(S)$ (for $S$ being label consistent) then for all
-$(l, l') \in flow(S)$ we have $reach_{entry}(l') \supseteq reach_{exit}(l)$.
+$(\ell, \ell') \in flow(S)$ we have $reach_{entry}(\ell') \supseteq reach_{exit}(\ell)$.
 \end{lemma}
 \begin{proof}
 Because of the definition of $RD^\subseteq$ and \ref{def_constr} this follows
@@ -199,21 +199,21 @@ this follows immediately.
 
 \begin{lemma}
 Assume $reach \models RD^\subseteq(S)$ with $S$ being label consistent. Then,
-$tr \sim X(l)$ implies $tr \sim N(l')$ for all $(l, l')$ in $flow(S)$.
+$tr \sim X(\ell)$ implies $tr \sim N(\ell')$ for all $(\ell, \ell')$ in $flow(S)$.
 \end{lemma}
 \begin{proof}
-By \ref{lem218}, $X(l) \subseteq N(l')$. We then apply \ref{lemmasq}.
+By \ref{lem218}, $X(\ell) \subseteq N(\ell')$. We then apply \ref{lemmasq}.
 \end{proof}
 
 \subsection{Theorem 2.21}
 
-\begin{theo*}
+\begin{theo}
 Let $S$ be a label consistent program and $reach \models RD^{\subseteq}(S)$. Then:
 \begin{enumerate}
 \item If $\pair{S,\sigma, tr} \to \pair{S', \sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim N(init(S'))$
 \item If $\pair{S,\sigma, tr} \to \pair{\sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim X(init(S))$
 \end{enumerate}
-\end{theo*}
+\end{theo}
 \begin{proof}
 The proof of this theorem goes by induction on the tree used to establish
 the transition (computation step) according to the rules of the instrumented operational semantics.
@@ -226,11 +226,15 @@ and $tr \sim N(\ell)$.
 
 From the constraints,
 
+\begin{equation}\label{assconst}
+X(\ell) \supseteq (N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}) \cup \{(x,l)\}
+\end{equation}
 
-\[X(\ell) \supseteq (N(\ell) \setminus \{(x,l')|l' \in \Lab_\star^?\}) \cup \{(x,l)\}\]
-
-
-
+Our goal is to prove that $tr' \sim X(init(S))$, that is to say $tr:(x,l) \sim X(\ell)$. Looking at the definition of $\sim$,
+this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM tr'$. The case $y=x$ is straightforward, as
+we then have $(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,l)$ which can easily be seen to be in $X(\ell)$, from \ref{asscont}.
+As for $y\neq x$, we just have $(y,SRD(tr')(y)) = (y,SRD(tr:(x,l))(y)) = (y,SRD(tr)(y))$, which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
+It is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$ because $x\neq y$. Thus, once again, \ref{asscont} guarantees it is in $X(\ell)$.
 
 Case $[skip]$:
 
@@ -254,7 +258,7 @@ Case $[seq2]$:
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
 The antecedent of the rule is $\pair{S_1,\sigma,tr} \to \pair{\sigma',tr'}$.
 By the same reason as in the previous case, we can apply the induction hypothesis, obtaining
-$tr \sim X(init(S_1))$. By definition of flow, $\forall l. l \in final(S_1). \;(l,init(S_2) \in flow(S_1,S_2)$
+$tr \sim X(init(S_1))$. By definition of flow, $\forall \ell. \ell \in final(S_1). \;(\ell,init(S_2) \in flow(S_1,S_2)$
 By Lemma 2.14 from the book, $final(S_1) = \{init(S_1\}$ (because computation ended in one step). Thus,
 $(init(S_1),init(S_1)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
 
@@ -263,7 +267,7 @@ Case $[if1]$:
 We have $\pair{\ifl [b]^\ell \thenl S_1 \elsel S_2,\sigma,tr} \to \pair{S1,\sigma,tr}$ and $tr \sim N(\ell)$.
 From the constraints in $RD^{\subseteq}$, 
 \[ X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
-Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(l,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
+Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(\ell,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
 to conclude $tr \sim N(init(S1))$.
 
 Case $[if2]$:
@@ -275,7 +279,7 @@ Case $[wh1]$:
 We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{S_b;\whilel [b]^\ell \dol S_b,\sigma,tr}$ and $tr \sim N(\ell)$.
 Again, from the constraints, we have
 \[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
-As before, $(l,init(S_b)) \in flow(S)$. Hence, as in the previous case, Lemmas \ref{lemmasq} and \ref{lemmaflow} give
+As before, $(\ell,init(S_b)) \in flow(S)$. Hence, as in the previous case, Lemmas \ref{lemmasq} and \ref{lemmaflow} give
 $tr \sim N(init(S_b))$.
 
 Case $[wh2]$:
@@ -312,17 +316,17 @@ like in the book (todo ref):
 Now we still need to give the cases for \texttt{proc} and \texttt{call}. For
 \texttt{proc} we give two transfer functions:
 
-\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+\texttt{proc p (val x, res y) is$^{\ell_n}$ S end$^{\ell_x}$}
 
-Both $f_{l_n}$ and $f_{l_x}$ are the identity function. All the hard work is
+Both $f_{\ell_n}$ and $f_{\ell_x}$ are the identity function. All the hard work is
 done in the procedure calls:
 
-Given $(l_c, l_n, l_x, l_r) \in IF$ and a call with a corresponding
+Given $(\ell_c, \ell_n, \ell_x, \ell_r) \in IF$ and a call with a corresponding
 procedure:
 
 \begin{align}
-\texttt{[call p (a, z)]$^{l_c}_{l_r}$}\\
-\texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
+\texttt{[call p (a, z)]$^{\ell_c}_{\ell_r}$}\\
+\texttt{proc p (val x, res y) is$^{\ell_n}$ S end$^{\ell_x}$}
 \end{align}
 
 The intuition for our functions is that at the end of a procedure we are going
@@ -333,16 +337,16 @@ argument for the call and add $x$ and $y$ only if they were live before the call
 (we have to compensate for the shadowing in the procedure).
  
 \begin{align}
-f^1_{l_r} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
-f^2_{l_r, l_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
+f^1_{\ell_r} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
+f^2_{\ell_r, \ell_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
 \end{align}
 
 Now we are ready to give the context-sensitive functions for call strings with
 unbounded length.
 
 \begin{align}
-\widehat{f^1_{l_r}} (\widehat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\widehat{l}(\delta') \mid \delta = l_r : \delta' \} \\
-\widehat{f^2_{l_r, l_c}} (\widehat{l'}, \widehat{l}) (\delta) & = f^2_{l_r, l_c} (\widehat{l'}(\delta), \widehat{l}(l_r : \delta))
+\widehat{f^1_{\ell_r}} (\widehat{\ell}) (\delta) & = \bigsqcup \{ f^1_{\ell_r} (\widehat{\ell}(\delta') \mid \delta = \ell_r : \delta' \} \\
+\widehat{f^2_{\ell_r, \ell_c}} (\widehat{\ell'}, \widehat{\ell}) (\delta) & = f^2_{\ell_r, \ell_c} (\widehat{\ell'}(\delta), \widehat{\ell}(\ell_r : \delta))
 \end{align}
 
 When doing call strings of bounded length $k$, we replace our $cons$-operator by
@@ -355,8 +359,8 @@ x :_k xs = take\ k\ (x : xs)
 Now we can use our previous definitions with $:$ replaced by $:_k$:
 
 \begin{align}
-\widehat{f^1_{l_r}} (\widehat{l}) (\delta) & = \bigsqcup \{ f^1_{l_r} (\widehat{l}(\delta') \mid \delta = l_r :_k \delta' \} \\
-\widehat{f^2_{l_r, l_c}} (\widehat{l'}, \widehat{l}) (\delta) & = f^2_{l_r, l_c} (\widehat{l'}(\delta), \widehat{l}(l_r :_k \delta))
+\widehat{f^1_{\ell_r}} (\widehat{\ell}) (\delta) & = \bigsqcup \{ f^1_{\ell_r} (\widehat{\ell}(\delta') \mid \delta = \ell_r :_k \delta' \} \\
+\widehat{f^2_{\ell_r, \ell_c}} (\widehat{\ell'}, \widehat{\ell}) (\delta) & = f^2_{\ell_r, \ell_c} (\widehat{\ell'}(\delta), \widehat{\ell}(\ell_r :_k \delta))
 \end{align}
 
 \subsection{Example}
