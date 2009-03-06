@@ -163,8 +163,10 @@ If $reach \models RD^\subseteq(S)$ (for $S$ being label consistent) and
 if $\pair{S,\sigma} \to \pair{S', \sigma'}$ then also $reach \models RD^\subseteq(S')$.
 
 
+\subsection{Lemma 2.20}
 
-\subsection{~}
+
+\subsection{Theorem 2.21}
 
 \[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_star \cup \{?\})}\]
 \[reach \models RD^{\subseteq}(S)\]
@@ -287,6 +289,13 @@ procedure:
 \texttt{[call p (a, z)]$^{l_c}_{l_r}$}\\
 \texttt{proc p (val x, res y) is$^{l_n}$ S end$^{l_x}$}
 \end{align}
+
+The intuition for our functions is that at the end of a procedure we are going
+to have all live variables except for the parameters and we only make the result
+live if it is actually used. Before the call we get $v$ and $w$, and we will
+take out the parameters again, make sure we add every free variable in the
+argument for the call and add $x$ and $y$ only if they were live before the call
+(we have to compensate for the shadowing in the procedure).
  
 \begin{align}
 f^1_{l_r} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
