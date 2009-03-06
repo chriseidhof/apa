@@ -21,11 +21,11 @@
 \newtheorem{theo}{Theorem}
 \newtheorem{prop}[theo]{Proposition}
 \newtheorem{lemma}[theo]{Lemma}
-\newtheorem{cor}[theo]{Corolary}
+\newtheorem{cor}[theo]{Corollary}
 \newtheorem*{theo*}{Theorem}
 \newtheorem*{prop*}{Proposition}
 \newtheorem*{lemma*}{Lemma}
-\newtheorem*{cor*}{Corolary}
+\newtheorem*{cor*}{Corollary}
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
 \newtheorem*{notation}{Notation}
@@ -70,6 +70,7 @@
 \def\breakl{\texttt{break}\ }
  
 \def\haskell{\textsc{Haskell}}
+\def\starto{\overset{\star}{\to}}
  
 \newcounter{Progenvcount}
 \setcounter{Progenvcount}{0}
@@ -208,6 +209,7 @@ By \ref{lem218}, $X(\ell) \subseteq N(\ell')$. We then apply \ref{lemmasq}.
 \subsection{Theorem 2.21}
 
 \begin{theo}
+\label{theo221}
 Let $S$ be a label consistent program and $reach \models RD^{\subseteq}(S)$. Then:
 \begin{enumerate}
 \item If $\pair{S,\sigma, tr} \to \pair{S', \sigma', tr'}$ and $tr \sim N(init(S))$, then $tr' \sim N(init(S'))$
@@ -297,6 +299,38 @@ Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 \end{proof}
 
 \subsection{Corollary 2.22}
+
+\begin{cor}
+If $reach \models RD^\subseteq(S)$ (with $S$ being label consistent) then:
+
+\begin{enumerate}
+\item If $\pair{S, \sigma, tr} \starto \pair{S', \sigma', tr'}$ and $ tr \sim
+N(init(S))$ then $tr' \sim N(init(S'))$
+\item If $\pair{S, \sigma, tr} \starto \pair{\sigma', tr'}$ and $ tr \sim
+N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
+\end{enumerate}
+\end{cor}
+\begin{proof}
+This proof is by induction on the length of the derivation sequence and uses
+\ref{theo221} at each step.
+\end{proof}
+
+\subsection{Final Proof}
+
+TODO: explain $RD_\star, tr_0, sigma_0$
+
+\begin{theo}
+If $reach \models RD_\star^\subseteq(S)$ (with $S$ being label consistent) then:
+
+\begin{enumerate}
+\item If $\pair{S, \sigma_0, tr_0} \starto \pair{S', \sigma', tr'}$ then $ tr' \sim
+N(init(S'))$ 
+\item If $\pair{S, \sigma_0, tr_0} \starto \pair{\sigma', tr'}$ then $ tr' \sim
+X(\ell)$ for some $\ell \in final(S)$.
+\end{enumerate}
+\end{theo}
+\begin{proof}
+\end{proof}
  
 \section{Part 2}
 
