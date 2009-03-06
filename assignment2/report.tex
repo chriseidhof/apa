@@ -197,7 +197,7 @@ this follows immediately.
 
 \subsection{Lemma 2.20}
 
-\begin{lemma}
+\begin{lemma}\label{lemmaflow}
 Assume $reach \models RD^\subseteq(S)$ with $S$ being label consistent. Then,
 $tr \sim X(\ell)$ implies $tr \sim N(\ell')$ for all $(\ell, \ell')$ in $flow(S)$.
 \end{lemma}
@@ -247,7 +247,7 @@ We have $\pair{[\skip]^\ell, \sigma, tr} \to \pair{\sigma, tr}$
 and $tr \sim N(\ell)$. 
 From the constraints we have
 \[X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
-Hence, by \ref{lemmasq}, $tr \sim X(\ell)$.
+Hence, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 
 Case $[seq1]$:
 
@@ -256,16 +256,16 @@ For the rule to apply, we also have $\pair{S_1,\sigma,tr} \to \pair{S'_1,\sigma'
 As $S_1$ is a subprogram of $S_1;S_2$, by Lemma \ref{lemmasubp},
 we can say that $reach \models RD^{\subseteq}(S_1)$. Also, $init(S_1;S_2) = init(S_1)$, so we have
 $tr \sim N(S_1)$ and we can then apply the induction hypothesis, giving $tr' \sim  N(init(S'_1))$.
-As $init(S'_1) = init(S'_1;S_2)$, we conclue $tr' \sim N(init(S'_1;S_2))$ as required.
+As $init(S'_1) = init(S'_1;S_2)$, we conclude $tr' \sim N(init(S'_1;S_2))$ as required.
 
 Case $[seq2]$:
 
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
 The antecedent of the rule is $\pair{S_1,\sigma,tr} \to \pair{\sigma',tr'}$.
 By the same reason as in the previous case, we can apply the induction hypothesis, obtaining
-$tr \sim X(init(S_1))$. By definition of flow, $\forall \ell. \ell \in final(S_1). \;(\ell,init(S_2) \in flow(S_1,S_2)$
-By Lemma 2.14 from the book, $final(S_1) = \{init(S_1\}$ (because computation ended in one step). Thus,
-$(init(S_1),init(S_1)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
+$tr' \sim X(init(S_1))$. By definition of flow, \[\forall \ell . \; \ell \in final(S_1). \;(\ell,init(S_2)) \in flow(S_1;S_2)\]
+By Lemma 2.14 from the book, $final(S_1) = \{init(S_1)\}$ (because computation ended in one step). Thus,
+$(init(S_1),init(S_2)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
 
 Case $[if1]$:
 
