@@ -230,11 +230,16 @@ From the constraints,
 X(\ell) \supseteq (N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}) \cup \{(x,l)\}
 \end{equation}
 
-Our goal is to prove that $tr' \sim X(init(S))$, that is to say $tr:(x,l) \sim X(\ell)$. Looking at the definition of $\sim$,
-this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM tr'$. The case $y=x$ is straightforward, as
-we then have $(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,l)$ which can easily be seen to be in $X(\ell)$, from \ref{asscont}.
-As for $y\neq x$, we just have $(y,SRD(tr')(y)) = (y,SRD(tr:(x,l))(y)) = (y,SRD(tr)(y))$, which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
-It is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$ because $x\neq y$. Thus, once again, \ref{asscont} guarantees it is in $X(\ell)$.
+Our goal is to prove that $tr' \sim X(init(S))$, that is to say $(tr:(x,l)) \sim X(\ell)$.
+Looking at the definition of $\sim$,
+this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM(tr')$.
+
+The case $y=x$ is straightforward, as
+we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,l)\] which can easily be seen to be in $X(\ell)$, from \ref{assconst}.
+
+As for $y\neq x$, we just have \[(y,SRD(tr')(y)) = (y,SRD(tr:(x,l))(y)) = (y,SRD(tr)(y))\] which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
+Because $y\neq x$, then it is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$, which in turn is contained in $X(\ell)$, by equation \ref{assconst}.
+
 
 Case $[skip]$:
 
