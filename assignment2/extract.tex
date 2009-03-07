@@ -1,0 +1,184 @@
+\documentclass[a4wide,12pt]{article}
+\usepackage{a4wide}
+\usepackage{times}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{palatino}
+\usepackage{rotating}
+ 
+%\usepackage{prooftree}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+\theoremstyle{definition}
+\newtheorem{defi}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{conj}{Conjecture}
+\newtheorem*{prob}{Problem}
+\newtheorem*{question}{Question}
+\theoremstyle{plain}
+\newtheorem{theo}{Theorem}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{lemma}[theo]{Lemma}
+\newtheorem{cor}[theo]{Corollary}
+\newtheorem*{theo*}{Theorem}
+\newtheorem*{prop*}{Proposition}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{cor*}{Corollary}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\def\qed{\begin{flushright} $\Box$ \end{flushright}}
+
+\newenvironment{prf}
+                {\vspace{-2mm} \noindent {\bf Proof.}}
+                {\par \nopagebreak \qed }
+\newenvironment{namedprf}[1]
+                {\noindent {\bf Proof (#1).}}
+                {\par \nopagebreak \qed }
+
+
+\def\logequiv{\Leftrightarrow}
+
+\allowdisplaybreaks[0]
+ 
+\def\eq{\;\; = \;\;}
+\def\N{\mathbb{N}}
+\def\Z{\mathbb{Z}}
+ 
+\def\pset#1{\mathcal{P}(#1)}
+\def\A#1{\mathcal{A}[\hspace{-1pt}[#1]\hspace{-1pt}]}
+ 
+\def\const#1{\mathopen{\langle}#1\mathclose{\rangle}} % <a,b,...z>
+\def\pair#1{\const{#1}}
+ 
+\def\Stmt {\mathbf{Stmt}}
+\def\Lab {\mathbf{Lab}}
+\def\Blocks{\mathbf{Blocks}}
+\def\Var {\mathbf{Var}}
+ 
+ 
+\def\skip {\texttt{skip}\ }
+\def\whilel{\texttt{while}\ }
+\def\dol {\texttt{do}\ }
+\def\ifl {\texttt{if}\ }
+\def\thenl {\texttt{then}\ }
+\def\elsel {\texttt{else}\ }
+\def\printl{\texttt{print}\ }
+\def\contl {\texttt{continue}\ }
+\def\breakl{\texttt{break}\ }
+ 
+\def\haskell{\textsc{Haskell}}
+\def\starto{\overset{\star}{\to}}
+ 
+\newcounter{Progenvcount}
+\setcounter{Progenvcount}{0}
+\newenvironment{progenv}
+                {\refstepcounter{Progenvcount} \nopagebreak
+                 \bigskip\hrule\nopagebreak\medskip\noindent
+                 {\bf Program \arabic{Progenvcount}.} \nopagebreak\vspace{0.3cm} \nopagebreak \\ \nopagebreak
+                  \nopagebreak
+                 $\begin{array}{ll}}
+                {\end{array}$ \bigskip\hrule\bigskip\bigskip }
+
+
+%\def\programold#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
+
+\def\restabR#1#2[#3]{
+\begin{table}
+{\scriptsize
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
+
+\def\restabRtiny#1#2[#3]{
+\begin{table}
+{\tiny
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
+
+
+\def\restab#1#2[#3]{
+\begin{table}
+\caption{#1}\label{#3}
+\begin{center}\input{#2}\end{center}
+\end{table}}
+
+
+\def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
+
+\def\Tiny{\fontsize{3pt}{3pt}\selectfont}
+\def\hs#1{\texttt{#1}}
+
+\def\rdsub{RD^\subseteq(S_\star)}
+
+ 
+\begin{document}
+
+\section{~}
+We define the set $RD^\subset(S)$ of constraints generated for a program $S$,
+not taking in account introducing undefinedness of all variables in the beginning. 
+\begin{align} 
+\label{def_constr}
+RD^{\subseteq}(S) = & \; \{X(\ell) \supseteq N(\ell) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
+\cup & \; \{N(\ell) \supseteq X(\ell') \mid (\ell', \ell) \in flow(S) \}
+\end{align}
+
+
+Now, the subprogram property (lemma 2.16 in the book ) holds and we can easily prove the lemmas
+and the main theorem, then getting to the following result:
+
+\begin{cor}\label{corr}
+If $reach \models RD^\subseteq(S)$ (with $S$ being label consistent) then:
+
+\begin{enumerate}
+\item If $\pair{S, \sigma, tr} \starto \pair{S', \sigma', tr'}$ and $ tr \sim
+N(init(S))$ then $tr' \sim N(init(S'))$
+\item If $\pair{S, \sigma, tr} \starto \pair{\sigma', tr'}$ and $ tr \sim
+N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
+\end{enumerate}
+\end{cor}
+
+\section{~}
+
+Informally, the above result means that execution of a piece of code keeps the analysis results correct with respect to the semantics.
+That is, if we have $reach \models RD^\subseteq(S)$ and we have a correct analysis result at $live_entry(init(S))$, then the analysis results will
+be correct with respect to every possible path at all (reachable) program points. 
+This is exactly what one would expect from a solution to $RD^\subseteq(S)$. 
+
+We now consider the whole $RD$ analysis:
+for a program $S_\star$, we generate all the constraints we had plus a constraint
+introducing variable undefinedness at the beginning. 
+ 
+\[RD^\subseteq_\star(S_\star) = RD^\subseteq(S_\star) \cup \{ \{(x,?) \mid x \in \Var_\star\} \subseteq init(S_\star) \}\]
+
+This set of constraints is intended to be applied only once, for the ``full'' program.
+The idea is that it correctly captures the semantics of executions of complete programs
+(but not of subprograms where some code has already been executed, unless we wanted to ``forget''
+this code).
+
+In the semantics side, a full evaluation of $S_\star$ starts from $\pair{S_\star,\sigma,tr_0}$
+where $\sigma$ is some initial state and $tr_0$ is the trace at the beginning, where yet no code
+has been executed.
+\[tr_0 = [ (x,?) \mid x \in Var_\star(S_\star) ] \]
+
+With these definitions, we can then formulate our correctness result.
+\begin{theo}
+If $reach \models RD_\star^\subseteq(S)$ (with $S$ being label consistent) then:
+
+\begin{enumerate}
+\item If $\pair{S, \sigma_0, tr_0} \starto \pair{S', \sigma', tr'}$ then $ tr' \sim
+N(init(S'))$ 
+\item If $\pair{S, \sigma_0, tr_0} \starto \pair{\sigma', tr'}$ then $ tr' \sim
+X(\ell)$ for some $\ell \in final(S)$.
+\end{enumerate}
+\end{theo}
+ 
+The proof is straightforward: basically the old constraints guarantee that the results are correctly propagated to each (reachable)
+program point (as seen in \ref{corr}) while the new constraint give us correct results to start with.
+
+\end{document}
