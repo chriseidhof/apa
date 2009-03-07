@@ -120,13 +120,14 @@
 \begin{document}
 
 \section{~}
-We define the set $RD^\subset(S)$ of constraints generated for a program $S$,
+We define the set $RD^\subseteq(S)$ of constraints generated for a program $S$,
 not taking in account introducing undefinedness of all variables in the beginning. 
-\begin{align} 
+
+\begin{align*} 
 \label{def_constr}
 RD^{\subseteq}(S) = & \; \{X(\ell) \supseteq N(\ell) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
 \cup & \; \{N(\ell) \supseteq X(\ell') \mid (\ell', \ell) \in flow(S) \}
-\end{align}
+\end{align*}
 
 
 Now, the subprogram property (lemma 2.16 in the book ) holds and we can easily prove the lemmas
@@ -146,12 +147,12 @@ N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
 \section{~}
 
 Informally, the above result means that execution of a piece of code keeps the analysis results correct with respect to the semantics.
-That is, if we have $reach \models RD^\subseteq(S)$ and we have a correct analysis result at $live_entry(init(S))$, then the analysis results will
+That is, if we have $reach \models RD^\subseteq(S)$ and we have a correct analysis result for $reach_{entry}(init(S))$, then the analysis results will
 be correct with respect to every possible path at all (reachable) program points. 
 This is exactly what one would expect from a solution to $RD^\subseteq(S)$. 
 
 We now consider the whole $RD$ analysis:
-for a program $S_\star$, we generate all the constraints we had plus a constraint
+for a program $S_\star$, we generate all the constraints in $RD^\subseteq(S_\star)$ plus a constraint
 introducing variable undefinedness at the beginning. 
  
 \[RD^\subseteq_\star(S_\star) = RD^\subseteq(S_\star) \cup \{ \{(x,?) \mid x \in \Var_\star\} \subseteq init(S_\star) \}\]
@@ -168,13 +169,13 @@ has been executed.
 
 With these definitions, we can then formulate our correctness result.
 \begin{theo}
-If $reach \models RD_\star^\subseteq(S)$ (with $S$ being label consistent) then:
+If $reach \models RD_\star^\subseteq(S_\star)$ (with $S_\star$ being label consistent) then:
 
 \begin{enumerate}
-\item If $\pair{S, \sigma_0, tr_0} \starto \pair{S', \sigma', tr'}$ then $ tr' \sim
+\item If $\pair{S_\star, \sigma, tr_0} \starto \pair{S', \sigma', tr'}$ then $ tr' \sim
 N(init(S'))$ 
-\item If $\pair{S, \sigma_0, tr_0} \starto \pair{\sigma', tr'}$ then $ tr' \sim
-X(\ell)$ for some $\ell \in final(S)$.
+\item If $\pair{S_\star, \sigma, tr_0} \starto \pair{\sigma', tr'}$ then $ tr' \sim
+X(\ell)$ for some $\ell \in final(S_\star)$.
 \end{enumerate}
 \end{theo}
  
