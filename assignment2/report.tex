@@ -113,15 +113,14 @@
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
-
-\def\rdsub{RD^\subseteq(S_\star)}
-
  
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
 \title{Data Flow Assignment II \\ Automatic Program Analysis}
  
 \maketitle
+
+\section{~}
 
 Our goal is to prove the correctness of reaching definitions analysis.
 We follow the structure of the proof presented in the book for the LV analysis.
@@ -132,9 +131,9 @@ modified analysis, we prove results analogous to the propositions 2.16 to 2.21 i
 Then, we reintroduce the undefinedness constraints into our analysis and prove the corresponding
 correctness result. In the end, we consider the relationship (analogous to Lemma 2.15)
 between the analysis using equations and
-the corresponding analysis using constraints (which we used for the proof).
+the corresponding analysis using constraints (which is used for the proof).
 
-\section{The Analysis}
+\subsection*{The Analysis}
 
 As we said, from here onwards we will consider $\iota$ to be the empty set. In our final result, we
 will show how our solution can be adapted for a non-empty $\iota$ that introduces
@@ -142,15 +141,15 @@ undefinedness in the beginning.
 
 Thus, the set $RD^\subseteq(S)$ of constraints generated for a program $S$ is:
 
-\begin{align} 
+\begin{align*} 
 \label{def_constr}
 RD^{\subseteq}(S) = & \; \{RD_{exit}(\ell) \supseteq RD_{entry}(\ell) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
 \cup & \; \{RD_{entry}(\ell) \supseteq RD_{exit}(\ell') \mid (\ell', \ell) \in flow(S) \}
-\end{align}
+\end{align*}
 
 A solution, $reach$, to the constraint system $RD^\subseteq(S)$ is a pair of functions
 \[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_star \cup \{?\})}\] 
-that satisfies the constraints (when instantiating $RD_entry$/$RD_{exit}$ with $reach_{entry}$/$reach_{exit}$.
+that satisfies the constraints (when instantiating $RD_{entry}$/$RD_{exit}$ with $reach_{entry}$/$reach_{exit}$).
 In that case, we write
 \[reach \models RD^{\subseteq}(S)\]
 
@@ -158,7 +157,7 @@ In what follows, $N$ will stand for $reach_{entry}$ and $X$ for $reach_{exit}$.
 
 
 Note that we presented only a constraint system (as opposed to a equation based system 
-as in the analysis formulation). In fact, just as for the case of Live Variables Analysis,
+as in the analysis formulation). In fact, just as for the case of live variables analysis,
 the correctness proof is much simpler to conduct using constraints. Anyway,
 the correctness for $RD^\subseteq$ implies the correctness for the corresponding
 equation based system. We defer the proof of a result similar to that of Lemma 2.15 in the book
@@ -171,69 +170,81 @@ We present two lemmas about solution $reach$ to the constraints, which are varia
 of lemmas 2.16 and 2.18 in the book for reaching definitions analysis.
 
 The former 
-shows that a solution for a program is also a solution for the constraints of any
-subprogram, so that, in a certain sense, constraints generation is composed incrementally.
+shows that a solution for the constraints of a program is also a solution for the constraints of any
+subprogram, that is, in a certain sense, constraints are composed incrementally.
 This result will be essential to prove the main theorem, particularly the cases when
-to semantic rules have non-empty premisses. 
+the semantic rules have non-empty premisses. 
 It is worth noticing that this property would not hold if we took $\iota \neq \emptyset$.
 
 \begin{lemma}[Subprogram Solutions (cf Lemma 2.16)]
+\label{lemmasubp}
 If $reach \models RD^\subseteq(S_1)$ (with $S_1$ being label consistent) and
 $flow(S_1) \supseteq flow(S_2)$ and $blocks(S_1) \supseteq blocks(S_2)$ then
 $reach \models RD^\subseteq(S_2)$ (with $S_2$ being label consistent).
 \end{lemma}
 \begin{proof}
-We now have that $RD^{\supseteq}(S_1) \supseteq RD^{\supseteq}(S_2)$, so as
-$reach \models RD^\subseteq(S_1)$ also $reach \models RD^\subseteq(S_2)$.
+As $S_2$'s flow graph is a subset of $S_1$'s, it is clear from the definition
+of the analysis 
+that $RD^{\subseteq}(S_2) \subseteq RD^{\subseteq}(S_1)$. Thus, if 
+$reach$ solves all the constraints in $RD^\subseteq(S_1)$, then in particular it
+solves all that are in $RD^\subseteq(S_2)$ ($reach \models RD^\subseteq(S_2)$.
 \end{proof}
 
 
 The second result simply states that the analysis results are
 propagated (forwardly) through the flow graph of the program.
 
-\begin{lemma}[Solutions through Flow (cf. Lemma 2.18)]
+\begin{lemma}[Flow Propagates Results(cf. Lemma 2.18)]
 \label{lem218}
 If $reach \models RD^\subseteq(S)$ (for $S$ being label consistent) then for all
 $(\ell, \ell') \in flow(S)$ we have $reach_{entry}(\ell') \supseteq reach_{exit}(\ell)$.
 \end{lemma}
 \begin{proof}
-Because of the definition of $RD^\subseteq$ and \ref{def_constr} this follows
+Because of the definition of $RD^\subseteq$, this follows
 immediately.
-(REWRITE, ref)
 \end{proof}
 
 \subsection*{Lemmas about the correctness relation (cf. 2.20) }
 
-Now, we consider some simple properties about the correctness relation.
+Now, we consider some properties about the correctness relation.
 
-SHOULD WE PRESENT THE DEF OF THE RELATION HERE?
+SHOULD WE PRESENT THE DEFINITION OF THE RELATION HERE?
 
-EXPLAIN NEXT LEMMA
 
-\begin{lemma}
+The next lemma is a simple property of the correctness relation. It can be read as a monotonicity property
+of $(tr \sim)$ seen as a function to the booleans: if we have a
+correct result $Y$ at a certain point, then any ``bigger'' result
+will still be correct (altough less optimal). 
+
+\begin{lemma}[Monotonicity of $(tr \sim)$]
 \label{lemmasq}
 If $tr \sim Y \and Y \subseteq Y'$ then $tr \sim Y'$.
 \end{lemma}
 \begin{proof}
-By definition of $\sim$
-this follows immediately.
-(ADD SMTHING HERE)
+$tr \sim Y$ means that for all $x \in DOM (tr)$ we have $(x,SRD(tr)(x)) \in Y$. Taking
+As $Y \subseteq Y'$, we also have $(x,SRD(tr)(x)) \in Y'$. Hence, $tr \sim Y'$.
 \end{proof}
 
-EXPLAIN tHIS LEMMA
+The follwing result corresponds to Lemma 2.20 in the book. 
+It is similar to Lemma \ref{lem218} in the sense that it conncerns what is propagated
+through the edges of the flow graph: in this case, the correctness of the analysis results.
 
 \begin{lemma}[Flow Preserves Correctness(cf. Lemma 2.20)]\label{lemmaflow}
 Assume $reach \models RD^\subseteq(S)$ with $S$ being label consistent. Then,
 $tr \sim X(\ell)$ implies $tr \sim N(\ell')$ for all $(\ell, \ell')$ in $flow(S)$.
 \end{lemma}
 \begin{proof}
-By \ref{lem218}, $X(\ell) \subseteq N(\ell')$. We then apply \ref{lemmasq}.
+By Lemma \ref{lem218}, we know that $X(\ell) \subseteq N(\ell')$. We then apply Lemma \ref{lemmasq}.
 \end{proof}
 
 
-\subsection*{Correctness Result (cf. 2.21)}
+\subsection*{Correctness Result for $RD^\subseteq$ (cf. 2.21,2.22)}
 
-BRIEF EXPLANATION
+This is the main step for proving the correctness
+of the reaching definitions analysis, similarly to Theorem 2.21 in the book.
+The theorem below states that the correctness
+relation is kept by each single execution step
+determined by the semantics.
 
 \begin{theo}[Stepwise Correctness (cf. Theorem 2.21)]
 \label{theo221}
@@ -326,7 +337,10 @@ Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 \end{proof}
 
 
-\begin{cor}[Through-Execution Correctness (cf. Corollary 2.22)]
+The previous result can then be lifted to executions consisting of several steps
+($\starto$ instead of just $\to$).
+
+\begin{cor}[Execution Correctness (cf. Corollary 2.22)]
 If $reach \models RD^\subseteq(S)$ (with $S$ being label consistent) then:
 
 
@@ -338,13 +352,13 @@ N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
 \end{enumerate}
 \end{cor}
 \begin{proof}
-This proof is by induction on the length of the derivation sequence and uses
+This proof is by mathematical induction on the length of the derivation sequence and uses
 \ref{theo221} at each step.
+DO WE NEED TO MAKE THE PROOF EXPLICITLY OR IS THIS ENOUGH?
 \end{proof}
 
-\subsection*{title}
 
-REVIEW THIS TEXT
+\subsection*{Introducing Undefinedness (?s)}
 
 Informally, the above result means that execution of a piece of code keeps the analysis results correct with respect to the semantics.
 That is, if we have $reach \models RD^\subseteq(S)$ and we have a correct analysis result for $reach_{entry}(init(S))$, then the analysis results will
@@ -386,9 +400,12 @@ program point (as seen in \ref{corr}) while the new constraint give us correct r
 \end{proof}
 
  
-\subsection*{Equation-Based Analysis}
+\subsection*{Equation-Based Analysis (cf. Lemma 2.15)}
 
-DEFINE $RD^=(S)$.
+We now consider the relationship between the constraint-based system considered so far and 
+the correspondent equation based system $RD^=_\star$, where all inclusions are replaced by equalities.
+The following result is analogous to Lemma 2.15 in the book and holds wheter we consider undefinedness
+($RD^{\subseteq/=}_\star$) or not ($RD^{\subseteq/=}$). 
 
 
 \begin{lemma}[Relationship between $RD_\star^\subseteq$ and $RD_\star^=$]
@@ -398,10 +415,12 @@ with the least solution of $RD_\star^\subseteq$.
 \end{lemma}
 \begin{proof}
 If $reach \models RD_\star^=(S_\star)$
-then clearly $reach \models \rdsub$ because $=$ is a subrelation of $\supseteq$.
+then clearly $reach \models RD^\subseteq_\star$ because $=$ is a subrelation of $\supseteq$
+(equality is a particular case of inclusion).
 
-Next we prove that $reach \models \rdsub$ has the same least solution
-as  $reach \models RD_\star^=(S_\star)$. The proof is the same as in the book, but we
+Next we prove that $reach \models RD_\star^\subseteq(S_\star)$ has the same least solution
+as  $reach \models RD_\star^=(S_\star)$.
+The proof is the same as in the book, but we
 need to make sure our lattice is complete and our function $F_{RD_\star}^S$ is monotone.
 For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
 type, a product of power sets, it is a complete lattice.
@@ -479,13 +498,20 @@ Now we can use our previous definitions with $:$ replaced by $:_k$:
 \widehat{f^2_{\ell_r, \ell_c}} (\widehat{\ell'}, \widehat{\ell}) (\delta) & = f^2_{\ell_r, \ell_c} (\widehat{\ell'}(\delta), \widehat{\ell}(\ell_r :_k \delta))
 \end{align}
 
-\subsection{Example}
-We only give the $X$-values for the interesting cases (label 1 and 14).
+\subsection*{Example}
+
+As an example, we worked out the analysis for the \texttt{fib} program presented in the book.
+
+We only give the $X$-value for the interesting cases (label 1 and 14), where it differs
+from the $N$-value. Basically, these are the edges where there are assignments to variables
+that become live, thus the edges where the analysis results really changes).
+
+NEED TO LABEL THE PROGRAM OR SAY HOW IT WAS LABELLED.IT ISN'T LABELLED IN THE BOOK
 
 \begin{table}
 $
 \begin{array}{lcccccccccccccccccccccccccccccccccccc}
-\  & [11, 11] & [9, 11] & [7, 11] & [3] & [11, 3] & [9, 3] & [7, 3] & [11, 9] & [9, 9 & [7, 9] & [\,] \\
+\  & [11, 11] & [9, 11] & [7, 11] & [3] & [11, 3] & [9, 3] & [7, 3] & [11, 9] & [9, 9] & [7, 9] & [\,] \\
 N(1)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \{x\}     \\
 X(1)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \{x, y\}  \\
 N(2)  & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \emptyset & \{x, y\} \\
@@ -508,8 +534,5 @@ N(16) & \emptyset & \emptyset & \{y   \}   & \emptyset & \emptyset & \emptyset &
 $
 \end{table}
 
-\end{document}
- 
-  
+\end{document}  
 
->>>>>>> eebc71b6d8903f8e9bb607a4f3462e13158e4bdc:assignment2/report.tex
