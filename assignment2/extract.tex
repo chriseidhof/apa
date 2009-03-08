@@ -123,6 +123,7 @@
 We define the set $RD^\subseteq(S)$ of constraints generated for a program $S$,
 not taking in account introducing undefinedness of all variables in the beginning. 
 
+
 \begin{align*} 
 \label{def_constr}
 RD^{\subseteq}(S) = & \; \{X(\ell) \supseteq N(\ell) \setminus kill_{RD}(B^l)) \cup gen_{RD}(B^l) \mid B^l \in blocks(S)\} \\
@@ -181,5 +182,6 @@ X(\ell)$ for some $\ell \in final(S_\star)$.
  
 The proof is straightforward: basically the old constraints guarantee that the results are correctly propagated to each (reachable)
 program point (as seen in \ref{corr}) while the new constraint give us correct results to start with.
+
 
 \end{document}
