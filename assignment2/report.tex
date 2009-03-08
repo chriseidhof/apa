@@ -390,19 +390,20 @@ program point (as seen in \ref{corr}) while the new constraint give us correct r
 
 DEFINE $RD^=(S)$.
 
-\begin{lemma}[Relationship between $RD^\subseteq$ and $RD^=$]
-Consider a label consistent program $S_\star$.  If $reach \models RD^=(S_\star)$
-then $reach \models \rdsub$. The least solution of $RD^=(S_\star)$ coincides
-with the least solution of $\rdsub$.
+
+\begin{lemma}[Relationship between $RD_\star^\subseteq$ and $RD_\star^=$]
+Consider a label consistent program $S_\star$.  If $reach \models RD_\star^=(S_\star)$
+then $reach \models RD_\star^\subseteq$. The least solution of $RD_\star^=(S_\star)$ coincides
+with the least solution of $RD_\star^\subseteq$.
 \end{lemma}
 \begin{proof}
-If $reach \models RD^=(S_\star)$
+If $reach \models RD_\star^=(S_\star)$
 then clearly $reach \models \rdsub$ because $=$ is a subrelation of $\supseteq$.
 
 Next we prove that $reach \models \rdsub$ has the same least solution
-as  $reach \models RD^=(S_\star)$. The proof is the same as in the book, but we
-need to make sure our lattice is complete and our function $F_RD^S$ is monotone.
-For $F_RD^S$ we can the function defined in section 1.3, and because of its
+as  $reach \models RD_\star^=(S_\star)$. The proof is the same as in the book, but we
+need to make sure our lattice is complete and our function $F_{RD_\star}^S$ is monotone.
+For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
 type, a product of power sets, it is a complete lattice.
 \end{proof}
 
