@@ -159,8 +159,8 @@ In what follows, $N$ will stand for $reach_{entry}$ and $X$ for $reach_{exit}$.
 
 Note that we presented only a constraint system (as opposed to a equation based system 
 as in the analysis formulation). In fact, just as for the case of live variables analysis,
-the correctness proof is much simpler to conduct using constraints. Anyway,
-the correctness for $RD^\subseteq$ implies the correctness for the corresponding
+the correctness proof is much simpler to conduct using constraints.
+The correctness for $RD^\subseteq$ also implies the correctness for the corresponding
 equation based system. We defer the proof of a result similar to that of Lemma 2.15 in the book
 until the end of this section, after we have reintroduced the undefinedness constraints.
 
@@ -210,7 +210,7 @@ immediately.
 We shall now consider some properties about the correctness relation.
 
 
-The correctness relation, $\sim: (Var_star \times \Lab_\star)^\star \to \pset{Var_\star \times \Lab_\star}$,
+The correctness relation, $\sim: (Var_\star \times \Lab_\star)^\star \to \pset{Var_\star \times \Lab_\star}$,
 relates traces of programs with analysis results at a certain point. It is defined as
 \[tr \sim Y \equiv \forall x \in DOM(tr) \,.\; (x,SRD(tr)(x)) \in Y\]
 where $DOM$ and $SRD$ are defined in the book, respectively yielding
@@ -247,7 +247,7 @@ By Lemma \ref{lem218}, we know that $X(\ell) \subseteq N(\ell')$. We then apply 
 \subsection*{Correctness Result for $RD^\subseteq$ (cf. 2.21,2.22)}
 
 This is the main step for proving the correctness
-of the reaching definitions analysis, similarly to Theorem 2.21 in the book.
+of the reaching definitions analysis, similar to Theorem 2.21 in the book.
 The theorem below states that the correctness
 relation is kept by each single execution step
 determined by the semantics.
@@ -262,7 +262,7 @@ Let $S$ be a label consistent program and $reach \models RD^{\subseteq}(S)$. The
 \end{theo}
 \begin{proof}
 The proof of this theorem goes by induction on the tree used to establish
-the transition (computation step) according to the rules of the instrumented operational semantics.
+the transition (i.e. computation step) according to the rules of the instrumented operational semantics.
 
 ~\\
 Case $[ass]$:
@@ -281,7 +281,7 @@ Our goal is to prove that $tr' \sim X(init(S))$, that is to say $(tr:(x,\ell)) \
 Looking at the definition of $\sim$,
 this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM(tr')$.
 
-The case $y=x$ is straightforward as
+The case for $y=x$ is straightforward as
 we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,\ell)\] which can easily be seen to be in $X(\ell)$ from equation \ref{assconst}.
 
 As for $y\neq x$, we have \[(y,SRD(tr')(y)) = (y,SRD(tr:(x,\ell))(y)) = (y,SRD(tr)(y))\] which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
@@ -311,7 +311,7 @@ Case $[seq2]$:
 
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
 The antecedent of the rule is $\pair{S_1,\sigma,tr} \to \pair{\sigma',tr'}$.
-By the same reason as in the previous case, we can apply the induction hypothesis, obtaining
+For the same reason as in the previous case we can apply the induction hypothesis, obtaining
 $tr' \sim X(init(S_1))$. By definition of flow, \[\forall \ell . \; \ell \in final(S_1). \;(\ell,init(S_2)) \in flow(S_1;S_2)\]
 By Lemma 2.14 from the book, $final(S_1) = \{init(S_1)\}$ (because the computation ended in one step). Thus,
 $(init(S_1),init(S_2)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
@@ -321,7 +321,7 @@ Case $[if1]$:
 
 We have $\pair{\ifl [b]^\ell\; \thenl S_1\; \elsel S_2,\sigma,tr} \to \pair{S_1,\sigma,tr}$ and $tr \sim N(\ell)$.
 From the constraints in $RD^{\subseteq}$, 
-\[ X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+\[ X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(\ell,init(S_1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
 to conclude $tr \sim N(init(S_1))$.
 
@@ -335,7 +335,7 @@ Case $[wh1]$:
 
 We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{S_b;\whilel [b]^\ell \dol S_b,\sigma,tr}$ and $tr \sim N(\ell)$.
 Again, from the constraints, we have
-\[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+\[X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 As before, $(\ell,init(S_b)) \in flow(S)$. Hence, as in the previous case, Lemmas \ref{lemmasq} and \ref{lemmaflow} give
 $tr \sim X(\ell)$ and then
 $tr \sim N(init(S_b))$.
@@ -345,7 +345,7 @@ Case $[wh2]$:
 
 We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{\sigma,tr}$ and $tr \sim N(\ell)$.
 The constraints give
-\[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
+\[X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 
 \end{proof}
@@ -367,7 +367,7 @@ N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
 \end{cor}
 \begin{proof}
 This proof is by mathematical induction on the length of the derivation sequence and uses
-\ref{theo221} at each step.
+Theorem \ref{theo221} at each step.
 \end{proof}
 
 
@@ -382,7 +382,8 @@ We now consider the whole $RD$ analysis:
 for a program $S_\star$, we generate all the constraints in $RD^\subseteq(S_\star)$ plus a constraint
 introducing variable undefinedness at the beginning. 
  
-\[RD^\subseteq_\star(S_\star) = RD^\subseteq(S_\star) \cup \{ \{(x,?) \mid x \in \Var_\star\} \subseteq init(S_\star) \}\]
+\[RD^\subseteq_\star(S_\star) = RD^\subseteq(S_\star) \cup \{ \{(x,?) \mid x \in
+\Var_\star\} \subseteq RD_{entry}(l) \text{ if } l \in init(S_\star) \}\]
 
 This set of constraints is intended to be applied only once, for the ``full'' program.
 The idea is that it correctly captures the semantics of executions of complete programs
@@ -470,8 +471,8 @@ Then, the data flow equations will read as below.
 \begin{align*}
 LV_{entry}(\ell) & = \widehat{f_\ell}(LV_{exit}(\ell)) \text{for labels not in \texttt{call}}\\
 LV_{exit}(\ell) &= \bigsqcup{LV_{exit}(\ell') \mid (\ell,\ell') \in flow(S_\star) \lor (\ell;\ell') \in flow(S_\star)}\\
-LV_{entry}(\ell_r) &= \widehat{f^1_{\ell_c}}(LV_{exit}(\ell_r) \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
-LV_{entry}(\ell_c) &= \widehat{f^2_{\ell_r,\ell_c}}(LV_{exit}(\ell_r),LV_{exit}(\ell_c) \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
+LV_{entry}(\ell_r) &= \widehat{f^1_{\ell_c}}(LV_{exit}(\ell_r)) \text{\;for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
+LV_{entry}(\ell_c) &= \widehat{f^2_{\ell_r,\ell_c}}(LV_{exit}(\ell_r),LV_{exit}(\ell_c)) \text{\;for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
 \end{align*}
 
 We now need to instantiate the transfer functions $\widehat{f_\ell} : \hat{L} \to \hat{L}$.
