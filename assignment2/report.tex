@@ -508,7 +508,7 @@ argument for the call and add $x$ and $y$ only if they are in $v$, that is, they
  
 \begin{align}
 f^1_{\ell_r} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
-f^2_{\ell_r, \ell_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\})
+f^2_{\ell_r, \ell_c} (v, w) & = (w \setminus \{x, y\}) \cup FV(a) \cup (v \cap \{x, y\} \setminus \{z\})
 \end{align}
 
 Now we are ready to give the context-sensitive functions for call strings with
@@ -534,6 +534,79 @@ Now we can use our previous definitions with $:$ replaced by $:_k$:
 \end{align}
 
 \subsection*{Example}
+
+We now present two small programs that shows how the transfer functions work with
+and without shadowing.
+
+\begin{progenv}
+\texttt{begin} \\
+\;\;\texttt{proc $id$ (val $x$, res $y$) is} ^{1}\\
+\;\;\;\;\lbrack y := x\rbrack^{2};\\
+\;\;\texttt{end}^3 \\
+\;\;\lbrack \texttt{call } id\;(x + 1, y)\rbrack^{4}_{5};\\
+\;\;\lbrack r := x + y\rbrack^{6};\\
+\texttt{end}
+\end{progenv}
+
+Two notable equations for Program 1 are:
+
+\begin{align*}
+f^1_{5} (v) & = (v \setminus \{x, y\}) \cup \{y \mid y \in v\} \\
+f^2_{5, 4} (v, w) & = (w \setminus \{x, y\}) \cup \{x\} \cup (v \cap \{x, y\} \setminus \{y\})
+\end{align*}
+
+Clearly, $X(5) = N(6) = \{x, y\}$. Then 
+\begin{align*}
+N(5)  & = f^1_5(X(5))  \\
+      & = f^1_5(\{x,y\})  \\
+      & = (\{x, y\} \setminus \{x, y\}) \cup \{y \mid y \in \{x, y\}\}  \\
+      & = \{y\} 
+\end{align*}
+Moreover, at the beginning of the procedure we will have $X(4) = N(1) = \{x\}$.
+And then 
+\begin{align*}
+N(4) & = f^2_{5, 4} (X(5), X(4))  \\
+     & = f^2_{5, 4} (\{x, y\}, \{x\}) \\
+     & = (\{x\} \setminus \{x, y\}) \cup \{x\} \cup (\{x, y\} \cap \{x, y\} \setminus \{y\}) \\
+     & = \emptyset \cup \{x\} \cup \{x\} \\
+     & = \{x\}
+\end{align*}
+
+\begin{progenv}
+\texttt{begin} \\
+\;\;\texttt{proc $id$ (val $x$, res $y$) is} ^{1}\\
+\;\;\;\;\lbrack y := x\rbrack^{2};\\
+\;\;\texttt{end}^3 \\
+\;\;\lbrack \texttt{call } id\;(t, z)\rbrack^{4}_{5};\\
+\;\;\lbrack r := z + q\rbrack^{6};\\
+\texttt{end}
+\end{progenv}
+
+Now for Program 2 we have
+
+\begin{align*}
+f^1_{5} (v) & = (v \setminus \{x, z\}) \cup \{y \mid z \in v\} \\
+f^2_{5, 4} (v, w) & = (w \setminus \{x, y\}) \cup \{t\} \cup (v \cap \{x, y\} \setminus \{z\})
+\end{align*}
+
+Clearly, $X(5) = N(6) = \{z, q\}$. Then 
+\begin{align*}
+N(5)  & = f^1_5(X(5))  \\
+      & = f^1_5(\{z,q\})  \\
+      & = (\{z, q\} \setminus \{x, z\}) \cup \{y \mid z \in \{z, q\} \\
+      & = \{y, q\} 
+\end{align*}
+Moreover, at the beginning of the procedure we will have $X(4) = N(1) = \{x, q\}$.
+And then 
+\begin{align*}
+N(4) & = f^2_{5, 4} (X(5), X(4))  \\
+     & = f^2_{5, 4} (\{z, q\}, \{x, q\}) \\
+     & = (\{x, q\} \setminus \{x, y\}) \cup \{t\} \cup (\{z, q\} \cap \{x, y\} \setminus \{z\}) \\
+     & = \{q\} \cup \{t\} \cup \emptyset \\
+     & = \{q, t\}
+\end{align*}
+
+\subsection*{Result Example}
 
 As an example, we worked out the analysis for the \texttt{fib} program presented in the book.
 
