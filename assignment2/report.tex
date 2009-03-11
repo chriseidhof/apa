@@ -527,15 +527,13 @@ unbounded length.
 \widehat{f^2_{\ell_r, \ell_c}} (\widehat{\ell'}, \widehat{\ell}) (\delta) & = f^2_{\ell_r, \ell_c} (\widehat{\ell'}(\delta), \widehat{\ell}(\ell_r : \delta))
 \end{align}
 
-When doing call strings of bounded length $k$, we replace our $cons$-operator by
-$:_k$ which is defined as following:
-
-\begin{align}
+When restricting to call strings of bounded length $k$, we replace our $cons$-operator by
+$:_k$ which is defined as follows:
+\begin{align*}
 x :_k xs = take\ k\ (x : xs)
-\end{align}
+\end{align*}
 
-Now we can use our previous definitions with $:$ replaced by $:_k$:
-
+Now we can use our previous definitions with $:$ replaced by $:_k$.
 \begin{align}
 \widehat{f^1_{\ell_r}} (\widehat{\ell}) (\delta) & = \bigsqcup \{ f^1_{\ell_r} (\widehat{\ell}(\delta') \mid \delta = \ell_r :_k \delta' \} \\
 \widehat{f^2_{\ell_r, \ell_c}} (\widehat{\ell'}, \widehat{\ell}) (\delta) & = f^2_{\ell_r, \ell_c} (\widehat{\ell'}(\delta), \widehat{\ell}(\ell_r :_k \delta))
