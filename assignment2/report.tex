@@ -432,22 +432,23 @@ with the least solution of $RD_\star^\subseteq$.
 \end{lemma}
 \begin{proof}
 If $reach \models RD_\star^=(S_\star)$
-then clearly $reach \models RD^\subseteq_\star$ because $=$ is a subrelation of $\supseteq$
+then clearly $reach \models RD^\subseteq_\star(S_\star)$ because $=$ is a subrelation of $\supseteq$
 (equality is a particular case of inclusion).
 
 Next we prove that $reach \models RD_\star^\subseteq(S_\star)$ has the same least solution
 as  $reach \models RD_\star^=(S_\star)$.
 The proof is the same as in the book, using Tarski's Fix Point Theorem.
-So, we just need to guarantee that we can apply it, that is, make sure that 
-function $F_{RD_\star}^S$ (as defined in chapter 1 of the book) is a monotone
+So, we just need to guarantee that it can be applied, that is, that 
+function $F_{RD_\star}^{S_\star}$ (as defined in chapter 1 of the book) is a monotone
 function in a complete lattice.
-Note that our $F_{RD_\star}$
-has type $\vec{L} \to \vec{L}$ were $\vec{L}$ is a lattice obtained via a direct product
-of power sets ($(\pset{\Var_\star \times \Lab_\star})^{2|\Lab_\star|}$) and so is a complete lattice. 
-For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
-type, a product of power sets, it is a complete lattice. To see that it is monotone,
-we just notice that the right hand sides defining $F_{RD_\star}$ are made of constant inclusions and
-exclusions as well as unions of several sets from the argument. Thus, given a tuple with pointwise
+Note that function $F_{RD_\star}^{S_\star}$
+has type $\vec{L} \to \vec{L}$ where $\vec{L}$ is a direct product
+of power sets: $(\pset{\Var_\star \times \Lab_\star})^{2|\Lab_\star|}$. Thus, it is a complete lattice. 
+To see that it is monotone
+we  notice that the right hand side of each component of $F_{RD_\star}^{S_\star}$
+is composed by operation that preserve monotonicity: set union and subtraction
+by constant sets.
+Thus, given a tuple with pointwise
 larger sets, we also get larger sets in the resulting tuple.
 \end{proof}
 
@@ -469,8 +470,8 @@ Then, the data flow equations will read as below.
 \begin{align*}
 LV_{entry}(\ell) & = \widehat{f_\ell}(LV_{exit}(\ell)) \text{for labels not in \texttt{call}}\\
 LV_{exit}(\ell) &= \bigsqcup{LV_{exit}(\ell') \mid (\ell,\ell') \in flow(S_\star) \lor (\ell;\ell') \in flow(S_\star)}\\
-LV_{entry}(\ell_r) &= \widehat{f^1_{\ell_c}(LV_{exit}(\ell_r)} \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
-LV_{entry}(\ell_c) &= \widehat{f^2_{\ell_r,\ell_c}(LV_{exit}(\ell_r),LV_{exit}(\ell_c)} \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
+LV_{entry}(\ell_r) &= \widehat{f^1_{\ell_c}}(LV_{exit}(\ell_r) \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
+LV_{entry}(\ell_c) &= \widehat{f^2_{\ell_r,\ell_c}}(LV_{exit}(\ell_r),LV_{exit}(\ell_c) \text{for all $(l_c,l_n,l_x,l_r) \in interflow(S_\star)$}\\
 \end{align*}
 
 We now need to instantiate the transfer functions $\widehat{f_\ell} : \hat{L} \to \hat{L}$.
