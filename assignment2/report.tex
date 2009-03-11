@@ -157,10 +157,10 @@ In that case, we write
 In what follows, $N$ will stand for $reach_{entry}$ and $X$ for $reach_{exit}$. 
 
 
-Note that we presented only a constraint system (as opposed to a equation based system 
-as in the analysis formulation). In fact, just as for the case of live variables analysis,
+Note that we presented only a constraint system (as opposed to an equation system 
+as in the analysis formulation). Actually, just as for the case of live variables analysis,
 the correctness proof is much simpler to conduct using constraints.
-The correctness for $RD^\subseteq$ also implies the correctness for the corresponding
+Nevertheless, the correctness for $RD^\subseteq$ implies the correctness for the corresponding
 equation based system. We defer the proof of a result similar to that of Lemma 2.15 in the book
 until the end of this section, after we have reintroduced the undefinedness constraints.
 
@@ -210,7 +210,7 @@ immediately.
 We shall now consider some properties about the correctness relation.
 
 
-The correctness relation, $\sim: (Var_\star \times \Lab_\star)^\star \to \pset{Var_\star \times \Lab_\star}$,
+The correctness relation, $\sim: (Var \times \Lab)^\star \to \pset{Var_\star \times \Lab_\star}$,
 relates traces of programs with analysis results at a certain point. It is defined as
 \[tr \sim Y \equiv \forall x \in DOM(tr) \,.\; (x,SRD(tr)(x)) \in Y\]
 where $DOM$ and $SRD$ are defined in the book, respectively yielding
