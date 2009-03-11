@@ -215,12 +215,12 @@ relates traces of programs with analysis results at a certain point. It is defin
 \[tr \sim Y \equiv \forall x \in DOM(tr) \,.\; (x,SRD(tr)(x)) \in Y\]
 where $DOM$ and $SRD$ are defined in the book, respectively yielding
 the domain of a trace and the label corresponding to the rightmost (most recent) 
-occorrence of a certain variable in a trace.
+occurrence of a certain variable in a trace.
 
 The next lemma is a simple property of the correctness relation. It can be read as a monotonicity property
 of $(tr \sim)$ seen as a function to the booleans: if we have a
 correct result $Y$ at a certain point, then any ``larger'' result
-will still be correct (altough less optimal). 
+will still be correct (although less optimal). 
 
 \begin{lemma}[Monotonicity of $(tr \sim)$]
 \label{lemmasq}
@@ -231,8 +231,8 @@ $tr \sim Y$ means that for all $x \in DOM (tr)$ we have $(x,SRD(tr)(x)) \in Y$.
 As $Y \subseteq Y'$, we also have $(x,SRD(tr)(x)) \in Y'$. Hence, $tr \sim Y'$.
 \end{proof}
 
-The follwing result corresponds to Lemma 2.20 in the book. 
-It is similar to Lemma \ref{lem218} in the sense that it conncerns what is propagated
+The following result corresponds to Lemma 2.20 in the book. 
+It is similar to Lemma \ref{lem218} in the sense that it concerns what is propagated
 through the edges of the flow graph: in this case, the correctness of the analysis results.
 
 \begin{lemma}[Flow Preserves Correctness(cf. Lemma 2.20)]\label{lemmaflow}
@@ -409,10 +409,10 @@ X(\ell)$ for some $\ell \in final(S_\star)$.
 \end{theo}
 \begin{proof}
 Let $reach \models RD_\star^\subseteq(S_\star)$. Then, in particular,
-$\{(x,?) \mid x \in \Var_\star\} \subseteq N(init(S_\star))$  is satisfied. So,
-$tr_0 \sim init(S_\star)$. Also,
+$\{(x,?) \mid x \in \Var_\star\} \subseteq N(init(S_\star))$  is satisfied. So
+$tr_0 \sim N(init(S_\star))$. Also,
 $reach \models RD^\subseteq(S_\star)$, thus Corollary \ref{cor222} holds. Applying it
-to $\pair{S_\star,\sigma,tr_0}$, knowing that $tr_0 \sim init(S_\star)$,
+to $\pair{S_\star,\sigma,tr_0}$, knowing that $tr_0 \sim N(init(S_\star))$,
 we get the desired result.
 \end{proof}
 
