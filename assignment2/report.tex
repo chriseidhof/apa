@@ -149,7 +149,7 @@ RD^{\subseteq}(S) = & \; \{RD_{exit}(\ell) \supseteq RD_{entry}(\ell) \setminus 
 \end{align*}
 
 A solution, $reach$, to the constraint system $RD^\subseteq(S)$ is a pair of functions
-\[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_star \cup \{?\})}\] 
+\[reach_{entry}, reach_{exit} : \Lab_\star \to \pset{\Var_\star \times (\Lab_\star \cup \{?\})}\] 
 that satisfies the constraints (when instantiating $RD_{entry}$/$RD_{exit}$ with $reach_{entry}$/$reach_{exit}$).
 In that case, we write
 \[reach \models RD^{\subseteq}(S)\]
@@ -192,7 +192,7 @@ solves all that are in $RD^\subseteq(S_2)$ (that is, $reach \models RD^\subseteq
 \end{proof}
 
 
-The second result simply states that the, ina aolution to the constraints, the analysis results are
+The second result simply states that the analysis results are
 propagated (forwardly) through the flow graph of the program.
 
 \begin{lemma}[Flow Propagates Results(cf. Lemma 2.18)]
@@ -219,7 +219,7 @@ occorrence of a certain variable in a trace.
 
 The next lemma is a simple property of the correctness relation. It can be read as a monotonicity property
 of $(tr \sim)$ seen as a function to the booleans: if we have a
-correct result $Y$ at a certain point, then any ``bigger'' result
+correct result $Y$ at a certain point, then any ``larger'' result
 will still be correct (altough less optimal). 
 
 \begin{lemma}[Monotonicity of $(tr \sim)$]
@@ -281,8 +281,8 @@ Our goal is to prove that $tr' \sim X(init(S))$, that is to say $(tr:(x,\ell)) \
 Looking at the definition of $\sim$,
 this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM(tr')$.
 
-The case $y=x$ is straightforward, as
-we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,\ell)\] which can easily be seen to be in $X(\ell)$, from equation \ref{assconst}.
+The case $y=x$ is straightforward as
+we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,\ell)\] which can easily be seen to be in $X(\ell)$ from equation \ref{assconst}.
 
 As for $y\neq x$, we have \[(y,SRD(tr')(y)) = (y,SRD(tr:(x,\ell))(y)) = (y,SRD(tr)(y))\] which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
 As $y\neq x$, then it is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$, which in turn is contained in $X(\ell)$, by equation \ref{assconst}.
@@ -313,22 +313,22 @@ We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(ini
 The antecedent of the rule is $\pair{S_1,\sigma,tr} \to \pair{\sigma',tr'}$.
 By the same reason as in the previous case, we can apply the induction hypothesis, obtaining
 $tr' \sim X(init(S_1))$. By definition of flow, \[\forall \ell . \; \ell \in final(S_1). \;(\ell,init(S_2)) \in flow(S_1;S_2)\]
-By Lemma 2.14 from the book, $final(S_1) = \{init(S_1)\}$ (because computation ended in one step). Thus,
+By Lemma 2.14 from the book, $final(S_1) = \{init(S_1)\}$ (because the computation ended in one step). Thus,
 $(init(S_1),init(S_2)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
 
 ~\\
 Case $[if1]$:
 
-We have $\pair{\ifl [b]^\ell \thenl S_1 \elsel S_2,\sigma,tr} \to \pair{S1,\sigma,tr}$ and $tr \sim N(\ell)$.
+We have $\pair{\ifl [b]^\ell\; \thenl S_1\; \elsel S_2,\sigma,tr} \to \pair{S_1,\sigma,tr}$ and $tr \sim N(\ell)$.
 From the constraints in $RD^{\subseteq}$, 
 \[ X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
-Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(\ell,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
-to conclude $tr \sim N(init(S1))$.
+Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(\ell,init(S_1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
+to conclude $tr \sim N(init(S_1))$.
 
 ~\\
 Case $[if2]$:
 
-The proof is the same as in the previous case, taking $S_2$ instead of $S_1$.
+The proof is the same as in the previous case, substituting $S_2$ for $S_1$.
 
 ~\\
 Case $[wh1]$:
@@ -354,7 +354,7 @@ Thus, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 The previous result can then be lifted to executions consisting of several steps
 ($\starto$ instead of just $\to$).
 
-\begin{cor}[Execution Correctness (cf. Corollary 2.22)]
+\begin{cor}[Execution Correctness (cf. Corollary 2.22)]\label{cor222}
 If $reach \models RD^\subseteq(S)$ (with $S$ being label consistent) then:
 
 
@@ -368,7 +368,6 @@ N(init(S))$ then $tr' \sim X(\ell)$ for some $\ell \in final(S)$.
 \begin{proof}
 This proof is by mathematical induction on the length of the derivation sequence and uses
 \ref{theo221} at each step.
-DO WE NEED TO MAKE THE PROOF EXPLICITLY OR IS THIS ENOUGH?
 \end{proof}
 
 
@@ -390,7 +389,7 @@ The idea is that it correctly captures the semantics of executions of complete p
 (but not of subprograms where some code has already been executed, unless we want to ``forget''
 that code).
 The idea is that the old constraints guarantee the results are correctly propagated to each (reachable)
-program point (as seen in \ref{cor221}) while the new constraint give us correct results to start with.
+program point (as seen in Corollary \ref{cor222}) while the new constraint give us correct results to start with.
 
 In fact, on the semantics side, a full evaluation of $S_\star$ starts from $\pair{S_\star,\sigma,tr_0}$
 where $\sigma$ is some initial state and $tr_0$ is the trace at the beginning, where yet no code
@@ -409,11 +408,11 @@ X(\ell)$ for some $\ell \in final(S_\star)$.
 \end{enumerate}
 \end{theo}
 \begin{proof}
-Let $reach \models RD_\star^\subseteq(S_\star)$. Then, in particualar,
-$\{(x,?) \mid x \in \Var_\star\} \subseqeq N(init(S_star))$  is satisfied. So,
-$tr_0 \sim init(S_star)$. Also,
-$reach \models RD^\subseteq(S_\star)$, thus \ref{cor221} holds. Applying it
-to $\pair{S_\star,\sigma,\tr_0}$, knowing that $tr_0 \sim init(S_star),
+Let $reach \models RD_\star^\subseteq(S_\star)$. Then, in particular,
+$\{(x,?) \mid x \in \Var_\star\} \subseteq N(init(S_\star))$  is satisfied. So,
+$tr_0 \sim init(S_\star)$. Also,
+$reach \models RD^\subseteq(S_\star)$, thus Corollary \ref{cor222} holds. Applying it
+to $\pair{S_\star,\sigma,tr_0}$, knowing that $tr_0 \sim init(S_\star)$,
 we get the desired result.
 \end{proof}
 
@@ -422,11 +421,11 @@ we get the desired result.
 
 We now consider the relationship between the constraint-based system considered so far and 
 the correspondent equation based system $RD^=_\star$, where all inclusions are replaced by equalities.
-The following result is analogous to Lemma 2.15 in the book and holds wheter we consider undefinedness
+The following result is analogous to Lemma 2.15 in the book and holds whether we consider undefinedness
 ($RD^{\subseteq/=}_\star$) or not ($RD^{\subseteq/=}$). 
 
 
-\begin{lemma}[Relationship between $RD_\star^\subseteq$ and $RD_\star^=$]
+\begin{lemma}[Relationship between $RD_\star^\subseteq$ and $RD_\star^=$ (cf. Lemma 2.15)]
 Consider a label consistent program $S_\star$.  If $reach \models RD_\star^=(S_\star)$
 then $reach \models RD_\star^\subseteq(S_\star)$. The least solution of $RD_\star^=(S_\star)$ coincides
 with the least solution of $RD_\star^\subseteq$.
@@ -447,8 +446,9 @@ has type $\vec{L} \to \vec{L}$ were $\vec{L}$ is a lattice obtained via a direct
 of power sets ($(\pset{\Var_\star \times \Lab_\star})^2|\Lab_\star|$) and so is a complete lattice. 
 For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
 type, a product of power sets, it is a complete lattice. To see that it is monotone,
-
-
+we just notice that the right hand sides defining $F_{RD_\star}$ are made of constant inclusions and
+exclusions as well as unions of several sets from the argument. Thus, given a tuple with poitwise
+larger sets, we also get larger sets in the resulting tuple.
 \end{proof}
 
 
