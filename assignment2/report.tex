@@ -215,12 +215,12 @@ relates traces of programs with analysis results at a certain point. It is defin
 \[tr \sim Y \equiv \forall x \in DOM(tr) \,.\; (x,SRD(tr)(x)) \in Y\]
 where $DOM$ and $SRD$ are defined in the book, respectively yielding
 the domain of a trace and the label corresponding to the rightmost (most recent) 
-occorrence of a certain variable in a trace.
+occurrence of a certain variable in a trace.
 
 The next lemma is a simple property of the correctness relation. It can be read as a monotonicity property
 of $(tr \sim)$ seen as a function to the booleans: if we have a
 correct result $Y$ at a certain point, then any ``larger'' result
-will still be correct (altough less optimal). 
+will still be correct (although less optimal). 
 
 \begin{lemma}[Monotonicity of $(tr \sim)$]
 \label{lemmasq}
@@ -231,8 +231,8 @@ $tr \sim Y$ means that for all $x \in DOM (tr)$ we have $(x,SRD(tr)(x)) \in Y$.
 As $Y \subseteq Y'$, we also have $(x,SRD(tr)(x)) \in Y'$. Hence, $tr \sim Y'$.
 \end{proof}
 
-The follwing result corresponds to Lemma 2.20 in the book. 
-It is similar to Lemma \ref{lem218} in the sense that it conncerns what is propagated
+The following result corresponds to Lemma 2.20 in the book. 
+It is similar to Lemma \ref{lem218} in the sense that it concerns what is propagated
 through the edges of the flow graph: in this case, the correctness of the analysis results.
 
 \begin{lemma}[Flow Preserves Correctness(cf. Lemma 2.20)]\label{lemmaflow}
@@ -447,8 +447,8 @@ of power sets ($(\pset{\Var_\star \times \Lab_\star})^2|\Lab_\star|$) and so is 
 For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
 type, a product of power sets, it is a complete lattice. To see that it is monotone,
 we just notice that the right hand sides defining $F_{RD_\star}$ are made of constant inclusions and
-exclusions as well as unions of several sets from the argument. Thus, given a tuple with poitwise
-larger sets, we also get larger sets in the resulting tuple.
+exclusions as well as unions of several sets from the argument. Thus, given a
+tuple with pointwise larger sets, we also get larger sets in the resulting tuple.
 \end{proof}
 
 
