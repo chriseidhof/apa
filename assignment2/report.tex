@@ -383,7 +383,7 @@ for a program $S_\star$, we generate all the constraints in $RD^\subseteq(S_\sta
 introducing variable undefinedness at the beginning. 
  
 \[RD^\subseteq_\star(S_\star) = RD^\subseteq(S_\star) \cup \{ \{(x,?) \mid x \in
-\Var_\star\} \subseteq RD_{entry}(l) \text{ if } l \in init(S_\star) \}\]
+\Var_\star\} \subseteq RD_{entry}(init(S_\star)) \}\]
 
 This set of constraints is intended to be applied only once, for the ``full'' program.
 The idea is that it correctly captures the semantics of executions of complete programs
