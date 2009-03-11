@@ -123,7 +123,8 @@
 \section{~}
 
 Our goal is to prove the correctness of reaching definitions analysis.
-We follow the structure of the proof presented in the book for the LV analysis.
+We follow the structure of the proof presented in the book for the live
+variable analysis.
 
 We start by presenting the analysis itself: the constraints generated for each program. Here,
 we make a deviation from the book, dropping the initial undefinedness constraints. For that
@@ -166,7 +167,7 @@ until the end of this section, after we have reintroduced the undefinedness cons
 
 \subsection*{Lemmas about the Analysis (cf. 2.16,2.18)}
 
-We present two lemmas about solution $reach$ to the constraints, which are variants
+We present two lemmas about a solution $reach$ to the constraints, which are variants
 of lemmas 2.16 and 2.18 in the book for reaching definitions analysis.
 
 The former 
@@ -187,11 +188,11 @@ As $S_2$'s flow graph is a subset of $S_1$'s, it is clear from the definition
 of the analysis 
 that $RD^{\subseteq}(S_2) \subseteq RD^{\subseteq}(S_1)$. Thus, if 
 $reach$ solves all the constraints in $RD^\subseteq(S_1)$, then in particular it
-solves all that are in $RD^\subseteq(S_2)$ ($reach \models RD^\subseteq(S_2)$.
+solves all that are in $RD^\subseteq(S_2)$ (that is, $reach \models RD^\subseteq(S_2)$).
 \end{proof}
 
 
-The second result simply states that the analysis results are
+The second result simply states that the, ina aolution to the constraints, the analysis results are
 propagated (forwardly) through the flow graph of the program.
 
 \begin{lemma}[Flow Propagates Results(cf. Lemma 2.18)]
@@ -206,10 +207,15 @@ immediately.
 
 \subsection*{Lemmas about the correctness relation (cf. 2.20) }
 
-Now, we consider some properties about the correctness relation.
+We shall now consider some properties about the correctness relation.
 
-SHOULD WE PRESENT THE DEFINITION OF THE RELATION HERE?
 
+The correctness relation, $\sim: (Var_star \times \Lab_\star)^\star \to \pset{Var_\star \times \Lab_\star}$,
+relates traces of programs with analysis results at a certain point. It is defined as
+\[tr \sim Y \equiv \forall x \in DOM(tr) \,.\; (x,SRD(tr)(x)) \in Y\]
+where $DOM$ and $SRD$ are defined in the book, respectively yielding
+the domain of a trace and the label corresponding to the rightmost (most recent) 
+occorrence of a certain variable in a trace.
 
 The next lemma is a simple property of the correctness relation. It can be read as a monotonicity property
 of $(tr \sim)$ seen as a function to the booleans: if we have a
@@ -218,10 +224,10 @@ will still be correct (altough less optimal).
 
 \begin{lemma}[Monotonicity of $(tr \sim)$]
 \label{lemmasq}
-If $tr \sim Y \and Y \subseteq Y'$ then $tr \sim Y'$.
+If $tr \sim Y$ and $Y \subseteq Y'$ then $tr \sim Y'$.
 \end{lemma}
 \begin{proof}
-$tr \sim Y$ means that for all $x \in DOM (tr)$ we have $(x,SRD(tr)(x)) \in Y$. Taking
+$tr \sim Y$ means that for all $x \in DOM (tr)$ we have $(x,SRD(tr)(x)) \in Y$. 
 As $Y \subseteq Y'$, we also have $(x,SRD(tr)(x)) \in Y'$. Hence, $tr \sim Y'$.
 \end{proof}
 
@@ -258,29 +264,30 @@ Let $S$ be a label consistent program and $reach \models RD^{\subseteq}(S)$. The
 The proof of this theorem goes by induction on the tree used to establish
 the transition (computation step) according to the rules of the instrumented operational semantics.
 
+~\\
 Case $[ass]$:
 
-We have $\pair{[x := a]^\ell, \sigma, tr} \to \pair{\sigma[x\mapsto\A{a}\sigma], tr:(x,l)}$
+We have $\pair{[x := a]^\ell, \sigma, tr} \to \pair{\sigma[x\mapsto\A{a}\sigma], tr:(x,\ell)}$
 and $tr \sim N(\ell)$. 
 
 
 From the constraints,
 
 \begin{equation}\label{assconst}
-X(\ell) \supseteq (N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}) \cup \{(x,l)\}
+X(\ell) \supseteq (N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}) \cup \{(x,\ell)\}
 \end{equation}
 
-Our goal is to prove that $tr' \sim X(init(S))$, that is to say $(tr:(x,l)) \sim X(\ell)$.
+Our goal is to prove that $tr' \sim X(init(S))$, that is to say $(tr:(x,\ell)) \sim X(\ell)$.
 Looking at the definition of $\sim$,
 this amounts to prove that $(y,SRD(tr')(y)) \in X(\ell)$ for every $y \in DOM(tr')$.
 
 The case $y=x$ is straightforward, as
-we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,l)\] which can easily be seen to be in $X(\ell)$, from \ref{assconst}.
+we then have \[(y,SRD(tr')(y)) = (x,SRD(tr:(x,\ell))(x)) = (x,\ell)\] which can easily be seen to be in $X(\ell)$, from equation \ref{assconst}.
 
-As for $y\neq x$, we just have \[(y,SRD(tr')(y)) = (y,SRD(tr:(x,l))(y)) = (y,SRD(tr)(y))\] which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
-Because $y\neq x$, then it is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$, which in turn is contained in $X(\ell)$, by equation \ref{assconst}.
+As for $y\neq x$, we have \[(y,SRD(tr')(y)) = (y,SRD(tr:(x,\ell))(y)) = (y,SRD(tr)(y))\] which clearly is in $N(\ell)$ (because $y \in DOM(tr)$ and $tr \sim N(\ell)$).
+As $y\neq x$, then it is also in $N(\ell) \setminus \{(x,\ell') \mid \ell' \in \Lab_\star^?\}$, which in turn is contained in $X(\ell)$, by equation \ref{assconst}.
 
-
+~\\
 Case $[skip]$:
 
 We have $\pair{[\skip]^\ell, \sigma, tr} \to \pair{\sigma, tr}$
@@ -289,15 +296,17 @@ From the constraints we have
 \[X(\ell) \supseteq (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 Hence, by Lemma \ref{lemmasq}, $tr \sim X(\ell)$.
 
+~\\
 Case $[seq1]$:
 
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S'_1;S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
 For the rule to apply, we also have $\pair{S_1,\sigma,tr} \to \pair{S'_1,\sigma',tr'}$.
 As $S_1$ is a subprogram of $S_1;S_2$, by Lemma \ref{lemmasubp},
 we can say that $reach \models RD^{\subseteq}(S_1)$. Also, $init(S_1;S_2) = init(S_1)$, so we have
-$tr \sim N(S_1)$ and we can then apply the induction hypothesis, giving $tr' \sim  N(init(S'_1))$.
+$tr \sim N(init(S_1))$ and we can then apply the induction hypothesis, giving $tr' \sim  N(init(S'_1))$.
 As $init(S'_1) = init(S'_1;S_2)$, we conclude $tr' \sim N(init(S'_1;S_2))$ as required.
 
+~\\
 Case $[seq2]$:
 
 We have $\pair{S_1;S_2,\sigma,tr} \to \pair{S_2,\sigma',tr'}$ and $tr \sim N(init(S_1;S_2))$.
@@ -307,6 +316,7 @@ $tr' \sim X(init(S_1))$. By definition of flow, \[\forall \ell . \; \ell \in fin
 By Lemma 2.14 from the book, $final(S_1) = \{init(S_1)\}$ (because computation ended in one step). Thus,
 $(init(S_1),init(S_2)) \in flow(S)$ and Lemma \ref{lemmaflow} gives $tr \sim N(init(S_2))$.
 
+~\\
 Case $[if1]$:
 
 We have $\pair{\ifl [b]^\ell \thenl S_1 \elsel S_2,\sigma,tr} \to \pair{S1,\sigma,tr}$ and $tr \sim N(\ell)$.
@@ -315,18 +325,22 @@ From the constraints in $RD^{\subseteq}$,
 Thus, by \ref{lemmasq}, $tr \sim X(\ell)$. Now, since $(\ell,init(S1)) \in flow(S)$, we can use Lemma \ref{lemmaflow}
 to conclude $tr \sim N(init(S1))$.
 
+~\\
 Case $[if2]$:
 
-The proof is the same as in the previous case, exchanging $S_1$ and $S_2$.
+The proof is the same as in the previous case, taking $S_2$ instead of $S_1$.
 
+~\\
 Case $[wh1]$:
 
 We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{S_b;\whilel [b]^\ell \dol S_b,\sigma,tr}$ and $tr \sim N(\ell)$.
 Again, from the constraints, we have
 \[X(\ell) \supset (N(\ell) \setminus \emptyset) \cup \emptyset = N(\ell)\]
 As before, $(\ell,init(S_b)) \in flow(S)$. Hence, as in the previous case, Lemmas \ref{lemmasq} and \ref{lemmaflow} give
+$tr \sim X(\ell)$ and then
 $tr \sim N(init(S_b))$.
 
+~\\
 Case $[wh2]$:
 
 We have $\pair{\whilel [b]^\ell \dol S_b,\sigma,tr} \to \pair{\sigma,tr}$ and $tr \sim N(\ell)$.
@@ -373,12 +387,14 @@ introducing variable undefinedness at the beginning.
 
 This set of constraints is intended to be applied only once, for the ``full'' program.
 The idea is that it correctly captures the semantics of executions of complete programs
-(but not of subprograms where some code has already been executed, unless we wanted to ``forget''
-this code).
+(but not of subprograms where some code has already been executed, unless we want to ``forget''
+that code).
+The idea is that the old constraints guarantee the results are correctly propagated to each (reachable)
+program point (as seen in \ref{cor221}) while the new constraint give us correct results to start with.
 
-In the semantics side, a full evaluation of $S_\star$ starts from $\pair{S_\star,\sigma,tr_0}$
+In fact, on the semantics side, a full evaluation of $S_\star$ starts from $\pair{S_\star,\sigma,tr_0}$
 where $\sigma$ is some initial state and $tr_0$ is the trace at the beginning, where yet no code
-has been executed.
+has been executed:
 \[tr_0 = [ (x,?) \mid x \in Var_\star(S_\star) ] \]
 
 With these definitions, we can then formulate our correctness result.
@@ -393,10 +409,12 @@ X(\ell)$ for some $\ell \in final(S_\star)$.
 \end{enumerate}
 \end{theo}
 \begin{proof}
-REWRITE ``PROOF''
- 
-The proof is straightforward: basically the old constraints guarantee that the results are correctly propagated to each (reachable)
-program point (as seen in \ref{corr}) while the new constraint give us correct results to start with.
+Let $reach \models RD_\star^\subseteq(S_\star)$. Then, in particualar,
+$\{(x,?) \mid x \in \Var_\star\} \subseqeq N(init(S_star))$  is satisfied. So,
+$tr_0 \sim init(S_star)$. Also,
+$reach \models RD^\subseteq(S_\star)$, thus \ref{cor221} holds. Applying it
+to $\pair{S_\star,\sigma,\tr_0}$, knowing that $tr_0 \sim init(S_star),
+we get the desired result.
 \end{proof}
 
  
@@ -410,7 +428,7 @@ The following result is analogous to Lemma 2.15 in the book and holds wheter we 
 
 \begin{lemma}[Relationship between $RD_\star^\subseteq$ and $RD_\star^=$]
 Consider a label consistent program $S_\star$.  If $reach \models RD_\star^=(S_\star)$
-then $reach \models RD_\star^\subseteq$. The least solution of $RD_\star^=(S_\star)$ coincides
+then $reach \models RD_\star^\subseteq(S_\star)$. The least solution of $RD_\star^=(S_\star)$ coincides
 with the least solution of $RD_\star^\subseteq$.
 \end{lemma}
 \begin{proof}
@@ -420,10 +438,17 @@ then clearly $reach \models RD^\subseteq_\star$ because $=$ is a subrelation of 
 
 Next we prove that $reach \models RD_\star^\subseteq(S_\star)$ has the same least solution
 as  $reach \models RD_\star^=(S_\star)$.
-The proof is the same as in the book, but we
-need to make sure our lattice is complete and our function $F_{RD_\star}^S$ is monotone.
+The proof is the same as in the book, using Tarski's Fix Point Theorem.
+So, we just need to guarantee that we can apply it, that is, make sure that 
+function $F_{RD_\star}^S$ (as defined in chapter 1 of the book) is a monotone
+endomorphism in a complete lattice.
+Note that our $F_{RD_\star}$
+has type $\vec{L} \to \vec{L}$ were $\vec{L}$ is a lattice obtained via a direct product
+of power sets ($(\pset{\Var_\star \times \Lab_\star})^2|\Lab_\star|$) and so is a complete lattice. 
 For $F_{RD_\star}^S$ we can the function defined in section 1.3, and because of its
-type, a product of power sets, it is a complete lattice.
+type, a product of power sets, it is a complete lattice. To see that it is monotone,
+
+
 \end{proof}
 
 
@@ -501,6 +526,9 @@ Now we can use our previous definitions with $:$ replaced by $:_k$:
 \subsection*{Example}
 
 As an example, we worked out the analysis for the \texttt{fib} program presented in the book.
+
+We labelled the program starting with the main body, then
+the procedure \texttt{fib} and finally the procedure \texttt{add}.
 
 We only give the $X$-value for the interesting cases (label 1 and 14), where it differs
 from the $N$-value. Basically, these are the edges where there are assignments to variables
