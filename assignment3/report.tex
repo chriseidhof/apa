@@ -213,10 +213,65 @@ That is:
 \end{eqnarray*}
 
 
+
 ALGORITHM W
 
 \section{Polyvariant}
+
+\begin{eqnarray*}
+\lbrack gen \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\htau}
+\justifies
+\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
+\end{prooftree}if \zeta_1, \ldots, \zeta_n do not occur free in ???\\
+& & \\
+\lbrack ins \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
+\justifies
+\judge{\HGamma}{e}{\theta \htau}
+\end{prooftree}if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
+& & \\
+\end{eqnarray*}
+
+
 \section{Subtyping}
+
+We need a new rule that ...
+
+\begin{eqnarray*}
+\lbrack sub \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\htau}
+\justifies
+\judge{\HGamma}{e}{\htau'}
+\end{prooftree}if \htau \leq \htau'\\
+& & \\
+\end{eqnarray*}
+
+
+We need now t define the subtyping relation.
+A first approach would be considering only the toplevel annotation
+and say that a dynamic can also be made static.
+
+However, this is not enough because we need some sanity checks on our types to guarantee
+that we still can't end up with things like dynamic functions
+that map static arguments to static results.
+
+Shape conformant: that is, the underlying type is mantained...
+
+\begin{eqnarray*}
+int^\varphi \leq int^{\varphi'}  if \varphi \sqleq \varphi' \\
+bool^\varphi \leq bool^{\varphi'}  if \varphi \sqleq \varphi' \\
+\htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
+if \varphi \sqleq \varphi' 
+ \land   \htau_1 \leq \htau_1'
+ \land   \htau_2 \leq \htau_2'
+ \land   \varphi \sqleq \annot{\htau_1'}
+ \land   \varphi \sqleq \annot{\htau_2'}
+\end{eqnarray*}
+
 
 \end{document}  
 
