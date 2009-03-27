@@ -7,7 +7,7 @@
 \usepackage{palatino}
 \usepackage{rotating}
  
-%\usepackage{prooftree}
+\usepackage{prooftree}
 
 \usepackage{amsmath, amsthm, amssymb}
 
@@ -108,10 +108,13 @@
 \begin{center}\input{#2}\end{center}
 \end{table}}
 
+\def\sqleq{\sqsubseteq}
 
 \def\htau{\hat{\tau}}
-\def\HGamme{\hat{\Gamma}}
-\def\judge#1#2#3{#1 \turnstile #2 : #3}
+\def\HGamma{\hat{\Gamma}}
+\def\judge#1#2#3{#1 \dashv #2 : #3}
+
+\def\annot#1{\|#1\|}
 
 \def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
 
@@ -131,24 +134,24 @@ types:
 
 annotated types:
 \begin{eqnarray*}
-\htau & := bool^\phi | int^\phi | \htau_1 \overtext{\phi}{\to} \htau_2 
+\htau & := bool^\varphi | int^\varphi | \htau_1 \overset{\varphi}{\to} \htau_2 
 \\
-\phi & := S | D
+\varphi & := S | D
 \end{eqnarray*}
 
-Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmosp annotation.
+Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation.
 That is:
 \begin{eqnarray*}
-\htau{bool^\phi} & = \phi \\
-\htau{int^\phi} & = \phi \\
-\htau{\htau_1 \overtext{\phi}{\to} \htau_2} & = \phi \\
+\annot{bool^\varphi} & = \varphi \\
+\annot{int^\varphi} & = \varphi \\
+\annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
 \end{eqnarray*}
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
 \begin{prooftree}
 \justifies
-\judge{\HGamma}{c}{\tau_c^\phi}
+\judge{\HGamma}{c}{\tau_c^\varphi}
 \end{prooftree}\\
 & & \\
 \lbrack var\rbrack\;\; &
@@ -162,34 +165,34 @@ That is:
 \begin{prooftree}
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fn x \Rightarrow e}{\htau_1 \overtext{\phi}{\to} \htau_2}
-\end{prooftree} for
-\phi \sqleq \annot{\htau_1} \and \phi \sqleq \annot{\htau_2} \\
+\judge{\HGamma}{fn x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree} if
+\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma[f \mapsto \htau_1 \overtext{\phi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
+\judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fun x \Rightarrow e}{\htau_1 \overtext{\phi}{\to} \htau_2}
-\end{prooftree} for
-\phi \sqleq \annot{\htau_1} \and \phi \sqleq \annot{\htau_2} \\
+\judge{\HGamma}{fun x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree} if
+\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_1 \overtext{\phi}{\to} \htau_2}  \judge{\HGamme}{e_2}{\htau_1}
+\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}  \judge{\HGamma}{e_2}{\htau_1}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
 \end{prooftree}\\
 & & \\
 \lbrack if \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_0}{bool^\phi_0}
+\judge{\HGamma}{e_0}{bool^\varphi_0}
 \judge{\HGamma}{e_1}{\htau}
 \judge{\HGamma}{e_2}{\htau}
 \justifies
 \judge{\HGamma}{if e_0 then e_1 else e_2}{\htau}
-\end{prooftree}for
-\phi_0 \sqleq \annot{\htau}\\
+\end{prooftree}if
+\varphi_0 \sqleq \annot{\htau}\\
 & & \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
@@ -201,10 +204,10 @@ That is:
 & & \\
 \lbrack op \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_op_1^\phi}
-\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_op_2^\phi}
+\judge{\HGamma}{e_1}{\htau_op_1^\varphi}
+\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_op_2^\varphi}
 \justifies
-\judge{\HGamma}{let x=e_1 in e_2}{\htau_op^\phi}
+\judge{\HGamma}{let x=e_1 in e_2}{\htau_op^\varphi}
 \end{prooftree}\\
 & & \\
 \end{eqnarray*}
