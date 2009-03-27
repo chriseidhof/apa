@@ -112,7 +112,7 @@
 
 \def\htau{\hat{\tau}}
 \def\HGamma{\hat{\Gamma}}
-\def\judge#1#2#3{#1 \dashv #2 : #3}
+\def\judge#1#2#3{#1 \vdash #2 : #3}
 
 \def\annot#1{\|#1\|}
 
@@ -268,9 +268,20 @@ bool^\varphi \leq bool^{\varphi'}  if \varphi \sqleq \varphi' \\
 if \varphi \sqleq \varphi' 
  \land   \htau_1 \leq \htau_1'
  \land   \htau_2 \leq \htau_2'
- \land   \varphi \sqleq \annot{\htau_1'}
- \land   \varphi \sqleq \annot{\htau_2'}
+ \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
+ \land   wff(\htau_1' \overset{\varphi}{\to} \htau_2')
 \end{eqnarray*}
+
+
+MOVE TO SECTION 1:
+
+well formedness at top level (it is enougjh due to induction (in the first section) and recursion (here)
+
+\[
+wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
+= \varphi \sqleq \annot{\htau_1}
+ \land   \varphi \sqleq \annot{\htau_2}
+\]
 
 
 \end{document}  
