@@ -1,0 +1,219 @@
+\documentclass[a4wide,12pt]{article}
+\usepackage{a4wide}
+\usepackage{times}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{palatino}
+\usepackage{rotating}
+ 
+%\usepackage{prooftree}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+\theoremstyle{definition}
+\newtheorem{defi}{Definition}
+\newtheorem{example}{Example}
+\newtheorem*{conj}{Conjecture}
+\newtheorem*{prob}{Problem}
+\newtheorem*{question}{Question}
+\theoremstyle{plain} 
+\newtheorem{theo}{Theorem}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{lemma}[theo]{Lemma}
+\newtheorem{cor}[theo]{Corollary}
+\newtheorem*{theo*}{Theorem}
+\newtheorem*{prop*}{Proposition}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{cor*}{Corollary}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{notation}{Notation}
+\def\qed{\begin{flushright} $\Box$ \end{flushright}}
+
+\newenvironment{prf}
+                {\vspace{-2mm} \noindent {\bf Proof.}}
+                {\par \nopagebreak \qed }
+\newenvironment{namedprf}[1]
+                {\noindent {\bf Proof (#1).}}
+                {\par \nopagebreak \qed }
+
+
+\def\logequiv{\Leftrightarrow}
+
+\allowdisplaybreaks[0]
+ 
+\def\eq{\;\; = \;\;}
+\def\N{\mathbb{N}}
+\def\Z{\mathbb{Z}}
+ 
+\def\pset#1{\mathcal{P}(#1)}
+\def\A#1{\mathcal{A}[\hspace{-1pt}[#1]\hspace{-1pt}]}
+ 
+\def\const#1{\mathopen{\langle}#1\mathclose{\rangle}} % <a,b,...z>
+\def\pair#1{\const{#1}}
+ 
+\def\Stmt {\mathbf{Stmt}}
+\def\Lab {\mathbf{Lab}}
+\def\Blocks{\mathbf{Blocks}}
+\def\Var {\mathbf{Var}}
+ 
+ 
+\def\skip {\texttt{skip}\ }
+\def\whilel{\texttt{while}\ }
+\def\dol {\texttt{do}\ }
+\def\ifl {\texttt{if}\ }
+\def\thenl {\texttt{then}\ }
+\def\elsel {\texttt{else}\ }
+\def\printl{\texttt{print}\ }
+\def\contl {\texttt{continue}\ }
+\def\breakl{\texttt{break}\ }
+ 
+\def\haskell{\textsc{Haskell}}
+\def\starto{\overset{\star}{\to}}
+ 
+\newcounter{Progenvcount}
+\setcounter{Progenvcount}{0}
+\newenvironment{progenv}
+                {\refstepcounter{Progenvcount} \nopagebreak
+                 \bigskip\hrule\nopagebreak\medskip\noindent
+                 {\bf Program \arabic{Progenvcount}.} \nopagebreak\vspace{0.3cm} \nopagebreak \\ \nopagebreak
+                  \nopagebreak
+                 $\begin{array}{ll}}
+                {\end{array}$ \bigskip\hrule\bigskip\bigskip }
+
+
+%\def\programold#1{\fbox{\begin{minipage}{0.5\textwidth}\protect{$\begin{array}{ll} #1 \end{array}$}\end{minipage}}}
+
+\def\restabR#1#2[#3]{
+\begin{table}
+{\scriptsize
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
+
+\def\restabRtiny#1#2[#3]{
+\begin{table}
+{\tiny
+\caption{#1}\label{#3}
+\begin{center}\begin{sideways}\input{#2}\end{sideways}\end{center}
+}
+\end{table}}
+
+
+\def\restab#1#2[#3]{
+\begin{table}
+\caption{#1}\label{#3}
+\begin{center}\input{#2}\end{center}
+\end{table}}
+
+
+\def\htau{\hat{\tau}}
+\def\HGamme{\hat{\Gamma}}
+\def\judge#1#2#3{#1 \turnstile #2 : #3}
+
+\def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
+
+\def\Tiny{\fontsize{3pt}{3pt}\selectfont}
+\def\hs#1{\texttt{#1}}
+ 
+\begin{document}
+\author{Chris Eidhof, Rui S. Barbosa}
+\title{Type and Effect Systems Assignment \\ Automatic Program Analysis}
+ 
+\maketitle
+
+\section{Monovariant Binding Time Analysis}
+
+types:
+\[\tau := bool | int | \tau_1 \to \tau_2\]
+
+annotated types:
+\begin{eqnarray*}
+\htau & := bool^\phi | int^\phi | \htau_1 \overtext{\phi}{\to} \htau_2 
+\\
+\phi & := S | D
+\end{eqnarray*}
+
+Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmosp annotation.
+That is:
+\begin{eqnarray*}
+\htau{bool^\phi} & = \phi \\
+\htau{int^\phi} & = \phi \\
+\htau{\htau_1 \overtext{\phi}{\to} \htau_2} & = \phi \\
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\lbrack con \rbrack\;\; &
+\begin{prooftree}
+\justifies
+\judge{\HGamma}{c}{\tau_c^\phi}
+\end{prooftree}\\
+& & \\
+\lbrack var\rbrack\;\; &
+\begin{prooftree}
+\HGamma(x)=\htau
+\justifies
+\judge{\HGamma}{x}{\htau}
+\end{prooftree}\\
+& & \\
+\lbrack fn \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
+\justifies
+\judge{\HGamma}{fn x \Rightarrow e}{\htau_1 \overtext{\phi}{\to} \htau_2}
+\end{prooftree} for
+\phi \sqleq \annot{\htau_1} \and \phi \sqleq \annot{\htau_2} \\
+& & \\
+\lbrack fun \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma[f \mapsto \htau_1 \overtext{\phi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
+\justifies
+\judge{\HGamma}{fun x \Rightarrow e}{\htau_1 \overtext{\phi}{\to} \htau_2}
+\end{prooftree} for
+\phi \sqleq \annot{\htau_1} \and \phi \sqleq \annot{\htau_2} \\
+& & \\
+\lbrack app \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_1}{\htau_1 \overtext{\phi}{\to} \htau_2}  \judge{\HGamme}{e_2}{\htau_1}
+\justifies
+\judge{\HGamma}{e_1 \; e_2}{\htau_2}
+\end{prooftree}\\
+& & \\
+\lbrack if \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_0}{bool^\phi_0}
+\judge{\HGamma}{e_1}{\htau}
+\judge{\HGamma}{e_2}{\htau}
+\justifies
+\judge{\HGamma}{if e_0 then e_1 else e_2}{\htau}
+\end{prooftree}for
+\phi_0 \sqleq \annot{\htau}\\
+& & \\
+\lbrack let \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_1}{\htau_1}
+\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_2}
+\justifies
+\judge{\HGamma}{let x=e_1 in e_2}{\htau_2}
+\end{prooftree}\\
+& & \\
+\lbrack op \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_1}{\htau_op_1^\phi}
+\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_op_2^\phi}
+\justifies
+\judge{\HGamma}{let x=e_1 in e_2}{\htau_op^\phi}
+\end{prooftree}\\
+& & \\
+\end{eqnarray*}
+
+
+ALGORITHM W
+
+\section{Polyvariant}
+\section{Subtyping}
+
+\end{document}  
+
