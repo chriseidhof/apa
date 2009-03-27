@@ -218,6 +218,24 @@ ALGORITHM W
 
 \section{Polyvariant}
 
+\begin{eqnarray*}
+\lbrack gen \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\htau}
+\justifies
+\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
+\end{prooftree}if \zeta_1, \ldots, \zeta_n do not occur free in ???\\
+& & \\
+\lbrack ins \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
+\justifies
+\judge{\HGamma}{e}{\theta \htau}
+\end{prooftree}if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
+& & \\
+\end{eqnarray*}
+
+
 \section{Subtyping}
 
 We need a new rule that ...
@@ -231,6 +249,7 @@ We need a new rule that ...
 \end{prooftree}if \htau \leq \htau'\\
 & & \\
 \end{eqnarray*}
+
 
 We need now t define the subtyping relation.
 A first approach would be considering only the toplevel annotation
@@ -252,6 +271,7 @@ if \varphi \sqleq \varphi'
  \land   \varphi \sqleq \annot{\htau_1'}
  \land   \varphi \sqleq \annot{\htau_2'}
 \end{eqnarray*}
+
 
 \end{document}  
 
