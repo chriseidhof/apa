@@ -18,7 +18,3 @@ class ToExpr a where
 instance ToExpr (Expr ())  where toExpr = id
 instance ToExpr Char       where toExpr = Var ()
 instance ToExpr Bool       where toExpr = CBool ()
-
--- Example programs
-ex01 = fn 'x' $ fn 'y' $ if_ ('x' >=: i 0) True 'y'
-ex02 = (fn 'x' (fn 'y' $ 'x') <@> True) <@> i 7

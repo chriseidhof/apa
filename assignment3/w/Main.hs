@@ -90,3 +90,11 @@ runW x = let ((e, subst), st) = runState (w (C []) x) (St 0 (A 0) (Constraints [
              solved   = solve vars (tla $ tla e') css
              replace x = maybe (error "No polymorphism allowed") id $ lookup (a x) solved
          in fmap (fmap replace) e'
+
+-- Example programs
+ex01  = (fn 'x' (fn 'y' $ 'x') <@> i 2) <@> i 3
+ex02  = let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
+ex03  = ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
+[res01, res02, res03] = map runW [ex01, ex02, ex03]
+
+
