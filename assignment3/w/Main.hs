@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeSynonymInstances #-}
 module Main where
 
 import Control.Monad.State
@@ -62,12 +63,20 @@ w gamma (Op _ e1 op e2) =    do (e1', th1) <- w gamma e1
 (-->) :: Type a -> Type a -> a -> Type a
 t1 --> t2 = Function t1 t2
 
+lookup' x (C gamma) = maybe (error $ "No such variable: " ++ show x) id $ lookup x gamma
+(C gamma) @-> x = C (x:gamma)
+
 infixr <.>
-(<.>) :: Subst a -> Context a -> Context a
-s <.> g = map (\(v,t) -> (v, s t)) g
+class Substitutable f where
+  (<.>) :: Subst a -> f a -> f a
+
+instance Substitutable Context where
+  s <.> (C g) = C $ map (\(v,t) -> (v, s t)) g
+
+instance Substitutable Constraints where
+  s <.> (Constraints g) = Constraints $ map (\(v :< t) -> (v :< s t)) g
 
 -- State functions
-
 freshTVar :: W (Type a)
 freshTVar = do x <- get
                put x {tVar = tVar x + 1}
@@ -78,11 +87,11 @@ freshAVar = do x <- get
                put x {aVar = A (a (aVar x) + 1)}
                return (aVar x)
 
-addConstraints :: [Constraint] -> W ()
-addConstraints ls = modify (\x -> x {constraints = ls ++ constraints x})
+addConstraints :: [Constraint AVar] -> W ()
+addConstraints ls = modify (\x -> x {constraints = Constraints (ls ++ cs (constraints x))})
 
 -- Helpers
 
-runW :: Expr () -> (Expr (Type AVar), [Constraint])
-runW e = let ((t, s), st) = runState (w [] e) (St 0 (A 0) [])
-         in (fmap s t, constraints st)
+runW :: Expr () -> (Expr (Type AVar), Constraints AVar)
+runW e = let ((t, subst), st) = runState (w (C []) e) (St 0 (A 0) (Constraints []))
+         in (fmap subst t, subst <.> constraints st)

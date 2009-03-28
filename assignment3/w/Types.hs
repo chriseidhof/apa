@@ -1,4 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Types where
 
 import Control.Monad.State (State)
@@ -29,11 +31,12 @@ data Expr a = CInt  a Int
             deriving (Show)
 
 type W = State St
-data St = St {tVar :: TVar, aVar :: AVar, constraints :: [Constraint]}
+data St = St {tVar :: TVar, aVar :: AVar, constraints :: Constraints AVar}
 
 type Subst a = Type a -> Type a
-type Context a = [(Var, Type a)]
-data Constraint = AVar :< Type AVar deriving (Show)
+newtype Context a = C [(Var, Type a)]
+data Constraint a = a :< Type a
+newtype Constraints a = Constraints {cs :: [Constraint a]}
 
 opTypeL = fst3 . opType'
 opTypeR = snd3 . opType'
@@ -98,7 +101,14 @@ instance Show (Type AVar) where
   show (Function l r a) = "(" ++ show l ++ "->" ++ show r ++ ")^" ++ show a
   show (TVar v) = "t_" ++ show v
 
+instance (Show a, Show (Type a)) => Show (Constraint a) where
+  show (a :< b) = show a ++ ":<" ++ show b
+
+instance Show (Constraint a) => Show (Constraints a) where
+  show (Constraints c) = show c
+
 -- Unifying
 
 class Unifiable a where
   unify' :: a -> a -> Subst a
+
