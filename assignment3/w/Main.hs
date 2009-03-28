@@ -6,6 +6,7 @@ import Types
 import Utils
 import Language
 import Unify
+import Solver
 
 w :: Context AVar -> Expr () -> W (Expr (Type AVar), Subst AVar)
 w gamma ex@(CInt _ _)      = do beta <- freshAVar
@@ -66,16 +67,6 @@ t1 --> t2 = Function t1 t2
 lookup' x (C gamma) = maybe (error $ "No such variable: " ++ show x) id $ lookup x gamma
 (C gamma) @-> x = C (x:gamma)
 
-infixr <.>
-class Substitutable f where
-  (<.>) :: Subst a -> f a -> f a
-
-instance Substitutable Context where
-  s <.> (C g) = C $ map (\(v,t) -> (v, s t)) g
-
-instance Substitutable Constraints where
-  s <.> (Constraints g) = Constraints $ map (\(v :< t) -> (v :< s t)) g
-
 -- State functions
 freshTVar :: W (Type a)
 freshTVar = do x <- get
@@ -91,7 +82,11 @@ addConstraints :: [Constraint AVar] -> W ()
 addConstraints ls = modify (\x -> x {constraints = Constraints (ls ++ cs (constraints x))})
 
 -- Helpers
-
-runW :: Expr () -> (Expr (Type AVar), Constraints AVar)
-runW e = let ((t, subst), st) = runState (w (C []) e) (St 0 (A 0) (Constraints []))
-         in (fmap subst t, subst <.> constraints st)
+-- runW :: Expr () -> (Expr (Type AVar), [(AVar, AVar)])
+runW x = let ((e, subst), st) = runState (w (C []) x) (St 0 (A 0) (Constraints []))
+             e' = fmap subst e 
+             css = map (\(x :< y) -> (x, tla y)) $ cs (subst <.> constraints st)
+             vars     = [0..a (aVar st)]
+             solved   = solve vars (tla $ tla e') css
+             replace x = maybe (error "No polymorphism allowed") id $ lookup (a x) solved
+         in fmap (fmap replace) e'

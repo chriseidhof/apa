@@ -3,6 +3,11 @@ module Unify where
 
 import Types
 
+-- Unifying
+
+class Unifiable a where
+  unify' :: a -> a -> Subst a
+
 instance Unifiable AVar where
   unify' = (||->)
 

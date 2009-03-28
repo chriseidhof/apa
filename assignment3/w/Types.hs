@@ -5,10 +5,9 @@ module Types where
 
 import Control.Monad.State (State)
 import Utils
+import BTAnnotations (Annot)
 
 data Type ann = Int ann | Bool ann | Function (Type ann) (Type ann) ann | TVar TVar
-
-data Ann = S | D | AVar Int
 
 type Var = Char
 type TVar = Int
@@ -101,14 +100,27 @@ instance Show (Type AVar) where
   show (Function l r a) = "(" ++ show l ++ "->" ++ show r ++ ")^" ++ show a
   show (TVar v) = "t_" ++ show v
 
+instance Show (Type Annot) where
+  show (Int ann)        = show ann
+  show (Bool ann)       = show ann
+  show (Function l r a) = "(" ++ show l ++ "->" ++ show r ++ ")^" ++ show a
+  show (TVar v)         = "t_" ++ show v
+
 instance (Show a, Show (Type a)) => Show (Constraint a) where
   show (a :< b) = show a ++ ":<" ++ show b
 
 instance Show (Constraint a) => Show (Constraints a) where
   show (Constraints c) = show c
 
--- Unifying
 
-class Unifiable a where
-  unify' :: a -> a -> Subst a
+-- Substituting
 
+infixr <.>
+class Substitutable f where
+  (<.>) :: Subst a -> f a -> f a
+
+instance Substitutable Context where
+  s <.> (C g) = C $ map (\(v,t) -> (v, s t)) g
+
+instance Substitutable Constraints where
+  s <.> (Constraints g) = Constraints $ map (\(v :< t) -> (v :< s t)) g
