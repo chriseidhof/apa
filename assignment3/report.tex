@@ -300,23 +300,37 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 TODO: view versions:
 
 VERSION 1:
-We implemented algorithm W in Haskell. The code closely follows the specification in the book:
-type and annotation variables are always given, types get unified and some constraints on annotations
-are collected and solved in the end. In fact, the form of constraints is restricted to
+---We implemented algorithm W in Haskell. The code closely follows the specification in the book:
+---type and annotation variables are always given, types get unified and some constraints on annotations
+---are collected and solved in the end. In fact, the form of constraints is restricted to
 \[\beta \sqleq \beta'\]
-where $\beta$ and $\beta'$ are annotation variables.
-Thus, they are quite easy to solve in a lattice like $\Annot$.
-
-We send the Haskell files with our implementation and also show some running examples in the
-next section that show the algorithm on work.
+--where $\beta$ and $\beta'$ are annotation variables.
+--Thus, they are quite easy to solve in a lattice like $\Annot$.
+--We send the Haskell files with our implementation and also show some running examples in the
+--next section that show the algorithm on work.
 
 VERSION2:
-Our algorithm can be found in the accompanying files and is a moderate extension
-of Algorithm W for simply typed lambda calculus. Our extension generates fresh
-annotation variables everywhere and constraints in the form of $\varphi \sqleq
-\annot{\htau}$. After running the algorithm the types are annotated with
-annotation variables, and after solving the constraints the annotation variables
-get replaced by $S$ or $D$.
+--Our algorithm can be found in the accompanying files and is a moderate extension
+--of Algorithm W for simply typed lambda calculus.
+--Our extension generates fresh
+--annotation variables everywhere and constraints in the form of $\varphi \sqleq\annot{\htau}$.
+--After running the algorithm the types are annotated with
+--annotation variables, and after solving the constraints the annotation variables
+--get replaced by $S$ or $D$.
+
+VERSION 1 \/ 2:
+Our implementation of the inferencing algorithm in Haskell can be found in the accompanying files.
+It is a moderate extension of Algorithm W for simply typed $\lambda$-calculus
+and the code closely follows the book's specification style.
+It generates fresh annotation variables everywhere and collects constraints
+with the restricted form
+\[\beta \sqleq \beta'\]
+where $\beta$ and $\beta'$ are annotation variables.
+After this first phase, every subexpression is given a type annotated
+with annotation variables. Then, in the constraint solving phase,
+the annotation variables get replaced by $S$ or $D$.
+The simple form of constraints and the simple structure of the lattice itself make it easy to solve them
+and get the ``best'' possible annotations (according to the type rules).
 
 \subsection{Examples}
 
