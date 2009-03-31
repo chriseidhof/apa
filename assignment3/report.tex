@@ -57,6 +57,11 @@
 \def\Lab {\mathbf{Lab}}
 \def\Blocks{\mathbf{Blocks}}
 \def\Var {\mathbf{Var}}
+\def\Type {\mathbf{Type}}
+\def\AType{\mathbf{AType}}
+\def\Annot{\mathbf{Annot}}
+\def\ATypeScheme{\mathbf{ATypeScheme}}
+
  
  
 \def\skip {\texttt{skip}\ }
@@ -111,16 +116,17 @@
 \def\sqleq{\sqsubseteq}
 
 \def\htau{\hat{\tau}}
+\def\hsigma{\hat{\sigma}}
 \def\HGamma{\hat{\Gamma}}
 \def\judge#1#2#3{#1 \vdash #2 : #3\;\;}
 
 \def\annot#1{\|#1\|}
+\def\baset#1{\lfloor#1\rfloor}
 
 \def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
-\def\baset#1{\lfloor#1\rfloor}
 
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
@@ -153,12 +159,12 @@ the associated order.
 Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation
 and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
 \begin{eqnarray*}
-\annot{.} : \AType -> \Annot\\
+\annot{.} &: \AType -> \Annot\\
 \annot{bool^\varphi} & = \varphi \\
 \annot{int^\varphi} & = \varphi \\
 \annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
 \\
-\baset{.} : \AType -> \Type
+\baset{.} & : \AType -> \Type\\
 \baset{bool^\varphi} & = bool \\
 \baset{int^\varphi} & = int \\
 \baset{\htau_1 \overset{\varphi}{\to} \htau_2} & = \baset{\htau_1} \to \baset{\htau_2} \\
@@ -187,7 +193,7 @@ We now present the type rules for monomorphic binding-time analysis.
 The judgments are of the form
 \[\judge{\HGamma}{e}{\htau}\]
 where $\HGamma: Var_\star \to AType$ is the context, assigning types to each program variable, 
-$e \in Stmt$ is an expression in the \sc{Fun} language and $\htau \in AType$ is an annotated type.
+$e \in Stmt$ is an expression in the \textsc{Fun} language and $\htau \in AType$ is an annotated type.
 The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
 
 TODO: SOME EXPLANATION ON THE RULES
@@ -211,7 +217,7 @@ TODO: SOME EXPLANATION ON THE RULES
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
+\end{prooftree}\;\; \text{if}\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack fun \rbrack\;\; &
@@ -219,7 +225,7 @@ TODO: SOME EXPLANATION ON THE RULES
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
+\end{prooftree}\;\; \text{if}\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack app \rbrack\;\; &
@@ -236,7 +242,7 @@ TODO: SOME EXPLANATION ON THE RULES
 \judge{\HGamma}{e_2}{\htau}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \varphi_0 \sqleq \annot{\htau}\\
 & & \\
 \lbrack let \rbrack\;\; &
@@ -293,7 +299,7 @@ on these. So, we extend $\AType$ and $\Annot$ as follows:
 \\
 \varphi & := \ldots  | \beta \\
 \end{eqnarray*}
-We now consider annotated type schemes $\hsigma \in ATypeScheme$ given by
+We now consider annotated type schemes $\hsigma \in \ATypeScheme$ given by
 \[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
 where $\zeta_i$ are type variables or annotation variables and $\htau \in AType$.
 
@@ -302,7 +308,7 @@ where $\zeta_i$ are type variables or annotation variables and $\htau \in AType$
 Our judgements are now of the form
 \[\judge{\HGamma}{e}{\hsigma}\]
 where $\hsigma$ is an annotated type scheme and $\HGamma$ also maps variables
-to $ATypeSchema$. However, we should only allow our top level
+to $\ATypeScheme$. However, we should only allow our top level
 programs to have annotated types with no free variables.
 
 We could extend our rule system with the following non-syntax directed rules that
@@ -317,14 +323,14 @@ for completely specified annotated types.
 \judge{\HGamma}{e}{\htau}
 \justifies
 \judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
-\end{prooftree}if \zeta_1, \ldots, \zeta_n do not occur free in ???\\
+\end{prooftree}\text{if} \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma)\\
 & & \\
 \lbrack ins \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
 \justifies
 \judge{\HGamma}{e}{\theta \htau}
-\end{prooftree}if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
+\end{prooftree}\text{if} dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
 & & \\
 \end{eqnarray*}
 
@@ -332,7 +338,7 @@ for completely specified annotated types.
 
 We will instead consider a syntax-directed version of the type rules.
 The judgements will be of the form
-\judge{\HGamma}{e}{\htau}
+\[\judge{\HGamma}{e}{\htau}\]
 where $\htau$ are annotated types (possibly including variables).
 Schemes are only allowed in the context $\HGamma$.
 
@@ -349,7 +355,7 @@ Below, we present the rules that need to change in relation to the monovariant v
 \HGamma(x)= \forall(\zeta_1,\ldots,\zeta_n). \htau
 \justifies
 \judge{\HGamma}{x}{\theta \htau}
-\end{prooftree} if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}
+\end{prooftree} \text{if} dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}
 & \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
@@ -357,7 +363,7 @@ Below, we present the rules that need to change in relation to the monovariant v
 \judge{\HGamma[x \mapsto \forall (\zeta_1, \ldots, \zeta_n). \htau_1]}{e_2}{\htau_2}
 \justifies
 \judge{\HGamma}{let x=e_1 in e_2}{\htau_2}
-\end{prooftree} if \zeta_i do not occur free in \HGamma \\
+\end{prooftree} \text{if} \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma) \\
 & & \\
 \end{eqnarray*}
 
@@ -378,10 +384,10 @@ that map static arguments to static results.
 Shape conformant: that is, the underlying type is mantained...
 
 \begin{eqnarray*}
-int^\varphi \leq int^{\varphi'}  if \varphi \sqleq \varphi' \\
-bool^\varphi \leq bool^{\varphi'}  if \varphi \sqleq \varphi' \\
+int^\varphi \leq int^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
+bool^\varphi \leq bool^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
 \htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
-if \varphi \sqleq \varphi' 
+\text{if} \varphi \sqleq \varphi' 
  \land   \htau_1 \geq \htau_1'
  \land   \htau_2 \leq \htau_2'
  \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
@@ -400,12 +406,12 @@ The rule for subeffecting is not syntax-directed:
 \judge{\HGamma}{e}{\htau}
 \justifies
 \judge{\HGamma}{e}{\htau'}
-\end{prooftree}\;\;if\;\; \annot{\htau} \sqleq \annot{\htau'}\\
+\end{prooftree}\;\;\text{if}\;\; \annot{\htau} \sqleq \annot{\htau'}\\
 & & \\
 \end{eqnarray*}
 
 In order to incorporate this into the syntax-directed type-rules we change the
-rules for $app$, $if$ and $op$. We are now also allowed to change $con$ to have
+rules $\lbrack app \rbrack$, $\lbrack if \rbrack$ and $\lbrack op \rbrack$. We are now also allowed to change $con$ to have
 a static annotation, solving the constrainst will make sure this isn't a
 problem.
 
@@ -431,7 +437,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
+\end{prooftree}\;\; \text{if}\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack fun \rbrack\;\; &
@@ -439,7 +445,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
+\end{prooftree}\;\; \text{if}\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack app \rbrack\;\; &
@@ -447,7 +453,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\; \judge{\HGamma}{e_2}{\htau_1'}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \annot{\htau_1'} \sqleq \annot{\htau}
 \\
 & & \\
@@ -458,7 +464,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_2}{\htau_2}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \varphi_0 \sqleq \annot{\htau}       \land
 \annot{\htau_1} \sqleq \annot{\htau} \land
 \annot{\htau_2} \sqleq \annot{\htau}
@@ -478,7 +484,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_2}{\tau_{op_2}^{\varphi_2}}
 \justifies
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \annot{\varphi_1} \sqleq \annot{\varphi} \land
 \annot{\varphi_2} \sqleq \annot{\varphi}
 \\
@@ -488,7 +494,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_1}{\tau^{\varphi}}
 \justifies
 \judge{\HGamma}{main = e_1}{\tau^\varphi}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 D \sqleq \annot{\varphi}
 \\
 & & \\
