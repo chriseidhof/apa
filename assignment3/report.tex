@@ -140,17 +140,17 @@ TODO: main rule for the 3 analysis
 
 \subsection{Types and Annotations}
 As in the book, we have the base type system $\Type$ where $\tau \in \Type$ are given by:
-\[\tau := bool | int | \tau_1 \to \tau_2\]
+\[\tau := bool \mid int \mid \tau_1 \to \tau_2\]
 
 We  now add annotations to our types. These annotations are always
-one of two values |S| (for static) or |D| (for Dynamic). 
+one of two values $S$ (for static) or $D$ (for Dynamic). 
 We need such an annotation
 at all levels in a type (and not only in fuctions). We call $\Annot$ to the set of annotations
 and $\AType$ to the set of annotated types. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
 \begin{eqnarray*}
-\htau & := bool^\varphi | int^\varphi | \htau_1 \overset{\varphi}{\to} \htau_2 
+\htau & := bool^\varphi \mid int^\varphi \mid \htau_1 \overset{\varphi}{\to} \htau_2 
 \\
-\varphi & := S | D
+\varphi & := S \mid D
 \end{eqnarray*}
 
 $\Annot$ is actually a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
@@ -295,9 +295,9 @@ TODO: examples using Hs ; do the examples in the handout and also one that shoul
 Instead of considering just types, we allow for type and annotation variables and top level quatification
 on these. So, we extend $\AType$ and $\Annot$ as follows:
 \begin{eqnarray*}
-\htau & := \ldots  | \alpha \\ 
+\htau & := \ldots  \mid \alpha \\ 
 \\
-\varphi & := \ldots  | \beta \\
+\varphi & := \ldots  \mid \beta \\
 \end{eqnarray*}
 We now consider annotated type schemes $\hsigma \in \ATypeScheme$ given by
 \[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
