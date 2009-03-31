@@ -129,23 +129,53 @@
 
 \section{Monovariant Binding Time Analysis}
 
-types:
+\subsection{Types and Annotations}
+As in the book, we have the following base type system:
 \[\tau := bool | int | \tau_1 \to \tau_2\]
 
-annotated types:
+We  now add annotations to our types. These annotations are always
+one of two values |S| (for static) or |D| (for Dynamic). 
+We need such an annotation
+at all levels in a type (and not only in fuctions).
 \begin{eqnarray*}
 \htau & := bool^\varphi | int^\varphi | \htau_1 \overset{\varphi}{\to} \htau_2 
 \\
 \varphi & := S | D
 \end{eqnarray*}
 
-Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation.
-That is:
+The annotations actually form a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
+the associated order. 
+
+Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation
+and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
 \begin{eqnarray*}
 \annot{bool^\varphi} & = \varphi \\
 \annot{int^\varphi} & = \varphi \\
 \annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
+\\
+\baset{bool^\varphi} & = bool \\
+\baset{int^\varphi} & = int \\
+\baset{\htau_1 \overset{\varphi}{\to} \htau_2} & = \baset{\htau_1} \to \baset{\htau_2} \\
 \end{eqnarray*}
+
+
+Actually, some annotated types are not allowed, so we need to introduce a wellformedness
+constraint to restrict those. Basically, this contraint will express that a dynamic function
+has to map a dynamic argument to a dynamic result. So, it 
+expects dynamic arguments and cannot produce static results. The latter is actually
+impossible, whilst the former will be considered again in the other versions
+(dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments).
+We will just be concerned to give a definition of wellformedness at top level and
+induction on the type rules then guarantees we will just construct
+well-formed types.
+\[
+wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
+= \varphi \sqleq \annot{\htau_1}
+ \land   \varphi \sqleq \annot{\htau_2}
+\]
+
+\subsection{Type Rules}
+We now present the type
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -212,12 +242,16 @@ That is:
 & & \\
 \end{eqnarray*}
 
+\subsection{Algorithm}
 
-
-
-ALGORITHM W
+\subsection{Examples}
 
 \section{Polyvariant}
+
+\subsection{Types and Annotations}
+
+\subsection{Type Rules: Non-Syntax Directed}
+
 
 \begin{eqnarray*}
 \lbrack gen \rbrack\;\; &
@@ -235,6 +269,8 @@ ALGORITHM W
 \end{prooftree}if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
 & & \\
 \end{eqnarray*}
+
+\subsection{Type Rules: Syntax Directed}
 
 \begin{eqnarray*}
 \lbrack var \rbrack\;\; &
@@ -254,23 +290,12 @@ ALGORITHM W
 & & \\
 \end{eqnarray*}
 
-
+\subsection{Examples}
 
 
 \section{Subeffecting}
 
-We need a new rule that ...
-
-\begin{eqnarray*}
-\lbrack sub \rbrack\;\; &
-\begin{prooftree}
-\judge{\HGamma}{e}{\htau}
-\justifies
-\judge{\HGamma}{e}{\htau'}
-\end{prooftree}if \htau \leq \htau'\\
-& & \\
-\end{eqnarray*}
-
+\subsection{Types and Annotations}
 
 We need now t define the subtyping relation.
 A first approach would be considering only the toplevel annotation
@@ -295,15 +320,21 @@ if \varphi \sqleq \varphi'
 
 ACTUALLY WE ARE JUST GOING TO CONSIDER SUBEFFECTING
 
-MOVE TO SECTION 1:
+\subsection{Type Rules: Non-Syntax Directed}
 
-well formedness at top level (it is enougjh due to induction (in the first section) and recursion (here)
+We need a new rule that ...
 
-\[
-wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
-= \varphi \sqleq \annot{\htau_1}
- \land   \varphi \sqleq \annot{\htau_2}
-\]
+\begin{eqnarray*}
+\lbrack sub \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e}{\htau}
+\justifies
+\judge{\HGamma}{e}{\htau'}
+\end{prooftree}if \htau \leq \htau'\\
+& & \\
+\end{eqnarray*}
+
+\subsection{Type Rules: Syntax Directed}
 
 SYNTAX DIRECTED RULES : 
 
@@ -374,6 +405,7 @@ SYNTAX DIRECTED RULES :
 \end{eqnarray*}
 
 
+\subsection{Examples}
 
 \end{document}  
 
