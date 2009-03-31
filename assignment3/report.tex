@@ -112,7 +112,7 @@
 
 \def\htau{\hat{\tau}}
 \def\HGamma{\hat{\Gamma}}
-\def\judge#1#2#3{#1 \vdash #2 : #3}
+\def\judge#1#2#3{#1 \vdash #2 : #3\;\;}
 
 \def\annot#1{\|#1\|}
 
@@ -120,7 +120,8 @@
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
- 
+\def\baset#1{\lfloor#1\rfloor}
+
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
 \title{Type and Effect Systems Assignment \\ Automatic Program Analysis}
@@ -180,7 +181,8 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)
 \]
 
 \subsection{Type Rules}
-We now present the type rules for the monovariant analysis.
+
+We now present the type rules for monomorphic binding-time analysis.
 
 The judgments are of the form
 \[\judge{\HGamma}{e}{\htau}\]
@@ -208,33 +210,33 @@ TODO: SOME EXPLANATION ON THE RULES
 \begin{prooftree}
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fn x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree} if
+\judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree}\;\; if\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fun x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree} if
+\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree}\;\; if\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}  \judge{\HGamma}{e_2}{\htau_1}
+\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\;  \judge{\HGamma}{e_2}{\htau_1}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
 \end{prooftree}\\
 & & \\
 \lbrack if \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_0}{bool^\varphi_0}
+\judge{\HGamma}{e_0}{bool^{\varphi_0}}
 \judge{\HGamma}{e_1}{\htau}
 \judge{\HGamma}{e_2}{\htau}
 \justifies
-\judge{\HGamma}{if e_0 then e_1 else e_2}{\htau}
-\end{prooftree}if
+\judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
+\end{prooftree}\;\;if\;\;
 \varphi_0 \sqleq \annot{\htau}\\
 & & \\
 \lbrack let \rbrack\;\; &
@@ -242,21 +244,22 @@ TODO: SOME EXPLANATION ON THE RULES
 \judge{\HGamma}{e_1}{\htau_1}
 \judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_2}
 \justifies
-\judge{\HGamma}{let x=e_1 in e_2}{\htau_2}
+\judge{\HGamma}{let\; x=e_1\; in\; e_2}{\htau_2}
 \end{prooftree}\\
 & & \\
 \lbrack op \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_op_1^\varphi}
-\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_op_2^\varphi}
+\judge{\HGamma}{e_1}{\tau_{op_1}^\varphi}
+\judge{\HGamma}{e_2}{\tau_{op_2}^\varphi}
 \justifies
-\judge{\HGamma}{let x=e_1 in e_2}{\htau_op^\varphi}
+\judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
 \end{prooftree}\\
 & & \\
 \end{eqnarray*}
 
 \subsection{Algorithm}
-
+TODO: view versions:
+VERSION 1:
 We implemented algorithm W in Haskell. The code closely follows the specification in the book:
 type and annotation variables are always given, types get unified and some constraints on annotations
 are collected and solved in the end. In fact, the form of constraints is restricted to
@@ -266,6 +269,14 @@ Thus, they are quite easy to solve in a lattice like $\Annot$.
 
 We send the Haskell files with our implementation and also show some running examples in the
 next section that show the algorithm on work.
+
+VERSION2:
+Our algorithm can be found in the accompanying files and is a moderate extension
+of Algorithm W for simply typed lambda calculus. Our extension generates fresh
+annotation variables everywhere and constraints in the form of $\varphi \sqleq
+\annot{\htau}$. After running the algorithm the types are annotated with
+annotation variables, and after solving the constraints the annotation variables
+get replaced by $S$ or $D$.
 
 \subsection{Examples}
 
@@ -339,7 +350,7 @@ Below, we present the rules that need to change in relation to the monovariant v
 \justifies
 \judge{\HGamma}{x}{\theta \htau}
 \end{prooftree} if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}
-& & \\
+& \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e_1}{\htau_1}
@@ -357,9 +368,8 @@ Below, we present the rules that need to change in relation to the monovariant v
 
 \subsection{Types and Annotations}
 
-We need now t define the subtyping relation.
-A first approach would be considering only the toplevel annotation
-and say that a dynamic can also be made static.
+We now define the subtyping relation. A first approach would be considering only
+the toplevel annotations and say that a dynamic can also be made static.
 
 However, this is not enough because we need some sanity checks on our types to guarantee
 that we still can't end up with things like dynamic functions
@@ -380,9 +390,9 @@ if \varphi \sqleq \varphi'
 
 ACTUALLY WE ARE JUST GOING TO CONSIDER SUBEFFECTING
 
-\subsection{Type Rules: Non-Syntax Directed}
+\subsection{Type Rules}
 
-We need a new rule that ...
+The rule for subeffecting is not syntax-directed:
 
 \begin{eqnarray*}
 \lbrack sub \rbrack\;\; &
@@ -390,20 +400,23 @@ We need a new rule that ...
 \judge{\HGamma}{e}{\htau}
 \justifies
 \judge{\HGamma}{e}{\htau'}
-\end{prooftree}if \htau \leq \htau'\\
+\end{prooftree}\;\;if\;\; \annot{\htau} \sqleq \annot{\htau'}\\
 & & \\
 \end{eqnarray*}
 
-\subsection{Type Rules: Syntax Directed}
+In order to incorporate this into the syntax-directed type-rules we change the
+rules for $app$, $if$ and $op$. We are now also allowed to change $con$ to have
+a static annotation, solving the constrainst will make sure this isn't a
+problem.
 
-SYNTAX DIRECTED RULES : 
+TODO: main is definitely not correct, figure this out.
+TODO: I only checked at top-level using annot, is this correct?
 
-(TODO: write them)
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
 \begin{prooftree}
 \justifies
-\judge{\HGamma}{c}{\tau_c^\varphi}
+\judge{\HGamma}{c}{\tau_c^S}
 \end{prooftree}\\
 & & \\
 \lbrack var\rbrack\;\; &
@@ -417,50 +430,67 @@ SYNTAX DIRECTED RULES :
 \begin{prooftree}
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fn x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree} if
+\judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree}\;\; if\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fun x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree} if
+\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\end{prooftree}\;\; if\;\;
 \varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}  \judge{\HGamma}{e_2}{\htau_1}
+\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\; \judge{\HGamma}{e_2}{\htau_1'}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
-\end{prooftree}\\
+\end{prooftree}\;\;if\;\;
+\annot{\htau_1'} \sqleq \annot{\htau}
+\\
 & & \\
 \lbrack if \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_0}{bool^\varphi_0}
-\judge{\HGamma}{e_1}{\htau}
-\judge{\HGamma}{e_2}{\htau}
+\judge{\HGamma}{e_0}{bool^{\varphi_0}}
+\judge{\HGamma}{e_1}{\htau_1}
+\judge{\HGamma}{e_2}{\htau_2}
 \justifies
-\judge{\HGamma}{if e_0 then e_1 else e_2}{\htau}
-\end{prooftree}if
-\varphi_0 \sqleq \annot{\htau}\\
+\judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
+\end{prooftree}\;\;if\;\;
+\varphi_0 \sqleq \annot{\htau}       \land
+\annot{\htau_1} \sqleq \annot{\htau} \land
+\annot{\htau_2} \sqleq \annot{\htau}
+\\
 & & \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e_1}{\htau_1}
 \judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_2}
 \justifies
-\judge{\HGamma}{let x=e_1 in e_2}{\htau_2}
+\judge{\HGamma}{let\; x=e_1\; in\; e_2}{\htau_2}
 \end{prooftree}\\
 & & \\
 \lbrack op \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_op_1^\varphi}
-\judge{\HGamma[x \mapsto \htau_1]}{e_2}{\htau_op_2^\varphi}
+\judge{\HGamma}{e_1}{\tau_{op_1}^{\varphi_1}}
+\judge{\HGamma}{e_2}{\tau_{op_2}^{\varphi_2}}
 \justifies
-\judge{\HGamma}{let x=e_1 in e_2}{\htau_op^\varphi}
-\end{prooftree}\\
+\judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
+\end{prooftree}\;\;if\;\;
+\annot{\varphi_1} \sqleq \annot{\varphi} \land
+\annot{\varphi_2} \sqleq \annot{\varphi}
+\\
+& & \\
+\lbrack main \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_1}{\tau^{\varphi}}
+\justifies
+\judge{\HGamma}{main = e_1}{\tau^\varphi}
+\end{prooftree}\;\;if\;\;
+D \sqleq \annot{\varphi}
+\\
 & & \\
 \end{eqnarray*}
 
