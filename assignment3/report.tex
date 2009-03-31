@@ -127,32 +127,37 @@
  
 \maketitle
 
+TODO: main rule for the 3 analysis
+
 \section{Monovariant Binding Time Analysis}
 
 \subsection{Types and Annotations}
-As in the book, we have the following base type system:
+As in the book, we have the base type system $\Type$ where $\tau \in \Type$ are given by:
 \[\tau := bool | int | \tau_1 \to \tau_2\]
 
 We  now add annotations to our types. These annotations are always
 one of two values |S| (for static) or |D| (for Dynamic). 
 We need such an annotation
-at all levels in a type (and not only in fuctions).
+at all levels in a type (and not only in fuctions). We call $\Annot$ to the set of annotations
+and $\AType$ to the set of annotated types. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
 \begin{eqnarray*}
 \htau & := bool^\varphi | int^\varphi | \htau_1 \overset{\varphi}{\to} \htau_2 
 \\
 \varphi & := S | D
 \end{eqnarray*}
 
-The annotations actually form a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
+$\Annot$ is actually a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
 the associated order. 
 
 Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation
 and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
 \begin{eqnarray*}
+\annot{.} : \AType -> \Annot\\
 \annot{bool^\varphi} & = \varphi \\
 \annot{int^\varphi} & = \varphi \\
 \annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
 \\
+\baset{.} : \AType -> \Type
 \baset{bool^\varphi} & = bool \\
 \baset{int^\varphi} & = int \\
 \baset{\htau_1 \overset{\varphi}{\to} \htau_2} & = \baset{\htau_1} \to \baset{\htau_2} \\
@@ -175,7 +180,15 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)
 \]
 
 \subsection{Type Rules}
-We now present the type
+We now present the type rules for the monovariant analysis.
+
+The judgments are of the form
+\[\judge{\HGamma}{e}{\htau}\]
+where $\HGamma: Var_\star \to AType$ is the context, assigning types to each program variable, 
+$e \in Stmt$ is an expression in the \sc{Fun} language and $\htau \in AType$ is an annotated type.
+The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
+
+TODO: SOME EXPLANATION ON THE RULES
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -244,14 +257,48 @@ We now present the type
 
 \subsection{Algorithm}
 
+We implemented algorithm W in Haskell. The code closely follows the specification in the book:
+type and annotation variables are always given, types get unified and some constraints on annotations
+are collected and solved in the end. In fact, the form of constraints is restricted to
+\[\beta \sqleq \beta'\]
+where $\beta$ and $\beta'$ are annotation variables.
+Thus, they are quite easy to solve in a lattice like $\Annot$.
+
+We send the Haskell files with our implementation and also show some running examples in the
+next section that show the algorithm on work.
+
 \subsection{Examples}
 
-\section{Polyvariant}
+TODO: examples using Hs ; do the examples in the handout and also one that should be used in other sections. for this last one, also present a type derivation.
+
+\section{Polyvariant Analysis}
 
 \subsection{Types and Annotations}
 
+Instead of considering just types, we allow for type and annotation variables and top level quatification
+on these. So, we extend $\AType$ and $\Annot$ as follows:
+\begin{eqnarray*}
+\htau & := \ldots  | \alpha \\ 
+\\
+\varphi & := \ldots  | \beta \\
+\end{eqnarray*}
+We now consider annotated type schemes $\hsigma \in ATypeScheme$ given by
+\[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
+where $\zeta_i$ are type variables or annotation variables and $\htau \in AType$.
+
 \subsection{Type Rules: Non-Syntax Directed}
 
+Our judgements are now of the form
+\[\judge{\HGamma}{e}{\hsigma}\]
+where $\hsigma$ is an annotated type scheme and $\HGamma$ also maps variables
+to $ATypeSchema$. However, we should only allow our top level
+programs to have annotated types with no free variables.
+
+We could extend our rule system with the following non-syntax directed rules that
+express generalization (astraction over type and annotation variables) and
+instantiation. The remaining rules would be unchanged (but considering schemes
+instead of types) and the $\lbrack main \rbrack$ rule would have to allow only
+for completely specified annotated types.
 
 \begin{eqnarray*}
 \lbrack gen \rbrack\;\; &
@@ -272,6 +319,19 @@ We now present the type
 
 \subsection{Type Rules: Syntax Directed}
 
+We will instead consider a syntax-directed version of the type rules.
+The judgements will be of the form
+\judge{\HGamma}{e}{\htau}
+where $\htau$ are annotated types (possibly including variables).
+Schemes are only allowed in the context $\HGamma$.
+
+We introduce generalization in the $\lbrack let \rbrack$ rule and
+instantiation in the $\lbrack var \rbrack$ rule. In these way, quantification
+over type variables will be restricted to let bindings. The only thing
+we still need to guarantee in the $\lbrack main \rbrack$ rule is that
+there are no type variables in the given type.
+
+Below, we present the rules that need to change in relation to the monovariant version.
 \begin{eqnarray*}
 \lbrack var \rbrack\;\; &
 \begin{prooftree}
