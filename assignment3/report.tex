@@ -143,43 +143,45 @@ As in the book, we have the base type system $\Type$ where $\tau \in \Type$ are 
 \[\tau := bool \mid int \mid \tau_1 \to \tau_2\]
 
 We  now add annotations to our types. These annotations are always
-one of two values $S$ (for static) or $D$ (for Dynamic). 
+one of the two values $S$ (for static) and $D$ (for Dynamic). 
 We need such an annotation
-at all levels in a type (and not only in fuctions). We call $\Annot$ to the set of annotations
-and $\AType$ to the set of annotated types. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
-\begin{eqnarray*}
-\htau & := bool^\varphi \mid int^\varphi \mid \htau_1 \overset{\varphi}{\to} \htau_2 
-\\
-\varphi & := S \mid D
-\end{eqnarray*}
+at all levels in a type (and not only in functions). We designate the set of annotations by $\Annot$ and
+the set of annotated types by
+$\AType$. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
+\begin{align*}
+\htau  \; := \; & bool^\varphi \mid int^\varphi \mid \htau_1 \overset{\varphi}{\to} \htau_2 \\
+& \\
+\varphi \; := \; & S \mid D\\
+\end{align*}
 
-$\Annot$ is actually a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
-the associated order. 
+$\Annot$ is endowed with a lattice structure where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
+the associated order relation. 
 
 Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation
 and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
-\begin{eqnarray*}
-\annot{.} &: \AType -> \Annot\\
-\annot{bool^\varphi} & = \varphi \\
-\annot{int^\varphi} & = \varphi \\
-\annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
+\begin{align*}
+ \annot{.} : \AType &\to \Annot\\
+ \annot{bool^\varphi} & = \varphi \\
+ \annot{int^\varphi} & = \varphi \\
+ \annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
 \\
-\baset{.} & : \AType -> \Type\\
+\baset{.}  : \AType &\to \Type\\
 \baset{bool^\varphi} & = bool \\
 \baset{int^\varphi} & = int \\
 \baset{\htau_1 \overset{\varphi}{\to} \htau_2} & = \baset{\htau_1} \to \baset{\htau_2} \\
-\end{eqnarray*}
+\end{align*}
 
 
-Actually, some annotated types are not allowed, so we need to introduce a wellformedness
-constraint to restrict those. Basically, this contraint will express that a dynamic function
+Actually, some annotated types are not allowed, so we need to introduce a well-formedness
+constraint to restrict them. Basically, this constraint will express that a dynamic function
 has to map a dynamic argument to a dynamic result. So, it 
-expects dynamic arguments and cannot produce static results. The latter is actually
-impossible, whilst the former will be considered again in the other versions
-(dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments).
-We will just be concerned to give a definition of wellformedness at top level and
-induction on the type rules then guarantees we will just construct
-well-formed types.
+cannot receive static arguments and cannot produce static results. The latter is actually
+an impossible situation, whilst the former will be considered again in the other versions
+(dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments,
+thus the constraint will be kept).
+We will just be concerned to give a definition of well-formedness at top level and
+induction on the type rules then guarantees that only
+well-formed types are ever constructed.
 \[
 wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
 = \varphi \sqleq \annot{\htau_1}
