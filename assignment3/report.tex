@@ -134,7 +134,8 @@
  
 \maketitle
 
-TODO: main rule for the 3 analysis
+TODO: main rule for the 3 analysis 
+(we need t think again ... i have some doubts...)
 
 \section{Monovariant Binding Time Analysis}
 
@@ -194,11 +195,34 @@ We now present the type rules for monomorphic binding-time analysis.
 
 The judgments are of the form
 \[\judge{\HGamma}{e}{\htau}\]
-where $\HGamma: Var_\star \to AType$ is the context, assigning types to each program variable, 
-$e \in Stmt$ is an expression in the \textsc{Fun} language and $\htau \in AType$ is an annotated type.
+where $\HGamma: \Var_\star \to \AType$ is the context, assigning types to each program variable, 
+$e \in \Stmt$ is an expression in the \textsc{Fun} language and $\htau \in \AType$ is an annotated type.
 The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
 
-TODO: SOME EXPLANATION ON THE RULES
+
+The actual rules are presented below. All the rules except for the last one
+have a counterpart in the underlying type system rules presented in the book.
+Most are just a lifting of their counterparts to deal with annotated types.
+Some specificities show up in the rules
+$\lbrack fn \rbrack$,
+$\lbrack fun \rbrack$,
+$\lbrack con \rbrack$ and
+$\lbrack if \rbrack$. 
+The first two were already discussed in the last subsection and refer to 
+the well-formedness constraint there defined.
+In what concerns the $\lbrack con \rbrack$ rule, we can note that we can annotate constants 
+as being either static or dynamic. This is in fact necessary so that ours
+is a conservative extension of the underlying type system in the sense that 
+we can give an annotated type to each valid term. In fact, the algorithm will always try to give the
+``best'' annotation (static) to a constant but it might be forced to decide that it is dynamic. 
+This will no longer be an issue when we allow for subeffecting: then the annotation will be weakened
+only when used. As for the $\lbrack if \rbrack$ rule, we just note that a conditional expression
+needs to be tagged as dynamic if the condition is itself dynamic (because in that case,
+the value of the expression cannot be known statically). On the other hand, if the condition
+can be known statically, then it does not impose a restriction on the expression annotation: it
+just needs to be the same as the branches' annotations.
+
+TODO: EXPLAIN main
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -220,7 +244,7 @@ TODO: SOME EXPLANATION ON THE RULES
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
@@ -228,7 +252,7 @@ TODO: SOME EXPLANATION ON THE RULES
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
@@ -263,10 +287,18 @@ TODO: SOME EXPLANATION ON THE RULES
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
 \end{prooftree}\\
 & & \\
+%\lbrack main \rbrack\;\; &
+%\begin{prooftree}
+%\judge{\HGamma}{e}{\htau}
+%\justifies
+%\judge{\HGamma}{main = e}{\htau}
+%\end{prooftree}\\ \text{if}
+%& & \\
 \end{eqnarray*}
 
 \subsection{Algorithm}
 TODO: view versions:
+
 VERSION 1:
 We implemented algorithm W in Haskell. The code closely follows the specification in the book:
 type and annotation variables are always given, types get unified and some constraints on annotations
@@ -440,15 +472,15 @@ TODO: I only checked at top-level using annot, is this correct?
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
+\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2} 
 \end{prooftree}\;\; \text{if}\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
