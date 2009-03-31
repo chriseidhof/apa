@@ -222,7 +222,7 @@ We now present the type rules for monomorphic binding-time analysis.
 \judge{\HGamma}{e_2}{\htau}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}if
+\end{prooftree}\;\;if\;\;
 \varphi_0 \sqleq \annot{\htau}\\
 & & \\
 \lbrack let \rbrack\;\; &
@@ -346,13 +346,14 @@ rules for $app$, $if$ and $op$. We are now also allowed to change $con$ to have
 a static annotation, solving the constrainst will make sure this isn't a
 problem.
 
-TODO: add construct for main!
+TODO: main is definitely not correct, figure this out.
+TODO: I only checked at top-level using annot, is this correct?
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
 \begin{prooftree}
 \justifies
-\judge{\HGamma}{c}{\tau_c^\varphi}
+\judge{\HGamma}{c}{\tau_c^S}
 \end{prooftree}\\
 & & \\
 \lbrack var\rbrack\;\; &
@@ -380,20 +381,25 @@ TODO: add construct for main!
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\;  \judge{\HGamma}{e_2}{\htau_1}
+\judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\; \judge{\HGamma}{e_2}{\htau_1'}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
-\end{prooftree}\\
+\end{prooftree}\;\;if\;\;
+\annot{\htau_1'} \sqleq \annot{\htau}
+\\
 & & \\
 \lbrack if \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e_0}{bool^{\varphi_0}}
-\judge{\HGamma}{e_1}{\htau}
-\judge{\HGamma}{e_2}{\htau}
+\judge{\HGamma}{e_1}{\htau_1}
+\judge{\HGamma}{e_2}{\htau_2}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}if
-\varphi_0 \sqleq \annot{\htau}\\
+\end{prooftree}\;\;if\;\;
+\varphi_0 \sqleq \annot{\htau}       \land
+\annot{\htau_1} \sqleq \annot{\htau} \land
+\annot{\htau_2} \sqleq \annot{\htau}
+\\
 & & \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
@@ -405,11 +411,23 @@ TODO: add construct for main!
 & & \\
 \lbrack op \rbrack\;\; &
 \begin{prooftree}
-\judge{\HGamma}{e_1}{\tau_{op_1}^\varphi}
-\judge{\HGamma}{e_2}{\tau_{op_2}^\varphi}
+\judge{\HGamma}{e_1}{\tau_{op_1}^{\varphi_1}}
+\judge{\HGamma}{e_2}{\tau_{op_2}^{\varphi_2}}
 \justifies
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
-\end{prooftree}\\
+\end{prooftree}\;\;if\;\;
+\annot{\varphi_1} \sqleq \annot{\varphi} \land
+\annot{\varphi_2} \sqleq \annot{\varphi}
+\\
+& & \\
+\lbrack main \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_1}{\tau^{\varphi}}
+\justifies
+\judge{\HGamma}{main = e_1}{\tau^\varphi}
+\end{prooftree}\;\;if\;\;
+D \sqleq \annot{\varphi}
+\\
 & & \\
 \end{eqnarray*}
 
