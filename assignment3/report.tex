@@ -199,7 +199,7 @@ $e \in \Stmt$ is an expression in the \textsc{Fun} language and $\htau \in \ATyp
 The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
 
 
-The actual rules are presented below. All the rules except for the last one
+The rules are presented below. All the rules except for the last one
 have a counterpart in the underlying type system rules presented in the book.
 Most are just a lifting of their counterparts to deal with annotated types.
 Some specificities show up in the rules
@@ -210,16 +210,16 @@ $\lbrack if \rbrack$.
 The first two were already discussed in the last subsection and refer to 
 the well-formedness constraint there defined.
 In what concerns the $\lbrack con \rbrack$ rule, we can note that we can annotate constants 
-as being either static or dynamic. This is in fact necessary so that ours
+as being either static or dynamic. This is necessary so that this type system
 is a conservative extension of the underlying type system in the sense that 
-we can give an annotated type to each valid term. In fact, the algorithm will always try to give the
-``best'' annotation (static) to a constant but it might be forced to decide that it is dynamic. 
+we can give an annotated type to each valid term. The algorithm will always try to give the
+optimal annotation ($S$) to a constant but it might be forced to decide that it is $D$. 
 This will no longer be an issue when we allow for subeffecting: then the annotation will be weakened
-only when used. As for the $\lbrack if \rbrack$ rule, we just note that a conditional expression
+only when used. Regarding the $\lbrack if \rbrack$ rule, we note that a conditional expression
 needs to be tagged as dynamic if the condition is itself dynamic (because in that case,
 the value of the expression cannot be known statically). On the other hand, if the condition
-can be known statically, then it does not impose a restriction on the expression annotation: it
-just needs to be the same as the branches' annotations.
+can be known statically then it does not impose a restriction on the expression annotation: it
+just needs to be the same as the annotations in the branches.
 
 TODO: EXPLAIN main
 
