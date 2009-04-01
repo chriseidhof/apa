@@ -57,6 +57,11 @@
 \def\Lab {\mathbf{Lab}}
 \def\Blocks{\mathbf{Blocks}}
 \def\Var {\mathbf{Var}}
+\def\Type {\mathbf{Type}}
+\def\AType{\mathbf{AType}}
+\def\Annot{\mathbf{Annot}}
+\def\ATypeScheme{\mathbf{ATypeScheme}}
+
  
  
 \def\skip {\texttt{skip}\ }
@@ -111,16 +116,17 @@
 \def\sqleq{\sqsubseteq}
 
 \def\htau{\hat{\tau}}
+\def\hsigma{\hat{\sigma}}
 \def\HGamma{\hat{\Gamma}}
 \def\judge#1#2#3{#1 \vdash #2 : #3\;\;}
 
 \def\annot#1{\|#1\|}
+\def\baset#1{\lfloor#1\rfloor}
 
 \def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
 
 \def\Tiny{\fontsize{3pt}{3pt}\selectfont}
 \def\hs#1{\texttt{#1}}
-\def\baset#1{\lfloor#1\rfloor}
 
 \begin{document}
 \author{Chris Eidhof, Rui S. Barbosa}
@@ -128,47 +134,55 @@
  
 \maketitle
 
+TODO: main rule for the 3 analysis 
+(we need t think again ... i have some doubts...)
+
 \section{Monovariant Binding Time Analysis}
 
 \subsection{Types and Annotations}
-As in the book, we have the following base type system:
+As in the book, we have the base type system $\Type$ where $\tau \in \Type$ are given by:
 \[\tau := bool\; |\; int\; | \;\tau_1 \to \tau_2\]
 
 We  now add annotations to our types. These annotations are always
-one of two values |S| (for static) or |D| (for Dynamic). 
+one of the two values $S$ (for static) and $D$ (for Dynamic). 
 We need such an annotation
-at all levels in a type (and not only in fuctions).
-\begin{eqnarray*}
-\htau & := bool^\varphi\; |\; int^\varphi\; |\; \htau_1 \overset{\varphi}{\to} \htau_2 
-\\
-\varphi & := S\; |\; D
-\end{eqnarray*}
+at all levels in a type (and not only in functions). We designate the set of annotations by $\Annot$ and
+the set of annotated types by
+$\AType$. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
+\begin{align*}
+\htau  \; := \; & bool^\varphi \mid int^\varphi \mid \htau_1 \overset{\varphi}{\to} \htau_2 \\
+& \\
+\varphi \; := \; & S \mid D\\
+\end{align*}
 
-The annotations actually form a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
-the associated order. 
+$\Annot$ is endowed with a lattice structure where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
+the associated order relation. 
 
 Given an annotated type $\htau$, $\annot{\htau}$ stands for its topmost annotation
 and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
-\begin{eqnarray*}
-\annot{bool^\varphi} & = \varphi \\
-\annot{int^\varphi} & = \varphi \\
-\annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
+\begin{align*}
+ \annot{.} : \AType &\to \Annot\\
+ \annot{bool^\varphi} & = \varphi \\
+ \annot{int^\varphi} & = \varphi \\
+ \annot{\htau_1 \overset{\varphi}{\to} \htau_2} & = \varphi \\
 \\
+\baset{.}  : \AType &\to \Type\\
 \baset{bool^\varphi} & = bool \\
 \baset{int^\varphi} & = int \\
 \baset{\htau_1 \overset{\varphi}{\to} \htau_2} & = \baset{\htau_1} \to \baset{\htau_2} \\
-\end{eqnarray*}
+\end{align*}
 
 
-Actually, some annotated types are not allowed, so we need to introduce a wellformedness
-constraint to restrict those. Basically, this contraint will express that a dynamic function
+Actually, some annotated types are not allowed, so we need to introduce a well-formedness
+constraint to restrict them. Basically, this constraint will express that a dynamic function
 has to map a dynamic argument to a dynamic result. So, it 
-expects dynamic arguments and cannot produce static results. The latter is actually
-impossible, whilst the former will be considered again in the other versions
-(dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments).
-We will just be concerned to give a definition of wellformedness at top level and
-induction on the type rules then guarantees we will just construct
-well-formed types.
+cannot receive static arguments and cannot produce static results. The latter is actually
+an impossible situation, whilst the former will be considered again in the other versions
+(dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments,
+thus the constraint will be kept).
+We will just be concerned to give a definition of well-formedness at top level and
+induction on the type rules then guarantees that only
+well-formed types are ever constructed.
 \[
 wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
 = \varphi \sqleq \annot{\htau_1}
@@ -176,7 +190,39 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)
 \]
 
 \subsection{Type Rules}
+
 We now present the type rules for monomorphic binding-time analysis.
+
+The judgments are of the form
+\[\judge{\HGamma}{e}{\htau}\]
+where $\HGamma: \Var_\star \to \AType$ is the context, assigning types to each program variable, 
+$e \in \Stmt$ is an expression in the \textsc{Fun} language and $\htau \in \AType$ is an annotated type.
+The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
+
+
+The actual rules are presented below. All the rules except for the last one
+have a counterpart in the underlying type system rules presented in the book.
+Most are just a lifting of their counterparts to deal with annotated types.
+Some specificities show up in the rules
+$\lbrack fn \rbrack$,
+$\lbrack fun \rbrack$,
+$\lbrack con \rbrack$ and
+$\lbrack if \rbrack$. 
+The first two were already discussed in the last subsection and refer to 
+the well-formedness constraint there defined.
+In what concerns the $\lbrack con \rbrack$ rule, we can note that we can annotate constants 
+as being either static or dynamic. This is in fact necessary so that ours
+is a conservative extension of the underlying type system in the sense that 
+we can give an annotated type to each valid term. In fact, the algorithm will always try to give the
+``best'' annotation (static) to a constant but it might be forced to decide that it is dynamic. 
+This will no longer be an issue when we allow for subeffecting: then the annotation will be weakened
+only when used. As for the $\lbrack if \rbrack$ rule, we just note that a conditional expression
+needs to be tagged as dynamic if the condition is itself dynamic (because in that case,
+the value of the expression cannot be known statically). On the other hand, if the condition
+can be known statically, then it does not impose a restriction on the expression annotation: it
+just needs to be the same as the branches' annotations.
+
+TODO: EXPLAIN main
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -197,16 +243,16 @@ We now present the type rules for monomorphic binding-time analysis.
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+\end{prooftree}\;\; \text{if}\;\;
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+\end{prooftree}\;\; \text{if}\;\;
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
@@ -222,7 +268,7 @@ We now present the type rules for monomorphic binding-time analysis.
 \judge{\HGamma}{e_2}{\htau}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \varphi_0 \sqleq \annot{\htau}\\
 & & \\
 \lbrack let \rbrack\;\; &
@@ -241,25 +287,83 @@ We now present the type rules for monomorphic binding-time analysis.
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
 \end{prooftree}\\
 & & \\
+%\lbrack main \rbrack\;\; &
+%\begin{prooftree}
+%\judge{\HGamma}{e}{\htau}
+%\justifies
+%\judge{\HGamma}{main = e}{\htau}
+%\end{prooftree}\\ \text{if}
+%& & \\
 \end{eqnarray*}
 
 \subsection{Algorithm}
+TODO: view versions:
 
-Our algorithm can be found in the accompanying files and is a moderate extension
-of Algorithm W for simply typed lambda calculus. Our extension generates fresh
-annotation variables everywhere and constraints in the form of $\varphi \sqleq
-\annot{\htau}$. After running the algorithm the types are annotated with
-annotation variables, and after solving the constraints the annotation variables
-get replaced by $S$ or $D$.
+VERSION 1:
+---We implemented algorithm W in Haskell. The code closely follows the specification in the book:
+---type and annotation variables are always given, types get unified and some constraints on annotations
+---are collected and solved in the end. In fact, the form of constraints is restricted to
+\[\beta \sqleq \beta'\]
+--where $\beta$ and $\beta'$ are annotation variables.
+--Thus, they are quite easy to solve in a lattice like $\Annot$.
+--We send the Haskell files with our implementation and also show some running examples in the
+--next section that show the algorithm on work.
+
+VERSION2:
+--Our algorithm can be found in the accompanying files and is a moderate extension
+--of Algorithm W for simply typed lambda calculus.
+--Our extension generates fresh
+--annotation variables everywhere and constraints in the form of $\varphi \sqleq\annot{\htau}$.
+--After running the algorithm the types are annotated with
+--annotation variables, and after solving the constraints the annotation variables
+--get replaced by $S$ or $D$.
+
+VERSION 1 \/ 2:
+Our implementation of the inferencing algorithm in Haskell can be found in the accompanying files.
+It is a moderate extension of Algorithm W for simply typed $\lambda$-calculus
+and the code closely follows the book's specification style.
+It generates fresh annotation variables everywhere and collects constraints
+with the restricted form
+\[\beta \sqleq \beta'\]
+where $\beta$ and $\beta'$ are annotation variables.
+After this first phase, every subexpression is given a type annotated
+with annotation variables. Then, in the constraint solving phase,
+the annotation variables get replaced by $S$ or $D$.
+The simple form of constraints and the simple structure of the lattice itself make it easy to solve them
+and get the ``best'' possible annotations (according to the type rules).
 
 \subsection{Examples}
 
-\section{Polyvariant}
+TODO: examples using Hs ; do the examples in the handout and also one that should be used in other sections. for this last one, also present a type derivation.
+
+\section{Polyvariant Analysis}
 
 \subsection{Types and Annotations}
 
+Instead of considering just types, we allow for type and annotation variables and top level quatification
+on these. So, we extend $\AType$ and $\Annot$ as follows:
+\begin{eqnarray*}
+\htau & := \ldots  \mid \alpha \\ 
+\\
+\varphi & := \ldots  \mid \beta \\
+\end{eqnarray*}
+We now consider annotated type schemes $\hsigma \in \ATypeScheme$ given by
+\[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
+where $\zeta_i$ are type variables or annotation variables and $\htau \in AType$.
+
 \subsection{Type Rules: Non-Syntax Directed}
 
+Our judgements are now of the form
+\[\judge{\HGamma}{e}{\hsigma}\]
+where $\hsigma$ is an annotated type scheme and $\HGamma$ also maps variables
+to $\ATypeScheme$. However, we should only allow our top level
+programs to have annotated types with no free variables.
+
+We could extend our rule system with the following non-syntax directed rules that
+express generalization (astraction over type and annotation variables) and
+instantiation. The remaining rules would be unchanged (but considering schemes
+instead of types) and the $\lbrack main \rbrack$ rule would have to allow only
+for completely specified annotated types.
 
 \begin{eqnarray*}
 \lbrack gen \rbrack\;\; &
@@ -267,26 +371,39 @@ get replaced by $S$ or $D$.
 \judge{\HGamma}{e}{\htau}
 \justifies
 \judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
-\end{prooftree}if \zeta_1, \ldots, \zeta_n do not occur free in ???\\
+\end{prooftree}\text{if} \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma)\\
 & & \\
 \lbrack ins \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
 \justifies
 \judge{\HGamma}{e}{\theta \htau}
-\end{prooftree}if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
+\end{prooftree}\text{if} dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}\\
 & & \\
 \end{eqnarray*}
 
 \subsection{Type Rules: Syntax Directed}
 
+We will instead consider a syntax-directed version of the type rules.
+The judgements will be of the form
+\[\judge{\HGamma}{e}{\htau}\]
+where $\htau$ are annotated types (possibly including variables).
+Schemes are only allowed in the context $\HGamma$.
+
+We introduce generalization in the $\lbrack let \rbrack$ rule and
+instantiation in the $\lbrack var \rbrack$ rule. In these way, quantification
+over type variables will be restricted to let bindings. The only thing
+we still need to guarantee in the $\lbrack main \rbrack$ rule is that
+there are no type variables in the given type.
+
+Below, we present the rules that need to change in relation to the monovariant version.
 \begin{eqnarray*}
 \lbrack var \rbrack\;\; &
 \begin{prooftree}
 \HGamma(x)= \forall(\zeta_1,\ldots,\zeta_n). \htau
 \justifies
 \judge{\HGamma}{x}{\theta \htau}
-\end{prooftree} if dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}
+\end{prooftree} \text{if} dom(\theta) \subset \{\zeta_1, \ldots, \zeta_n\}
 & \\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
@@ -294,7 +411,7 @@ get replaced by $S$ or $D$.
 \judge{\HGamma[x \mapsto \forall (\zeta_1, \ldots, \zeta_n). \htau_1]}{e_2}{\htau_2}
 \justifies
 \judge{\HGamma}{let x=e_1 in e_2}{\htau_2}
-\end{prooftree} if \zeta_i do not occur free in \HGamma \\
+\end{prooftree} \text{if} \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma) \\
 & & \\
 \end{eqnarray*}
 
@@ -315,10 +432,10 @@ that map static arguments to static results.
 Shape conformant: that is, the underlying type is mantained...
 
 \begin{eqnarray*}
-int^\varphi \leq int^{\varphi'}  if \varphi \sqleq \varphi' \\
-bool^\varphi \leq bool^{\varphi'}  if \varphi \sqleq \varphi' \\
+int^\varphi \leq int^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
+bool^\varphi \leq bool^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
 \htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
-if \varphi \sqleq \varphi' 
+\text{if} \varphi \sqleq \varphi' 
  \land   \htau_1 \geq \htau_1'
  \land   \htau_2 \leq \htau_2'
  \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
@@ -337,12 +454,12 @@ The rule for subeffecting is not syntax-directed:
 \judge{\HGamma}{e}{\htau}
 \justifies
 \judge{\HGamma}{e}{\htau'}
-\end{prooftree}\;\;if\;\; \annot{\htau} \sqleq \annot{\htau'}\\
+\end{prooftree}\;\;\text{if}\;\; \annot{\htau} \sqleq \annot{\htau'}\\
 & & \\
 \end{eqnarray*}
 
 In order to incorporate this into the syntax-directed type-rules we change the
-rules for $app$, $if$ and $op$. We are now also allowed to change $con$ to have
+rules $\lbrack app \rbrack$, $\lbrack if \rbrack$ and $\lbrack op \rbrack$. We are now also allowed to change $con$ to have
 a static annotation, solving the constrainst will make sure this isn't a
 problem.
 
@@ -368,23 +485,23 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma[x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+\end{prooftree}\;\; \text{if}\;\;
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma[f \mapsto \htau_1 \overset{\varphi}{\to} \htau_2][x\mapsto\htau_1]}{e}{\htau_2}
 \justifies
-\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
-\end{prooftree}\;\; if\;\;
-\varphi \sqleq \annot{\htau_1} \land \varphi \sqleq \annot{\htau_2} \\
+\judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2} 
+\end{prooftree}\;\; \text{if}\;\;
+wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e_1}{\htau_1 \overset{\varphi}{\to} \htau_2}\; \judge{\HGamma}{e_2}{\htau_1'}
 \justifies
 \judge{\HGamma}{e_1 \; e_2}{\htau_2}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \annot{\htau_1'} \sqleq \annot{\htau}
 \\
 & & \\
@@ -395,7 +512,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_2}{\htau_2}
 \justifies
 \judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \varphi_0 \sqleq \annot{\htau}       \land
 \annot{\htau_1} \sqleq \annot{\htau} \land
 \annot{\htau_2} \sqleq \annot{\htau}
@@ -415,7 +532,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_2}{\tau_{op_2}^{\varphi_2}}
 \justifies
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 \annot{\varphi_1} \sqleq \annot{\varphi} \land
 \annot{\varphi_2} \sqleq \annot{\varphi}
 \\
@@ -425,7 +542,7 @@ TODO: I only checked at top-level using annot, is this correct?
 \judge{\HGamma}{e_1}{\tau^{\varphi}}
 \justifies
 \judge{\HGamma}{main = e_1}{\tau^\varphi}
-\end{prooftree}\;\;if\;\;
+\end{prooftree}\;\;\text{if}\;\;
 D \sqleq \annot{\varphi}
 \\
 & & \\
