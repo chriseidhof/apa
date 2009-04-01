@@ -134,7 +134,6 @@
  
 \maketitle
 
-TODO: main rule for the 3 analysis (we need t think again ... i have some doubts...)
 
 TODO: subeffecting definition seems to be a problem: see explanation when we thought we had subtyping.
    just top level comparison can lead to inconsistencies, right? ...
@@ -408,7 +407,17 @@ Below, we present the rules that need to change in relation to the monovariant v
 
 We now define a subeffecting relation.
 
-\[\htau \preceq \htau' \equiv \baset{\htau}=\baset{\htau'} \land \annot{\htau} \sqleq \annot{\htau}\]
+\begin{eqnarray*}
+int^\varphi \leq int^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
+bool^\varphi \leq bool^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
+\htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
+\text{if} \varphi \sqleq \varphi' 
+ \land   \htau_1 \geq \htau_1'
+ \land   \htau_2 \leq \htau_2'
+ \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
+ \land   wff(\htau_1' \overset{\varphi}{\to} \htau_2')
+\end{eqnarray*}
+
 
 OLD STUFF BELOW (BUT DONT ERASE YET)
 
@@ -421,16 +430,7 @@ that map static arguments to static results.
 
 Shape conformant: that is, the underlying type is mantained...
 
-\begin{eqnarray*}
-int^\varphi \leq int^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
-bool^\varphi \leq bool^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
-\htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
-\text{if} \varphi \sqleq \varphi' 
- \land   \htau_1 \geq \htau_1'
- \land   \htau_2 \leq \htau_2'
- \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
- \land   wff(\htau_1' \overset{\varphi}{\to} \htau_2')
-\end{eqnarray*}
+
 
 ACTUALLY WE ARE JUST GOING TO CONSIDER SUBEFFECTING
 
