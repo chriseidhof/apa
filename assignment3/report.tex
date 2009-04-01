@@ -53,7 +53,7 @@
 \def\const#1{\mathopen{\langle}#1\mathclose{\rangle}} % <a,b,...z>
 \def\pair#1{\const{#1}}
  
-\def\Stmt {\mathbf{Stmt}}
+\def\Expr{\mathbf{Expr}}
 \def\Lab {\mathbf{Lab}}
 \def\Blocks{\mathbf{Blocks}}
 \def\Var {\mathbf{Var}}
@@ -177,11 +177,11 @@ and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
 Some annotated types are not allowed, so we need to introduce a well-formedness
 constraint to restrict them. This constraint will express that a dynamic function
 has to map a dynamic argument to a dynamic result. This implies that
-can neither receive static arguments nor produce static results. The latter is actually
+it can neither receive static arguments nor produce static results. The latter is actually
 an impossible situation, whilst the former will be considered again in the other versions
 (dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments,
 thus the constraint will be kept).
-We will just be concerned to give a definition of well-formedness at the top-level and
+We will just be concerned to give a definition of well-formedness at the top-level as
 induction on the type rules then guarantees that only
 well-formed types are ever constructed.
 \[
@@ -197,11 +197,11 @@ We now present the type rules for monomorphic binding-time analysis.
 The judgments are of the form
 \[\judge{\HGamma}{e}{\htau}\]
 where $\HGamma: \Var_\star \to \AType$ is the context, assigning types to each program variable, 
-$e \in \Stmt$ is an expression in the \textsc{Fun} language and $\htau \in \AType$ is an annotated type.
+$e \in \Expr$ is an expression in the \textsc{Fun} language and $\htau \in \AType$ is an annotated type.
 The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
 
 
-The rules are presented below. All the rules except for the last one
+The rules are presented below. All the rules 
 have a counterpart in the underlying type system rules presented in the book.
 Most are just a lifting of their counterparts to deal with annotated types.
 Some specificities show up in the rules
@@ -223,7 +223,6 @@ the value of the expression cannot be known statically). On the other hand, if t
 can be known statically then it does not impose a restriction on the expression annotation: it
 just needs to be the same as the annotations in the branches.
 
-TODO: EXPLAIN main
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -298,28 +297,7 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \end{eqnarray*}
 
 \subsection{Algorithm}
-TODO: view versions:
 
-%VERSION 1:
-%We implemented algorithm W in Haskell. The code closely follows the specification in the book:
-%type and annotation variables are always given, types get unified and some constraints on annotations
-%are collected and solved in the end. In fact, the form of constraints is restricted to
-%\[\beta \sqleq \beta'\]
-%where $\beta$ and $\beta'$ are annotation variables.
-%Thus, they are quite easy to solve in a lattice like $\Annot$.
-%We send the Haskell files with our implementation and also show some running examples in the
-%next section that show the algorithm on work.
-%
-%VERSION2:
-%Our algorithm can be found in the accompanying files and is a moderate extension
-%of Algorithm W for simply typed lambda calculus.
-%Our extension generates fresh
-%annotation variables everywhere and constraints in the form of $\varphi \sqleq\annot{\htau}$.
-%After running the algorithm the types are annotated with
-%annotation variables, and after solving the constraints the annotation variables
-%get replaced by $S$ or $D$.
-
-%VERSION 1 `join` 2:
 Our implementation of the inferencing algorithm in Haskell can be found in the accompanying files.
 It is a moderate extension of Algorithm W for simply typed $\lambda$-calculus
 and the code closely follows the book's specification style.
@@ -332,6 +310,11 @@ with annotation variables. Then, in the constraint solving phase,
 the annotation variables get replaced by $S$ or $D$.
 The simple form of constraints and the simple structure of the lattice itself make it easy to solve them
 and get the ``best'' possible annotations (according to the type rules).
+
+When using the algorithm to analyze actual programs, the user will need to supply a 
+annotation for each free variable (the arguments to |main|). The algorithm will then add
+those to the constraints and will also add that the program itself needs to be dynamic.
+This will become clearer in the examples below.
 
 \subsection{Examples}
 
