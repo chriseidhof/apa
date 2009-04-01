@@ -410,7 +410,10 @@ samebelow(\htau,\htau') &\overset{.}{=}
 \\ &\lor
 (\exists \varphi, \varphi',\htau_1,\htau_2.\;\;
 \htau = \htau_1 \overset{\varphi}{\to} \htau_2 \land 
-\htau' = \htau_1 \overset{\varphi'}{\to} \htau_2) \\
+\htau' = \htau_1 \overset{\varphi'}{\to} \htau_2 \land
+wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
+wff(\htau_1 \overset{\varphi'}{\to} \htau_2)
+) \\
 \end{align*}
 Note that, in the case for functions above, the annotated types of the arguments (resp. results) need
 to be exactly the same.
@@ -431,7 +434,7 @@ A simple rule for subeffecting would be
 Again, we have the problem that this is not syntax-directed.
 In order to incorporate this into the syntax-directed type rules we change the
 rules $\lbrack app \rbrack$, $\lbrack if \rbrack$ and $\lbrack op \rbrack$. We are now also allowed to give
-static annotations to constants:  we can always weaken them when we need to use them.
+static annotations to constants:  they can always be weakened when we need to use them.
 The type rules for the subeffecting analysis are presented below.
 
 \begin{eqnarray*}
@@ -501,21 +504,15 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \justifies
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
 \end{prooftree}\;\;\text{if}\;\;
-\varphi_1 \sqleq \varphi \land
-\varphi_2 \sqleq \varphi
+\tau_{op_1}^{\varphi_1} \preceq \tau_{op}^\varphi \land
+\tau_{op_2}^{\varphi_2} \preceq \tau_{op}^\varphi 
 \\
 & & \\
-%\lbrack main \rbrack\;\; &
-%\begin{prooftree}
-%\judge{\HGamma}{e_1}{\tau^{\varphi}}
-%\justifies
-%\judge{\HGamma}{main = e_1}{\tau^\varphi}
-%\end{prooftree}\;\;\text{if}\;\;
-%D \sqleq \annot{\varphi}
-%\\
-%& & \\
 \end{eqnarray*}
 
+In the last rule, the condition could have been written more simply as $\varphi_1 \sqleq \varphi \land \varphi_2 \sqleq \varphi$.
+We chose not to write in that way so that it is explicit in the type
+rules where subeffecting is being applied and  where the conditions are just meant to guarantee well-formedness.
 
 \section{Examples}
 
