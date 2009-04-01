@@ -61,10 +61,13 @@ w gamma (Op _ e1 op e2) =    do (e1', th1) <- w gamma e1
                                 return (Op (opType op @@ beta) e1' op e2', th4 . th3 . th2 . th1)
 
 
+-- A Function from t1 to t2
 (-->) :: Type a -> Type a -> a -> Type a
 t1 --> t2 = Function t1 t2
 
 lookup' x (C gamma) = maybe (error $ "No such variable: " ++ show x) id $ lookup x gamma
+
+-- Extend the context
 (C gamma) @-> x = C (x:gamma)
 
 -- State functions

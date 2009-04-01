@@ -24,9 +24,11 @@ unify t        (TVar a) | a `elem` (variables t) = error $ "Infinite type: " ++ 
 unify (TVar a) t        = unify t (TVar a)
 unify t1       t2       = error $ "Can not unify" ++ show t1 ++ " and " ++ show t2
 
+-- Substitute v' for v
 (||->) :: AVar -> AVar -> Subst AVar
 (||->) v v' = fmap (\x -> if x == v then v' else x)
 
+-- substitute t for v
 (|->) :: TVar -> Type a -> Subst a
 (|->) v t (TVar x) | v == x   = t
 (|->) v t (Function x y a)    = Function ((v |-> t) x) ((v |-> t) y) a

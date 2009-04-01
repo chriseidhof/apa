@@ -142,13 +142,12 @@ TODO: subeffecting definition seems to be a problem: see explanation when we tho
 \section{Monovariant Binding Time Analysis}
 
 \subsection{Types and Annotations}
-As in the book, we have the base type system $\Type$ where $\tau \in \Type$ are given by:
-\[\tau := bool \mid int \mid \tau_1 \to \tau_2\]
+As in the book, we have the base type system $\Type$ where $\tau \in \Type$ is given by:
+\[\tau := bool\; |\; int\; | \;\tau_1 \to \tau_2\]
 
-We  now add annotations to our types. These annotations are always
-one of the two values $S$ (for static) and $D$ (for Dynamic). 
+We  now add annotations to our types. An annotation can be either $S$ (for static) or $D$ (for Dynamic). 
 We need such an annotation
-at all levels in a type (and not only in functions). We designate the set of annotations by $\Annot$ and
+at all levels in a type (not just on functions). We designate the set of annotations by $\Annot$ and
 the set of annotated types by
 $\AType$. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
 \begin{align*}
@@ -175,14 +174,14 @@ and $\baset{\htau}$ stands for its underlying (not annotated) type. That is:
 \end{align*}
 
 
-Actually, some annotated types are not allowed, so we need to introduce a well-formedness
-constraint to restrict them. Basically, this constraint will express that a dynamic function
-has to map a dynamic argument to a dynamic result. So, it 
-cannot receive static arguments and cannot produce static results. The latter is actually
+Some annotated types are not allowed, so we need to introduce a well-formedness
+constraint to restrict them. This constraint will express that a dynamic function
+has to map a dynamic argument to a dynamic result. This implies that
+can neither receive static arguments nor produce static results. The latter is actually
 an impossible situation, whilst the former will be considered again in the other versions
 (dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments,
 thus the constraint will be kept).
-We will just be concerned to give a definition of well-formedness at top level and
+We will just be concerned to give a definition of well-formedness at the top-level and
 induction on the type rules then guarantees that only
 well-formed types are ever constructed.
 \[
@@ -202,7 +201,7 @@ $e \in \Stmt$ is an expression in the \textsc{Fun} language and $\htau \in \ATyp
 The meaning is that we can assign the annotated type $\htau$ to expression $e$ under the context $\HGamma$. 
 
 
-The actual rules are presented below. All the rules except for the last one
+The rules are presented below. All the rules except for the last one
 have a counterpart in the underlying type system rules presented in the book.
 Most are just a lifting of their counterparts to deal with annotated types.
 Some specificities show up in the rules
@@ -213,16 +212,16 @@ $\lbrack if \rbrack$.
 The first two were already discussed in the last subsection and refer to 
 the well-formedness constraint there defined.
 In what concerns the $\lbrack con \rbrack$ rule, we can note that we can annotate constants 
-as being either static or dynamic. This is in fact necessary so that ours
+as being either static or dynamic. This is necessary so that this type system
 is a conservative extension of the underlying type system in the sense that 
-we can give an annotated type to each valid term. In fact, the algorithm will always try to give the
-``best'' annotation (static) to a constant but it might be forced to decide that it is dynamic. 
+we can give an annotated type to each valid term. The algorithm will always try to give the
+optimal annotation ($S$) to a constant but it might be forced to decide that it is $D$. 
 This will no longer be an issue when we allow for subeffecting: then the annotation will be weakened
-only when used. As for the $\lbrack if \rbrack$ rule, we just note that a conditional expression
+only when used. Regarding the $\lbrack if \rbrack$ rule, we note that a conditional expression
 needs to be tagged as dynamic if the condition is itself dynamic (because in that case,
 the value of the expression cannot be known statically). On the other hand, if the condition
-can be known statically, then it does not impose a restriction on the expression annotation: it
-just needs to be the same as the branches' annotations.
+can be known statically then it does not impose a restriction on the expression annotation: it
+just needs to be the same as the annotations in the branches.
 
 TODO: EXPLAIN main
 
