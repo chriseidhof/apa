@@ -132,16 +132,16 @@
 
 \subsection{Types and Annotations}
 As in the book, we have the following base type system:
-\[\tau := bool | int | \tau_1 \to \tau_2\]
+\[\tau := bool\; |\; int\; | \;\tau_1 \to \tau_2\]
 
 We  now add annotations to our types. These annotations are always
 one of two values |S| (for static) or |D| (for Dynamic). 
 We need such an annotation
 at all levels in a type (and not only in fuctions).
 \begin{eqnarray*}
-\htau & := bool^\varphi | int^\varphi | \htau_1 \overset{\varphi}{\to} \htau_2 
+\htau & := bool^\varphi\; |\; int^\varphi\; |\; \htau_1 \overset{\varphi}{\to} \htau_2 
 \\
-\varphi & := S | D
+\varphi & := S\; |\; D
 \end{eqnarray*}
 
 The annotations actually form a lattice where $S$ is bottom and  $D$ is top. We write $\sqleq$ for
