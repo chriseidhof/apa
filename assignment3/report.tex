@@ -317,68 +317,51 @@ This will become clearer in the examples below.
 
 \subsection{Examples}
 
-TODO: examples using Hs ; do the examples in the handout and also one that should be used in other sections. for this last one, also present a type derivation.
+TODO: examples using Hs ; do the examples in the handout and also one that should be used in other sections. 
 
 \section{Polyvariant Analysis}
 
 \subsection{Types and Annotations}
 
-Instead of considering just types, we allow for type and annotation variables and top level quatification
-on these. So, we extend $\AType$ and $\Annot$ as follows:
+Instead of considering just types, we allow for type and annotation variables.
+We also need to consider
+top level quantification
+over these in let bindings. 
+
+So, we extend $\AType$ and $\Annot$ as follows:
 \begin{eqnarray*}
 \htau & := \ldots  \mid \alpha \\ 
 \\
 \varphi & := \ldots  \mid \beta \\
 \end{eqnarray*}
-We now consider annotated type schemes $\hsigma \in \ATypeScheme$ given by
+We define annotated type schemes $\hsigma \in \ATypeScheme$ given by
 \[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
 where the $\zeta_i$ are type variables or annotation variables and $\htau \in \AType$.
 
-\subsection{Type Rules: Non Syntax Directed}
+Note however that we only allow our top level
+programs to have annotated types with no free variables, so polymorphism will only show up when using $\texttt{let}$.
 
-Our judgements are now of the form
-\[\judge{\HGamma}{e}{\hsigma}\]
-where $\hsigma$ is an annotated type scheme and $\HGamma$ also maps variables
-to $\ATypeScheme$. However, we should only allow our top level
-programs to have annotated types with no free variables.
+\subsection{Type Rules}
 
-We could extend our rule system with the following non-syntax directed rules that
-express generalization (astraction over type and annotation variables) and
-instantiation. The remaining rules would be unchanged (but considering schemes
-instead of types) and the $\lbrack main \rbrack$ rule would have to allow only
-for completely specified annotated types.
+We could extend our rule system with the rules
+$\lbrack gen \rbrack$ and $\lbrack ins \rbrack$
+from the book which
+express generalization (abstraction over type and annotation variables) and
+instantiation, respectively.
+The problem with these is that they are 
+non-syntax directed.
+We will instead include those concepts into  syntax-directed rules.
 
-\begin{eqnarray*}
-\lbrack gen \rbrack\;\; &
-\begin{prooftree}
-\judge{\HGamma}{e}{\htau}
-\justifies
-\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
-\end{prooftree}\;\;\text{if}\;\; \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma)\\
-& & \\
-\lbrack ins \rbrack\;\; &
-\begin{prooftree}
-\judge{\HGamma}{e}{\forall (\zeta_1,\ldots, \zeta_n). \htau}
-\justifies
-\judge{\HGamma}{e}{\theta\; \htau}
-\end{prooftree}\;\;\text{if}\;\; dom(\theta) \subseteq \{\zeta_1, \ldots, \zeta_n\}\\
-& & \\
-\end{eqnarray*}
-
-\subsection{Type Rules: Syntax Directed}
-
-We will instead consider a syntax-directed version of the type rules.
 The judgements will be of the form
 \[\judge{\HGamma}{e}{\htau}\]
-where $\htau$ are annotated types (possibly including variables).
-Schemes are only allowed in the context $\HGamma$.
+where $\htau$ are annotated types (possibly including variables)
+and $\HGamma$ now maps variables
+to $\ATypeScheme$.
 
-We introduce generalization in the $\lbrack let \rbrack$ rule and
+We introduce generalization in the $\lbrack let \rbrack$ rule (generalizing types
+and putting them in the context for typing the expression) and
 instantiation in the $\lbrack var \rbrack$ rule. In these way, quantification
-over type variables will be restricted to let bindings. The only thing
-we still need to guarantee in the $\lbrack main \rbrack$ rule is that
-there are no type variables in the given type.
-
+over type variables will be restricted to let bindings.
 Below, we present the rules that need to change in relation to the monovariant version.
 \begin{eqnarray*}
 \lbrack var \rbrack\;\; &
