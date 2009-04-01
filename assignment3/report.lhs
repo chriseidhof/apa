@@ -333,7 +333,8 @@ ex02  =  let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
 ex03  =  ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
 \end{spec}
 
-When we then run the examples we get the expected results:
+When we then run the examples we get the expected results (the annotation is
+always the first part of the constructor, see also \texttt{Types.hs}):
 
 \begin{verbatim}
 res01  = App D (App (S->D)^S 
