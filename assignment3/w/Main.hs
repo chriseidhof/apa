@@ -84,20 +84,38 @@ freshAVar = do x <- get
 addConstraints :: [Constraint AVar] -> W ()
 addConstraints ls = modify (\x -> x {constraints = Constraints (ls ++ cs (constraints x))})
 
+type InitialAnnotations = [(AVar, Annot)]
+
+addInitialVariable :: Var -> Annot -> (Context AVar, InitialAnnotations) -> W (Context AVar, InitialAnnotations)
+addInitialVariable var ann  (c,i) = do
+  alpha <- freshTVar
+  beta  <- freshAVar
+  addConstraints [beta :< alpha]
+  return (c @-> (var, alpha), (beta,ann):i)
+  
+
 -- Helpers
--- runW :: Expr () -> (Expr (Type AVar), [(AVar, AVar)])
-runW x = let ((e, subst), st) = runState (w (C []) x) (St 0 (A 0) (Constraints []))
-             e' = fmap subst e 
-             css = map (\(x :< y) -> (x, tla y)) $ cs (subst <.> constraints st)
-             vars     = [0..a (aVar st)]
-             solved   = solve vars (tla $ tla e') css
-             replace x = maybe (error "No polymorphism allowed") id $ lookup (a x) solved
-         in fmap (fmap replace) e'
+runW :: [(Var, Annot)] -> Expr () -> Expr (Type Annot)
+runW init x = 
+    let xs = map (uncurry addInitialVariable) init
+        result = do (c, i)     <- foldl (>>=) (return (C [], [])) xs
+                    (e, subst) <- w c x
+                    return (i, e, subst)
+        ((i, e, subst), st) = runState result (St 0 (A 0) (Constraints []))
+        e'        = fmap subst e 
+        css       = map (\(x :< y) -> (x, tla y)) $ cs (subst <.> constraints st)
+        vars      = [0..a (aVar st)]
+        solved    = solve i vars (tla $ tla e') css
+        replace x = maybe (error "No polymorphism allowed") id $ lookup (a x) solved
+    in fmap (fmap replace) e'
 
 -- Example programs
 ex01  = (fn 'x' (fn 'y' $ 'x') <@> i 2) <@> i 3
 ex02  = let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
 ex03  = ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
-[res01, res02, res03] = map runW [ex01, ex02, ex03]
+
+ex04  = fn 'x' 'x' <@> ('z' +: i 1)
+ex01'  = (fn 'x' (fn 'y' $ 'x') <@> ('q' +: i 1)) <@> ('r' +: i 1)
+[res01, res02, res03] = map (runW []) [ex01, ex02, ex03]
 
 
