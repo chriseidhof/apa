@@ -393,39 +393,42 @@ Below, we present the rules that need to change in relation to the monovariant v
 
 \subsection{Types and Annotations}
 
-We now define a subeffecting relation.
+We will now consider subeffecting, a form of weakening annotations. The underlying
+idea is that, when we expect a dynamic argument, it does no harm to pass
+a static one. So, we will be able to loose the information that something is static, weakening it to dynamic.
 
-\begin{eqnarray*}
-int^\varphi \leq int^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
-bool^\varphi \leq bool^{\varphi'}  \text{if} \varphi \sqleq \varphi' \\
-\htau_1 \overset{\varphi}{\to} \htau_2 \leq \htau_1' \overset{\varphi}{\to} \htau_2' 
-\text{if} \varphi \sqleq \varphi' 
- \land   \htau_1 \geq \htau_1'
- \land   \htau_2 \leq \htau_2'
- \land   wff(\htau_1 \overset{\varphi}{\to} \htau_2)
- \land   wff(\htau_1' \overset{\varphi}{\to} \htau_2')
-\end{eqnarray*}
+For that, we need a weakening relation on types. We will not consider a structural shap-conformant
+subtyping relation
+but will restrict ourselves to look into the topmost annotation and weaken that. 
+There is obviously a loss of expressive power, but on the other hand it is much easier to implement
+this in practise. 
 
+We will then say that an annotated type $\tau$ can be weakened to
+another $\htau'$  ($\htau \preceq \htau'$) if $\annot{\htau} \sqleq \annot{htau'}$
+and they have the same underlying type and the same annotations
+in all deeper levels. So the only thing we are allowed to do is weakening the top level annotation.
+This is not enough yet: we also need to perform some sanity checks to guarantee
+that our types are well-formed. The actual definition is given below. 
+\begin{align*}
+\htau \leq \htau' &\overset{.}{=} \annot{\htau} \sqleq \annot{\htau'} \land samebelow(\htau,\htau') \\
+samebelow(\htau,\htau') &\overset{.}{=} 
+(\exists \varphi,\varphi'.\;\; \htau = int^{\varphi} \land \htau' = int^{\varphi'})
+\\ &\lor 
+(\exists \varphi,\varphi'.\;\; \htau = bool^{\varphi} \land \htau' = bool^{\varphi'})
+\\ &\lor
+(\exists \varphi, \varphi',\htau_1,\htau_2.\;\;
+\htau = \htau_1 \overset{\varphi}{\to} \htau_2 \land 
+\htau' = \htau_1 \overset{\varphi'}{\to} \htau_2 \land
+wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
+wff(\htau_1 \overset{\varphi'}{\to} \htau_2)
+) \\
+\end{align*}
+Note that, in the case for functions above, the annotated types of the arguments (resp. results) need
+to be exactly the same.
 
-OLD STUFF BELOW (BUT DONT ERASE YET)
+\subsection{Type Rules}
 
-A first approach would be considering only
-the toplevel annotations and say that a dynamic can also be made static.
-
-However, this is not enough because we need some sanity checks on our types to guarantee
-that we still can't end up with things like dynamic functions
-that map static arguments to static results.
-
-Shape conformant: that is, the underlying type is mantained...
-
-
-
-ACTUALLY WE ARE JUST GOING TO CONSIDER SUBEFFECTING
-
-\subsection{Type Rules: Non Syntax Directed}
-
-The rule for subeffecting is not syntax-directed:
-
+A simple rule for subeffecting would be
 \begin{eqnarray*}
 \lbrack sub \rbrack\;\; &
 \begin{prooftree}
@@ -436,16 +439,11 @@ The rule for subeffecting is not syntax-directed:
 & & \\
 \end{eqnarray*}
 
-\subsection{Type Rules: Syntax Directed}
-
-In order to incorporate this into the syntax-directed type-rules we change the
+Again, we have the problem that this is not syntax-directed.
+In order to incorporate this into the syntax-directed type rules we change the
 rules $\lbrack app \rbrack$, $\lbrack if \rbrack$ and $\lbrack op \rbrack$. We are now also allowed to give
-constants static annotations:  we can always weaken them when we need to use them.
-
-TODO: main is definitely not correct, figure this out.
-TODO: I only checked at top-level using annot, is this correct?
-not entirely..we should use the subeffecting relation, that also guarantees shape and i think we should have even
-more, i dont know how (cf toplevel TODO)
+static annotations to constants:  they can always be weakened when we need to use them.
+The type rules for the subeffecting analysis are presented below.
 
 \begin{eqnarray*}
 \lbrack con \rbrack\;\; &
@@ -514,21 +512,15 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \justifies
 \judge{\HGamma}{e_1\;op\;e_2}{\tau_{op}^\varphi}
 \end{prooftree}\;\;\text{if}\;\;
-\varphi_1 \sqleq \varphi \land
-\varphi_2 \sqleq \varphi
+\tau_{op_1}^{\varphi_1} \preceq \tau_{op}^\varphi \land
+\tau_{op_2}^{\varphi_2} \preceq \tau_{op}^\varphi 
 \\
 & & \\
-%\lbrack main \rbrack\;\; &
-%\begin{prooftree}
-%\judge{\HGamma}{e_1}{\tau^{\varphi}}
-%\justifies
-%\judge{\HGamma}{main = e_1}{\tau^\varphi}
-%\end{prooftree}\;\;\text{if}\;\;
-%D \sqleq \annot{\varphi}
-%\\
-%& & \\
 \end{eqnarray*}
 
+In the last rule, the condition could have been written more simply as $\varphi_1 \sqleq \varphi \land \varphi_2 \sqleq \varphi$.
+We chose not to write in that way so that it is explicit in the type
+rules where subeffecting is being applied and  where the conditions are just meant to guarantee well-formedness.
 
 \section{Examples}
 
