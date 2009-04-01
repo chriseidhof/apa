@@ -398,9 +398,6 @@ Below, we present the rules that need to change in relation to the monovariant v
 & & \\
 \end{eqnarray*}
 
-\subsection{Examples}
-
-
 \section{Subeffecting}
 
 \subsection{Types and Annotations}
@@ -542,7 +539,60 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \end{eqnarray*}
 
 
-\subsection{Examples}
+\section{Examples}
+
+We have one example that shows the difference between all three analyses.
+
+\begin{align*}
+\texttt{let } & id = \texttt{fn } x \overset{a \overset{a}{\to} a}{\Rightarrow} x^{a} \\
+\texttt{in } & (\;\;( \\
+             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{a \overset{a}{\to} (a \overset{a}{\to} a)}{\Rightarrow} (\texttt{fn } y
+             \overset{a \overset{a}{\to} a}{\Rightarrow} x^{a})) \\
+             & \;\;\;\;\;\;\;(\;id^{a \overset{a}{\to} a} \; (z^{a} + 1^{a})^{a}\;)^{a}  \\
+             & \;\;\;\;\;)^{a} \\
+             & \;\;\;\;(\;id^{a \overset{a}{\to} a} \; (5^{a} + 3^{a})^{a}\;)^{a}   \\
+             & )^{a}
+\end{align*}
+
+We now give the annotations when doing monovariant analysis:
+
+\begin{align*}
+\texttt{let } & id = \texttt{fn } x \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D} \\
+\texttt{in } & (\;\;( \\
+             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{D \overset{S}{\to} (D \overset{S}{\to} D)}{\Rightarrow} (\texttt{fn } y
+             \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D})) \\
+             & \;\;\;\;\;\;\;(\;id^{D \overset{S}{\to} D} \; (z^{D} + 1^{D})^{D}\;)^{D}  \\
+             & \;\;\;\;\;)^{D \to D} \\
+             & \;\;\;\;(\;id^{D \overset{S}{\to} D} \; (5^{D} + 3^{D})^{D}\;)^{D}   \\
+             & )^{D}
+\end{align*}
+
+We now give the annotations when doing polyvariant analysis. The nice thing here
+is that the last argument is $S$.
+
+\begin{align*}
+\texttt{let } & id = \texttt{fn } x \overset{\alpha \overset{S}{\to} \alpha}{\Rightarrow} x^{\alpha} \\
+\texttt{in } & (\;\;( \\
+             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{D \overset{S}{\to} (S \overset{S}{\to} D)}{\Rightarrow} (\texttt{fn } y
+             \overset{S \overset{S}{\to} D}{\Rightarrow} x^{D})) \\
+             & \;\;\;\;\;\;\;(\;id^{D \overset{S}{\to} D} \; (z^{D} + 1^{D})^{D}\;)^{D}  \\
+             & \;\;\;\;\;)^{S \to D} \\
+             & \;\;\;\;(\;id^{S \overset{S}{\to} S} \; (5^{S} + 3^{S})^{S}\;)^{S}   \\
+             & )^{D}
+\end{align*}
+
+We now give the annotations when doing sub-effect analysis:
+
+\begin{align*}
+\texttt{let } & id = \texttt{fn } x \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D} \\
+\texttt{in } & (\;\;( \\
+             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{D \overset{S}{\to} (D \overset{S}{\to} D)}{\Rightarrow} (\texttt{fn } y
+             \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D})) \\
+             & \;\;\;\;\;\;\;(\;id^{D \overset{S}{\to} D} \; (z^{D} + 1^{S})^{D}\;)^{D}  \\
+             & \;\;\;\;\;)^{D \to D} \\
+             & \;\;\;\;(\;id^{D \overset{S}{\to} D} \; (5^{S} + 3^{S})^{S}\;)^{D}   \\
+             & )^{D}
+\end{align*}
 
 \end{document}  
 
