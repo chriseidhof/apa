@@ -116,6 +116,9 @@ ex03  = ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
 
 ex04  = fn 'x' 'x' <@> ('z' +: i 1)
 ex01'  = (fn 'x' (fn 'y' $ 'x') <@> ('q' +: i 1)) <@> ('r' +: i 1)
+st     = runW [('r',S),('q', S)] ex01'
+dyn    = runW [('r',D),('q', D)] ex01'
+
 [res01, res02, res03] = map (runW []) [ex01, ex02, ex03]
 
 

@@ -121,7 +121,7 @@
 \def\HGamma{\hat{\Gamma}}
 \def\judge#1#2#3{#1 \vdash #2 : #3\;\;}
 
-\def\annot#1{\|#1\|}
+\def\annot#1{\mid#1\mid}
 \def\baset#1{\lfloor#1\rfloor}
 
 \def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
@@ -320,12 +320,64 @@ This will become clearer in the examples below.
 
 \subsection{Examples}
 
+Our algorithm has the following type:
+\begin{spec}
+runW :: [(Var, Annot)] -> Expr () -> Expr (Type Annot)
+\end{spec}
+
 The examples in the assignment translate to the following Haskell-code:
 \begin{spec}
-ex01  = (fn 'x' (fn 'y' $ 'x') <@> i 2) <@> i 3
-ex02  = let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
-ex03  = ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
+ex01, ex02, ex03 :: Expr ()
+ex01  =  (fn 'x' (fn 'y' $ 'x') <@> i 2) <@> i 3
+ex02  =  let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
+ex03  =  ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
 \end{spec}
+
+When we then run the examples we get the expected results:
+
+\begin{verbatim}
+res01  = App D (App (S->D)^S 
+                    (Fn (D->(S->D)^S)^S 'x' (Fn (S->D)^S 'y' (Var D 'x'))) 
+                    (CInt D 2)
+               ) 
+               (CInt S 3)
+res02  = Let D 'i' (Fn (D->D)^S 'x' (Var D 'x')) 
+                   (Let D 'y' (App D (Var (D->D)^S 'i') (CInt D 2)) 
+                              (App D (Var (D->D)^S 'i') (CInt D 3)))
+res03  = App D (App (D->D)^S (Fn ((D->D)^S->(D->D)^S)^S 'f' 
+                                 (Fn (D->D)^S 'x' (App D 
+                                                       (Var (D->D)^S 'f') 
+                                                       (Var D 'x')
+                                                  )
+                                 )
+                             ) 
+                             (Fn (D->D)^S 'y' (Var D 'y'))) 
+               (CInt D 42)
+\end{verbatim}
+
+To illustrate the initial context, consider the program $ex01'$:
+\begin{spec}
+ex01'  = (fn 'x' (fn 'y' $ 'x') <@> ('q' +: i 1)) <@> ('r' +: i 1)
+st     = runW [('r',S),('q', S)] ex01'
+dyn    = runW [('r',D),('q', D)] ex01'
+\end{spec}
+
+When we take |r| and |q| static we get the following result:
+\begin{verbatim}
+App D (App (S->D)^S (Fn (D->(S->D)^S)^S 'x' (Fn (S->D)^S 'y' (Var D 'x'))) 
+                    (Op D (Var D 'q') Plus (CInt D 1))) 
+      (Op S (Var S 'r') Plus (CInt S 1))
+
+\end{verbatim}
+
+If we now take both |r| and |q| to be dynamic we see that this will also change
+the functions.
+
+\begin{verbatim}
+App D (App (D->D)^S (Fn (D->(D->D)^S)^S 'x' (Fn (D->D)^S 'y' (Var D 'x'))) 
+                    (Op D (Var D 'q') Plus (CInt D 1))) 
+      (Op D (Var D 'r') Plus (CInt D 1))
+\end{verbatim}
 
 \section{Polyvariant Analysis}
 
