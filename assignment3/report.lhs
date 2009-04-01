@@ -77,6 +77,8 @@
  
 \def\haskell{\textsc{Haskell}}
 \def\starto{\overset{\star}{\to}}
+
+\def\wff{w\!f\!\!f}
  
 \newcounter{Progenvcount}
 \setcounter{Progenvcount}{0}
@@ -121,7 +123,7 @@
 \def\HGamma{\hat{\Gamma}}
 \def\judge#1#2#3{#1 \vdash #2 : #3\;\;}
 
-\def\annot#1{\mid#1\mid}
+\def\annot#1{||#1||}
 \def\baset#1{\lfloor#1\rfloor}
 
 \def\program#1[#2]{\begin{progenv}\label{#2}\input{#1}\end{progenv}}
@@ -136,9 +138,6 @@
 \maketitle
 
 
-TODO: subeffecting definition seems to be a problem: see explanation when we thought we had subtyping.
-   just top level comparison can lead to inconsistencies, right? ...
-
 \section{Monovariant Binding Time Analysis}
 
 \subsection{Types and Annotations}
@@ -148,8 +147,11 @@ As in the book, we have the base type system $\Type$ where $\tau \in \Type$ is g
 \end{align*}
 
 We  now add annotations to our types. An annotation can be either $S$ (for static) or $D$ (for Dynamic). 
+If an expression is annotated with an |S|, it means that is value can be computed
+at compile time, whilst for Dynamic expressions the compiler must generate code.
+
 We need such an annotation
-at all levels in a type (not just on functions). We designate the set of annotations by $\Annot$ and
+at all levels in a type (not just on functions!). We designate the set of annotations by $\Annot$ and
 the set of annotated types by
 $\AType$. $\htau \in \AType$ and $\varphi \in \Annot$ are given by:
 \begin{align*}
@@ -183,11 +185,11 @@ it can neither receive static arguments nor produce static results. The latter i
 an impossible situation, whilst the former will be considered again in the other versions
 (dynamic functions will be able to accept static arguments, even though they still expect dynamic arguments,
 thus the constraint will be kept).
-We will just be concerned to give a definition of well-formedness at the top-level as
-induction on the type rules then guarantees that only
+We will just be concerned to give a definition of well-formedness at the top-level 
+because induction on the type rules then guarantees that only
 well-formed types are ever constructed.
 \[
-wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
 = \varphi \sqleq \annot{\htau_1}
  \land   \varphi \sqleq \annot{\htau_2}
 \]
@@ -204,7 +206,7 @@ The meaning is that we can assign the annotated type $\htau$ to expression $e$ u
 
 
 The rules are presented below. All the rules 
-have a counterpart in the underlying type system rules presented in the book.
+have a counterpart in the underlying type system presented in the book.
 Most are just a lifting of their counterparts to deal with annotated types.
 Some specificities show up in the rules
 $\lbrack fn \rbrack$,
@@ -213,10 +215,10 @@ $\lbrack con \rbrack$ and
 $\lbrack if \rbrack$. 
 The first two were already discussed in the last subsection and refer to 
 the well-formedness constraint there defined.
-In what concerns the $\lbrack con \rbrack$ rule, we can note that we can annotate constants 
+In what concerns the $\lbrack con \rbrack$ rule, note that we can annotate constants 
 as being either static or dynamic. This is necessary so that this type system
 is a conservative extension of the underlying type system in the sense that 
-we can give an annotated type to each valid term. The algorithm will always try to give the
+we can give an annotated type to each typeable term. The algorithm will always try to give the
 optimal annotation ($S$) to a constant but it might be forced to decide that it is $D$. 
 This will no longer be an issue when we allow for subeffecting: then the annotation will be weakened
 only when used. Regarding the $\lbrack if \rbrack$ rule, we note that a conditional expression
@@ -246,7 +248,7 @@ just needs to be the same as the annotations in the branches.
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
@@ -254,7 +256,7 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
@@ -314,9 +316,9 @@ The simple form of constraints and the simple structure of the lattice itself ma
 and get the ``best'' possible annotations (according to the type rules).
 
 When using the algorithm to analyze programs, the user will need to supply an
-annotation for each free variable (the arguments to |main|). The algorithm will then add
-those to the constraints and will also add that the program itself needs to be dynamic.
-This will become clearer in the examples below.
+annotation for each free variable (the arguments to |main|). The algorithm will then add that information
+to the constraints and will also add the constraint that the program itself needs to be dynamic (because
+code must be generated for it). This will become clearer in the examples below.
 
 \subsection{Examples}
 
@@ -336,6 +338,7 @@ ex03  =  ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
 When we then run the examples we get the expected results (the annotation is
 always the first part of the constructor, see also \texttt{Types.hs}):
 
+{\small
 \begin{verbatim}
 res01  = App D (App (S->D)^S 
                     (Fn (D->(S->D)^S)^S 'x' (Fn (S->D)^S 'y' (Var D 'x'))) 
@@ -355,6 +358,7 @@ res03  = App D (App (D->D)^S (Fn ((D->D)^S->(D->D)^S)^S 'f'
                              (Fn (D->D)^S 'y' (Var D 'y'))) 
                (CInt D 42)
 \end{verbatim}
+}
 
 To illustrate the initial context, consider the program $ex01'$:
 \begin{spec}
@@ -364,21 +368,26 @@ dyn    = runW [('r',D),('q', D)] ex01'
 \end{spec}
 
 When we take |r| and |q| static we get the following result:
+{\small
 \begin{verbatim}
 App D (App (S->D)^S (Fn (D->(S->D)^S)^S 'x' (Fn (S->D)^S 'y' (Var D 'x'))) 
                     (Op D (Var D 'q') Plus (CInt D 1))) 
       (Op S (Var S 'r') Plus (CInt S 1))
 
 \end{verbatim}
+}
+Note that |q| becomes dynamic because the analysis is monovariant and the result is dynamic anyway.
 
 If we now take both |r| and |q| to be dynamic we see that this will also change
-the functions.
+the annotations in the function types.
 
+{\small
 \begin{verbatim}
 App D (App (D->D)^S (Fn (D->(D->D)^S)^S 'x' (Fn (D->D)^S 'y' (Var D 'x'))) 
                     (Op D (Var D 'q') Plus (CInt D 1))) 
       (Op D (Var D 'r') Plus (CInt D 1))
 \end{verbatim}
+}
 
 \section{Polyvariant Analysis}
 
@@ -391,10 +400,13 @@ over these in let bindings.
 
 So, we extend $\AType$ and $\Annot$ as follows:
 \begin{eqnarray*}
-\htau & := \ldots  \mid \alpha \\ 
+\htau & := \ldots  \mid \alpha^\beta \\ 
 \\
 \varphi & := \ldots  \mid \beta \\
 \end{eqnarray*}
+A type variable $\alpha^\beta$ always carries information about an associated
+annotation variable and we   define $\annot{\alpha^\beta} = \beta$.
+
 We define annotated type schemes $\hsigma \in \ATypeScheme$ given by
 \[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
 where the $\zeta_i$ are type variables or annotation variables and $\htau \in \AType$.
@@ -404,13 +416,14 @@ programs to have annotated types with no free variables, so polymorphism will on
 
 \subsection{Type Rules}
 
-We could extend our rule system with the rules
+We could extend our rule system with rules
+similar to
 $\lbrack gen \rbrack$ and $\lbrack ins \rbrack$
 from the book which
 express generalization (abstraction over type and annotation variables) and
 instantiation, respectively.
 The problem with these is that they are 
-non-syntax directed.
+not syntax-directed.
 We will instead include those concepts into  syntax-directed rules.
 
 The judgements will be of the form
@@ -430,8 +443,8 @@ Below, we present the rules that need to change in relation to the monovariant v
 \HGamma(x)= \forall(\zeta_1,\ldots,\zeta_n). \htau
 \justifies
 \judge{\HGamma}{x}{\theta\; \htau}
-\end{prooftree} \;\;\text{if}\;\; dom(\theta) \subseteq \{\zeta_1, \ldots, \zeta_n\}
-& \\
+\end{prooftree} \;\; \\& \text{if}\;\; dom(\theta) \subseteq \{\zeta_1, \ldots, \zeta_n\} \land \forall \alpha^\beta \in dom(\theta).\; \annot{\theta \alpha^\beta}=\theta \beta \land \forall \htau' \in cod(\theta).\; wft(\htau')
+& \\ &\\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
 \judge{\HGamma}{e_1}{\htau_1}
@@ -441,6 +454,19 @@ Below, we present the rules that need to change in relation to the monovariant v
 \end{prooftree}\;\; \text{if}\;\; \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma) \\
 & & \\
 \end{eqnarray*}
+
+In the first rule $\theta$ is a substitution (mapping type and annotation variables to $AType$).
+Also, $wft$ stands for well-formed type. The condition expresses that the types in the co-domain of the
+substitution have to obey
+to the well-formedness constraint for function types ($\wff$) at all levels. This predicate is defined as follows. 
+\begin{align*}
+wft(int^\varphi) &\equiv true \\
+wft(bool^\varphi) &\equiv true \\
+wft(\htau_1 \overset{\varphi}{\to} \htau_2) &\equiv
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
+wft(\htau_1) \land wft(\htau_2) \\
+\end{align*}
+Also they need to preserve the association between type variables and annotation variables.
 
 \section{Subeffecting}
 
@@ -472,8 +498,8 @@ samebelow(\htau,\htau') &\overset{.}{=}
 (\exists \varphi, \varphi',\htau_1,\htau_2.\;\;
 \htau = \htau_1 \overset{\varphi}{\to} \htau_2 \land 
 \htau' = \htau_1 \overset{\varphi'}{\to} \htau_2 \land
-wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
-wff(\htau_1 \overset{\varphi'}{\to} \htau_2)
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
+\wff(\htau_1 \overset{\varphi'}{\to} \htau_2)
 ) \\
 \end{align*}
 Note that, in the case for functions above, the annotated types of the arguments (resp. results) need
@@ -518,7 +544,7 @@ The type rules for the subeffecting analysis are presented below.
 \justifies
 \judge{\HGamma}{fn\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2}
 \end{prooftree}\;\; \text{if}\;\;
-wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack fun \rbrack\;\; &
 \begin{prooftree}
@@ -526,7 +552,7 @@ wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 \justifies
 \judge{\HGamma}{fun\; x \Rightarrow e}{\htau_1 \overset{\varphi}{\to} \htau_2} 
 \end{prooftree}\;\; \text{if}\;\;
-wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2)\\
 & & \\
 \lbrack app \rbrack\;\; &
 \begin{prooftree}
@@ -580,18 +606,22 @@ rules where subeffecting is being applied and  where the conditions are just mea
 We have one example that shows the difference between all three analyses.
 
 \begin{align*}
-\texttt{let } & id = \texttt{fn } x \overset{a \overset{a}{\to} a}{\Rightarrow} x^{a} \\
+\texttt{let } & id = \texttt{fn } x \overset{int \to int}{\Rightarrow} x^{int} \\
 \texttt{in } & (\;\;( \\
-             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{a \overset{a}{\to} (a \overset{a}{\to} a)}{\Rightarrow} (\texttt{fn } y
-             \overset{a \overset{a}{\to} a}{\Rightarrow} x^{a})) \\
-             & \;\;\;\;\;\;\;(\;id^{a \overset{a}{\to} a} \; (z^{a} + 1^{a})^{a}\;)^{a}  \\
-             & \;\;\;\;\;)^{a} \\
-             & \;\;\;\;(\;id^{a \overset{a}{\to} a} \; (5^{a} + 3^{a})^{a}\;)^{a}   \\
-             & )^{a}
+             & \;\;\;\;\;\;\;(\texttt{fn } x \overset{int \to (int \to int)}{\Rightarrow} (\texttt{fn } y
+             \overset{int \to int}{\Rightarrow} x^{int})) \\
+             & \;\;\;\;\;\;\;(\;id^{int \to int} \; (z^{int} + 1^{int})^{int}\;)^{int}  \\
+             & \;\;\;\;\;)^{int \to int} \\
+             & \;\;\;\;(\;id^{int \to int} \; (5^{int} + 3^{int})^{int}\;)^{int}   \\
+             & )^{int}
 \end{align*}
 
-We now give the annotations when doing monovariant analysis:
+We will present analysis results for the three versions that reveal some differences.
+To keep it more readable, we will omit the types and give only the annotation. We assume that in our context
+the varible $z$ is dynamic.
 
+When performing a monovariant analysis, we get the following result, where we can observe a lot of poisoning due to multiple uses
+of $id$ and lack of weakness.
 \begin{align*}
 \texttt{let } & id = \texttt{fn } x \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D} \\
 \texttt{in } & (\;\;( \\
@@ -603,9 +633,7 @@ We now give the annotations when doing monovariant analysis:
              & )^{D}
 \end{align*}
 
-We now give the annotations when doing polyvariant analysis. The nice thing here
-is that the last argument is $S$.
-
+We now give the annotations when doing polyvariant analysis.
 \begin{align*}
 \texttt{let } & id = \texttt{fn } x \overset{\alpha \overset{S}{\to} \alpha}{\Rightarrow} x^{\alpha} \\
 \texttt{in } & (\;\;( \\
@@ -616,9 +644,12 @@ is that the last argument is $S$.
              & \;\;\;\;(\;id^{S \overset{S}{\to} S} \; (5^{S} + 3^{S})^{S}\;)^{S}   \\
              & )^{D}
 \end{align*}
+Although this analysis also gives polymorphism (on types),
+we will only focus on polyvariance (on annotations). The nice thing here
+is that the last argument is $S$. That happens despite the fact that we applied $id$ to obtain it.
+Polyvariance allows us to give different annotations to the $id$ function when using (applying) it.
 
-We now give the annotations when doing sub-effect analysis:
-
+Finally, we give the annotations given by the sub-effecting analysis. 
 \begin{align*}
 \texttt{let } & id = \texttt{fn } x \overset{D \overset{S}{\to} D}{\Rightarrow} x^{D} \\
 \texttt{in } & (\;\;( \\
@@ -629,6 +660,9 @@ We now give the annotations when doing sub-effect analysis:
              & \;\;\;\;(\;id^{D \overset{S}{\to} D} \; (5^{S} + 3^{S})^{S}\;)^{D}   \\
              & )^{D}
 \end{align*}
-
+Here $id$ has again to be $D \overset{S}{\to} D$
+but the arguments can always be weakened from $S$ and the same happens for operators. For example, the expression $1$
+could be made static even though $z+1$ must be dynamic. This was not the case in the previous two analysis.
+From this example, we can see that both extensions give more precision to the analysis and that neither is strictly better than the other: they act in different ways.
 \end{document}  
 
