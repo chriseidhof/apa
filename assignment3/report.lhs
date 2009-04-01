@@ -1,4 +1,5 @@
 \documentclass[a4wide,12pt]{article}
+%include polycode.fmt 
 \usepackage{a4wide}
 \usepackage{times}
 \usepackage{fancyvrb}
@@ -142,7 +143,9 @@ TODO: subeffecting definition seems to be a problem: see explanation when we tho
 
 \subsection{Types and Annotations}
 As in the book, we have the base type system $\Type$ where $\tau \in \Type$ is given by:
-\[\tau := bool\; |\; int\; | \;\tau_1 \to \tau_2\]
+\begin{align*}
+\tau := bool \mid int \mid \tau_1 \to \tau_2
+\end{align*}
 
 We  now add annotations to our types. An annotation can be either $S$ (for static) or $D$ (for Dynamic). 
 We need such an annotation
@@ -310,14 +313,19 @@ the annotation variables get replaced by $S$ or $D$.
 The simple form of constraints and the simple structure of the lattice itself make it easy to solve them
 and get the ``best'' possible annotations (according to the type rules).
 
-When using the algorithm to analyze actual programs, the user will need to supply a 
+When using the algorithm to analyze programs, the user will need to supply an
 annotation for each free variable (the arguments to |main|). The algorithm will then add
 those to the constraints and will also add that the program itself needs to be dynamic.
 This will become clearer in the examples below.
 
 \subsection{Examples}
 
-TODO: examples using Hs ; do the examples in the handout and also one that should be used in other sections. 
+The examples in the assignment translate to the following Haskell-code:
+\begin{spec}
+ex01  = (fn 'x' (fn 'y' $ 'x') <@> i 2) <@> i 3
+ex02  = let_ 'i' (fn 'x' 'x') $ let_ 'y' ('i' <@> i 2) ('i' <@> i 3)
+ex03  = ((fn 'f' (fn 'x' $ 'f' <@> 'x')) <@> (fn 'y' 'y')) <@> i 42
+\end{spec}
 
 \section{Polyvariant Analysis}
 
