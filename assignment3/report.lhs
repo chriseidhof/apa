@@ -400,7 +400,7 @@ over these in let bindings.
 
 So, we extend $\AType$ and $\Annot$ as follows:
 \begin{eqnarray*}
-\htau & := \ldots  \mid \alpha^\beta \\ 
+\htau & := \ldots  \mid \alpha^\varphi \\ 
 \\
 \varphi & := \ldots  \mid \beta \\
 \end{eqnarray*}
