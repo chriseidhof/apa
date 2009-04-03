@@ -404,8 +404,8 @@ So, we extend $\AType$ and $\Annot$ as follows:
 \\
 \varphi & := \ldots  \mid \beta \\
 \end{eqnarray*}
-A type variable $\alpha^\beta$ always carries information about an associated
-annotation variable and we   define $\annot{\alpha^\beta} = \beta$.
+A type variable $\alpha$ always carries information about an associated
+annotation and we   define $\annot{\alpha^\varphi} = \varphi$.
 
 We define annotated type schemes $\hsigma \in \ATypeScheme$ given by
 \[\hsigma = \forall (\zeta_1 \ldots \zeta_n). \htau\]
@@ -443,7 +443,8 @@ Below, we present the rules that need to change in relation to the monovariant v
 \HGamma(x)= \forall(\zeta_1,\ldots,\zeta_n). \htau
 \justifies
 \judge{\HGamma}{x}{\theta\; \htau}
-\end{prooftree} \;\; \\& \text{if}\;\; dom(\theta) \subseteq \{\zeta_1, \ldots, \zeta_n\} \land \forall \alpha^\beta \in dom(\theta).\; \annot{\theta \alpha^\beta}=\theta \beta \land \forall \htau' \in cod(\theta).\; wft(\htau')
+\end{prooftree} \;\; \\& \text{if}\;\; dom(\theta) \subseteq \{\zeta_1, \ldots,
+\zeta_n\} \land \forall \alpha \in dom(\theta).\; \annot{\theta \alpha}=\theta \annot{\alpha} \land \forall \htau' \in cod(\theta).\; wft(\htau')
 & \\ &\\
 \lbrack let \rbrack\;\; &
 \begin{prooftree}
@@ -452,7 +453,6 @@ Below, we present the rules that need to change in relation to the monovariant v
 \justifies
 \judge{\HGamma}{let\; x=e_1\; in\; e_2}{\htau_2}
 \end{prooftree}\;\; \text{if}\;\; \zeta_1, \ldots, \zeta_n \notin freeVar(\HGamma) \\
-& & \\
 \end{eqnarray*}
 
 In the first rule $\theta$ is a substitution (mapping type and annotation variables to $AType$).
@@ -462,11 +462,43 @@ to the well-formedness constraint for function types ($\wff$) at all levels. Thi
 \begin{align*}
 wft(int^\varphi) &\equiv true \\
 wft(bool^\varphi) &\equiv true \\
+wft(\alpha^\varphi) &\equiv true \\
 wft(\htau_1 \overset{\varphi}{\to} \htau_2) &\equiv
 \wff(\htau_1 \overset{\varphi}{\to} \htau_2) \land
 wft(\htau_1) \land wft(\htau_2) \\
 \end{align*}
 Also they need to preserve the association between type variables and annotation variables.
+
+Some rules in the monovariant system impose constraint on type annotations. We
+now present additional (analogous) rules to deal with constraints that are not
+completely solveable. We will make choices that are guaranteed to be safe, but
+restrict polyvariance. We would get more precision if we would allow constraints
+in the type schemes as qualified types. However, in combination with
+subeffecting the current approach is likely to be sufficient.
+
+\begin{eqnarray*}
+\lbrack if_{var} \rbrack\;\; &
+\begin{prooftree}
+\judge{\HGamma}{e_0}{bool^{\beta}}
+\judge{\HGamma}{e_1}{\htau}
+\judge{\HGamma}{e_2}{\htau}
+\justifies
+\judge{\HGamma}{if\;e_0\;then\;e_1\;else\;e_2}{\htau}
+\end{prooftree}\;\;\text{if}\;\;
+\beta = \annot{\htau}\\
+& & \\
+\end{eqnarray*}
+
+We also change our well-formedness rule:
+
+\begin{eqnarray*}
+\wff(\htau_1 \overset{\varphi}{\to} \htau_2) 
+& if \varphi \sqleq \annot{\htau_1}
+ \land   \varphi \sqleq \annot{\htau_2} \\
+\wff(\htau_1 \overset{\beta}{\to} \htau_2) 
+& if \beta = \annot{\htau_1}
+ \land   \beta = \annot{\htau_2}
+\end{eqnarray*}
 
 \section{Subeffecting}
 
