@@ -125,7 +125,7 @@
  
 \maketitle
 
-\section~{Galois Connections}
+\section{Galois Connections}
 
 We start out by giving a pair of functions $\alpha, \gamma$ that transform
 $\pset{\Z}$ into $\Zext$ and the other way around:
@@ -162,12 +162,12 @@ $(\pset{\Varstar \to \Z}, \alpha^3, \gamma^3, \Varstar \to \Zext)$. Now we only
 have apply the total function space combinator once more to get to our final
 result, $(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)$
 
-\section*{II}
+\section{II}
 ii: Together
-\section*{III}
+\section{III}
 iii: Rui
 
-\section*{Mini Project 4.1}
+\section{Mini Project 4.1}
 iv: Chris, correction by Rui.
 
 We assume the functions |isSuffix| and |sameHead| on lists (as described in the
@@ -182,10 +182,58 @@ diff & (x,y) & = length(x)-length(y) \\
 cmpRange & & = range \compose diff
 \end{eqnarray*}
 
-Now we can combine the two $cmp$-functions into one big
+Now we can us the two $cmp$-functions to get our $compare$-function:
 
+\[compare (x, y) = (cmpRange (x,y), cmpRange (x,y))\].
 
+We can lift the function $compare$ to sets, yielding our $\alpha$ function:
+
+TODO: do we need $forall$-quantification here?
+
+\[\alpha\;A = \{compare\;v \mid v \in A\}\]
+
+We can then define $\gamma$ by inverting $compare$:
+
+\[\gamma\;B = \{(x,y) \mid compare\;(x,y) = b \land b \in B\}\]
+
+For a Galois insertion, it is required that $\alpha \compose \gamma$ is the
+identity function. We show this by equational reasoning:
+\begin{eqnarray*}
+       & (\alpha \compose \gamma)\; B \\
+\equiv & (\{compare\;v \mid v \in \{(x,y) \land compare\;(x,y) = b \mid b \in
+B\}\})\; B  \\
+\equiv & (\{compare\;(x,y) \mid compare\;(x,y) = b \land b \in B\})\; B \\
+\equiv & (\{b \mid b \in B\})\; B \\
+\equiv & B \\
+\end{eqnarray*}
+
+(TODO: is non-surjectivity a problem for $\alpha \compose \gamma$?). 
+
+We also need to show that $\gamma \compose \alpha \sqsupseteq id$. If we expand
+the definitions of $\gamma$ we get the following equation:
+
+\[(\gamma \compose \alpha)\; A = \{(x,y) \mid \underline{compare\;(x,y) = z} \land z \in \alpha(A)\}\]
+
+It can easily be seen from the definition of $compare$ that it is a
+non-injective function: there are inputs have the same output.  This means that the
+pairs $(x,y)$ in the underlined $compare$ function are a superset of $A$. Thus,
+the result is a superset of $A$ which gives us $\gamma \compose \alpha \sqsupseteq id$.
+(TODO: better explanation).
+
+Now we can define our Galois insertion:
+
+\[\pset{V \times V}, \alpha, \gamma, \pset{\mathbf{LR}}\]
+
+Because a powersets ordered by inclusion is a complete lattice, and we have
+shown the necessary properties of $\alpha \compose \gamma$ and $\gamma \compose
+\alpha$ we can conclude that this is a valid Galois insertion.
+
+TODO: do we need to prove that $\alpha$ and $\gamma$ are monotone?
+
+\section{Widening Operators}
 v: Chris
+
+\section{Types}
 vi: Rui
 
 \end{document}  
