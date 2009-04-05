@@ -1,4 +1,5 @@
 \documentclass[a4wide,12pt]{article}
+%include polycode.fmt 
 \usepackage{a4wide}
 \usepackage{times}
 \usepackage{fancyvrb}
@@ -140,6 +141,7 @@ $\pset{\Z}$ into $\Zext$ and the other way around:
 \end{eqnarray*}
 
 TODO chris: step by step.
+TODO rui/chris: did it preserve galois insertion?
 
 If we take $\alpha \compose \gamma$ we can verify for all values in $\Zext$ that
 this is equal to the identity function. For $\gamma \compose \alpha$ we have
@@ -160,14 +162,28 @@ $(\pset{\Varstar \to \Z}, \alpha^3, \gamma^3, \Varstar \to \Zext)$. Now we only
 have apply the total function space combinator once more to get to our final
 result, $(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)$
 
+\section*{II}
 ii: Together
+\section*{III}
 iii: Rui
+
+\section*{Mini Project 4.1}
 iv: Chris, correction by Rui.
 
-\[diff(x,y) = lenght(x)-lenght(y)\]
-\[ range \comp diff \]
+We assume the functions |isSuffix| and |sameHead| on lists (as described in the
+book). Now we can compare two lists and return the set $\pset{\{H,S\}}$.
+\[cmpParts(x,y) = \{S \mid isSuffix(x,y)\} \cup \{H \mid sameHead(x,y) \]
 
-\[cmp(x,y) = \{S|isSuffix(x,y)\} \cup \{H|sameHead(x,y) \]
+To compute the range, we first compute the difference (with $diff : (V \prod V)
+\to \Z$) and then apply the $range$ function as found in the book.
+
+\begin{eqnarray*}
+diff & (x,y) & = length(x)-length(y) \\
+cmpRange & & = range \compose diff
+\end{eqnarray*}
+
+Now we can combine the two $cmp$-functions into one big
+
 
 v: Chris
 vi: Rui
