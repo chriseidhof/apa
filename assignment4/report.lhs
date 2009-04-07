@@ -222,7 +222,7 @@ the result is a superset of $A$ which gives us $\gamma \compose \alpha \sqsupset
 
 Now we can define our Galois insertion:
 
-\[\pset{V \times V}, \alpha, \gamma, \pset{\mathbf{LR}}\]
+\[(\pset{V \times V}, \alpha, \gamma, \pset{\mathbf{LR}})\]
 
 Because a powersets ordered by inclusion is a complete lattice, and we have
 shown the necessary properties of $\alpha \compose \gamma$ and $\gamma \compose
@@ -231,7 +231,34 @@ shown the necessary properties of $\alpha \compose \gamma$ and $\gamma \compose
 TODO: do we need to prove that $\alpha$ and $\gamma$ are monotone?
 
 \section{Widening Operators}
-v: Chris
+We need to show that $\nabla$ is a widening operator. This means that the
+following two statements should hold:
+
+\begin{itemize}
+\item $\nabla$ is an upper-bound operator, i.e. $l_1 \sqsubseteq (l_1 \nabla
+l_2) \sqsupseteq l_2$ for all $l_1, l_2 \in L$.
+\item for all ascending chains $(l_n)_n$ the ascending chain $(l_n^\nabla)_n$
+eventually stabilises.
+\end{itemize}
+
+Here, $\nabla$ is defined as:
+
+\begin{eqnarray*}
+\bot \nabla X & = & X \\
+X   \nabla \bot & = & X \\
+\lbrack i_1,j_1 \rbrack  \nabla \lbrack i_2, j_2\rbrack  & = & \lbrack\text{if } i_2 < i_1 \text{ then } -\infty \text { else } i_1, \text{if } j_2 > j_1 \text{ then } \infty \text{ else } j_1\rbrack 
+\end{eqnarray*}
+
+\subsection*{Upper-boundness}
+
+
+We need to show that $l_1 \sqsubseteq (l_1 \nabla l_2) \sqsupseteq l_2$ for all
+$l_1, l_2 \in L$. If either $l_1$ or $l_2$ is $\bot$ then it is straightforward
+to see that this holds. 
+
+TODO: the case where they are not bottom.
+\subsection*{Ascending Chain}
+TODO
 
 \section{Types}
 vi: Rui
