@@ -140,7 +140,6 @@ $\pset{\Z}$ into $\Zext$ and the other way around:
 \gamma & \top & = \Z 
 \end{eqnarray*}
 
-TODO chris: step by step.
 TODO rui/chris: did it preserve galois insertion?
 
 If we take $\alpha \compose \gamma$ we can verify for all values in $\Zext$ that
@@ -187,8 +186,6 @@ Now we can us the two $cmp$-functions to get our $compare$-function:
 \[compare (x, y) = (cmpRange (x,y), cmpRange (x,y))\].
 
 We can lift the function $compare$ to sets, yielding our $\alpha$ function:
-
-TODO: do we need $forall$-quantification here?
 
 \[\alpha\;A = \{compare\;v \mid v \in A\}\]
 
@@ -251,13 +248,48 @@ X   \nabla \bot & = & X \\
 
 \subsection*{Upper-boundness}
 
-
 We need to show that $l_1 \sqsubseteq (l_1 \nabla l_2) \sqsupseteq l_2$ for all
 $l_1, l_2 \in L$. If either $l_1$ or $l_2$ is $\bot$ then it is straightforward
-to see that this holds. 
+to see that this holds by looking at the definiton of $\nabla$. We now show this for
+the cases where both $l_1$ and $l_2$ are not $\bot$.
 
-If we want to show that $l1 \sqsubseteq (l1 \nabla l2)$ for another interval we
-can use the definition of $\nabla$, so we have to prove that 
+First, we show that $l_1 \sqsubseteq (l_1 \nabla l_2)$ by using the definition of $\nabla$:
+
+\begin{eqnarray*}
+& l_1 & \sqsubseteq (l_1 \nabla l_2) \\
+\equiv & \lbrack i_1,j_1 \rbrack & \sqsubseteq (\lbrack i_1,j_1 \rbrack  \nabla \lbrack i_2, j_2\rbrack) \\
+\equiv & \lbrack i_1,j_1 \rbrack & \sqsubseteq \lbrack\text{if } i_2 < i_1 \text{ then } -\infty \text { else } i_1, \text{if } j_2 > j_1 \text{ then } \infty \text{ else } j_1\rbrack
+\end{eqnarray*}
+
+By definition of $inf$, $sup$ and the partial order on \textbf{Interval} we have to show that
+
+\[       ((\text{if } i_2 < i_1 \text{ then } -\infty \text{ else } i_1) \leq i_1)
+   \land (j_1 \leq (\text{if } j_2 > j_1 \text{ then }  \infty \text{ else }
+   j_1))
+\]
+
+Both parts of the conjunction clearly hold, regardless of the condition. Now we
+also need to show that $(l_1 \nabla l_2) \sqsupseteq l_2$, or equivalently, $l_2 \sqsubseteq (l_1 \nabla l_2)$
+
+We will use similar reasoning as above:
+
+\begin{eqnarray*}
+& l_2 & \sqsubseteq (l_1 \nabla l_2) \\
+\equiv & \lbrack i_2,j_2 \rbrack & \sqsubseteq (\lbrack i_1,j_1 \rbrack  \nabla \lbrack i_2, j_2\rbrack) \\
+\equiv & \lbrack i_2,j_2 \rbrack & \sqsubseteq \lbrack\text{if } i_2 < i_1 \text{ then } -\infty \text { else } i_1, \text{if } j_2 > j_1 \text{ then } \infty \text{ else } j_1\rbrack
+\end{eqnarray*}
+
+Which leaves us with the need to prove the following:
+
+\[       ((\text{if } i_2 < i_1 \text{ then } -\infty \text{ else } i_1) \leq i_2)
+   \land (j_2 \leq (\text{if } j_2 > j_1 \text{ then }  \infty \text{ else }
+   j_1))
+\]
+
+And again, regardless of the conditions of the \textbf{if}-statement, both conjuncts
+will hold. We can now conclude that $l_1 \sqsubseteq (l_1 \nabla l_2)
+\sqsupseteq l_2$.
+
 \subsection*{Ascending Chain}
 TODO
 
