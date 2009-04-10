@@ -154,15 +154,49 @@ We can now apply a number of transformations to end up in our final result. Thes
 transformations preserve the Galois insertion and thus the Galois connection.
 Firstly, we will transform $start$ using the total function space combinator,
 yielding the Galois insertion $(\Varstar \to \pset{\Z}, \alpha^1, \gamma^1,
-\Varstar \to \Zext)$. Next, we use the Galois Connection from slide 13 in
-lecture 13, which gives us $(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2,
-\Varstar \to \pset{\Z})$. If we then apply composition we get 
+\Varstar \to \Zext)$. Next, we use the Galois Connection combinator from slide 13 in
+lecture 13, which gives us the Galois \textbf{connection} $(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2.
+\Varstar \to \pset{\Z})$ (from here on it is not a Galois insertion anymore). If we then apply composition we get 
 $(\pset{\Varstar \to \Z}, \alpha^3, \gamma^3, \Varstar \to \Zext)$. Now we only
 have apply the total function space combinator once more to get to our final
-result, $(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)$
+result, the Galois connection $(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)$
 
 \section{II}
-ii: Together
+We reuse the $\alpha$ and $\beta$ from the previous exercise. Now we have again the
+Galois insertion $start$. If we transform using the total function space
+combinator, we end up with 
+
+\[(\Varstar \to \pset{\Z}, \alpha^1, \gamma^1, \Varstar \to \Zext)\]
+
+TODO: find out which transformation we need to use for this step:
+
+\[(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2, \Varstar \to \Zext)\]
+
+Now we apply the total function space combinator again, yielding:
+
+\[(\Labstar \to (\pset{\Varstar \to \Z}), \alpha^3, \gamma^3, \Labstar \to (\Varstar \to \Zext))\]
+
+Finally, we merge the labels in $\alpha_4$, and we ignore them in $\gamma_4$:
+
+\begin{eqnarray*}
+\alpha_4 & f & = \alpha_3 \compose \bigsqcup \{f(l) \mid l \in \Labstar\} \\
+\gamma_4 & f & = \gamma_3 \compose \lambda x . f
+\end{eqnarray*}
+
+We can show that $\alpha_4 \compose \gamma_4 = id$:
+
+\begin{eqnarray*}
+       & (\alpha_4 \compose \gamma_4)\; f \\
+       & \text{TODO} \\
+\equiv & f
+\end{eqnarray*}
+
+$\gamma \compose \alpha \sqsubseteq id$ is straightforward to see (TODO)
+
+Which gives us the final Galois connection:
+
+\[(\Labstar \to (\pset{\Varstar \to \Z}), \alpha^4, \gamma^4, \Varstar \to \Zext)\]
+
 \section{III}
 iii: Rui
 
