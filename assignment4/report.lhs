@@ -315,8 +315,8 @@ $\text{sup}(int^\nabla_{n_i} \nabla int_{n_{i+1}})$, which is equivalent to
 \[ \text{if } \text{sup}(int_{n_{i+1}}) > \text{sup}(int^\nabla_{n_i}) \text{
   then } \infty \text{ else } \text{sup}(int^\nabla_{n_i}) \]
 
-It can easily be seen that $\text{sup}(int^\nabla_{n_i + 1})$ does not lie
-between $\infty$ and $\text{sup}(int^\nabla_{n_i})$, so we have a contradiction.
+It can easily be seen that $\text{sup}(int^\nabla_{n_i + 1})$ is
+equal to either $\infty$ or $\text{sup}(int^\nabla_{n_i})$, so we have a contradiction.
 This proves our original statement that $(int_n^\nabla)_n$ eventually
 stabilizes.
 
