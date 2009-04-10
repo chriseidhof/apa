@@ -256,7 +256,8 @@ We need to show that $l_1 \sqsubseteq (l_1 \nabla l_2) \sqsupseteq l_2$ for all
 $l_1, l_2 \in L$. If either $l_1$ or $l_2$ is $\bot$ then it is straightforward
 to see that this holds. 
 
-TODO: the case where they are not bottom.
+If we want to show that $l1 \sqsubseteq (l1 \nabla l2)$ for another interval we
+can use the definition of $\nabla$, so we have to prove that 
 \subsection*{Ascending Chain}
 TODO
 
