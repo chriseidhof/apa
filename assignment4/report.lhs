@@ -140,26 +140,37 @@ $\pset{\Z}$ into $\Zext$ and the other way around:
 \gamma & \top & = \Z 
 \end{eqnarray*}
 
-TODO rui/chris: did it preserve galois insertion?
-
 If we take $\alpha \compose \gamma$ we can verify for all values in $\Zext$ that
 this is equal to the identity function. For $\gamma \compose \alpha$ we have
 that in the case of $\emptyset$ and a singleton set that it is the identity
 function, but when applying $\gamma \compose \alpha$ to a non-empty set with more
 than one element we get $\Z$ as a result. Thus, this is clearly not the identity
 function, but the relation $gamma \compose \alpha \sqsubseteq id$ holds, which
-makes $start = (\pset{\Z}, \alpha, \gamma, \Zext)$ a Galois insertion.
+makes the Galois insertion
+
+\[ start = (\pset{\Z}, \alpha, \gamma, \Zext)\]
 
 We can now apply a number of transformations to end up in our final result. These
 transformations preserve the Galois insertion and thus the Galois connection.
 Firstly, we will transform $start$ using the total function space combinator,
-yielding the Galois insertion $(\Varstar \to \pset{\Z}, \alpha^1, \gamma^1,
-\Varstar \to \Zext)$. Next, we use the Galois Connection combinator from slide 13 in
-lecture 13, which gives us the Galois \textbf{connection} $(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2.
-\Varstar \to \pset{\Z})$ (from here on it is not a Galois insertion anymore). If we then apply composition we get 
-$(\pset{\Varstar \to \Z}, \alpha^3, \gamma^3, \Varstar \to \Zext)$. Now we only
+yielding the next Galois insertion:
+
+\[ (\Varstar \to \pset{\Z}, \alpha^1, \gamma^1, \Varstar \to \Zext) \]. 
+
+Next, we use the Galois Connection combinator from slide 13 in
+lecture 13, which gives us the Galois \textbf{connection} 
+
+\[(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2. \Varstar \to \pset{\Z})\] 
+
+From here on it is not a Galois insertion anymore). If we then apply composition we get 
+
+\[(\pset{\Varstar \to \Z}, \alpha^3, \gamma^3, \Varstar \to \Zext)\]
+
+Now we only
 have apply the total function space combinator once more to get to our final
-result, the Galois connection $(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)$
+result, the Galois connection 
+
+\[(\pset{\Labstar \to \Varstar \to \Z}, \alpha^4, \gamma^4, \Labstar \to \Varstar \to \Zext)\]
 
 \section{II}
 We reuse the $\alpha$ and $\beta$ from the previous exercise. Now we have again the
@@ -168,7 +179,8 @@ combinator, we end up with
 
 \[(\Varstar \to \pset{\Z}, \alpha^1, \gamma^1, \Varstar \to \Zext)\]
 
-TODO: find out which transformation we need to use for this step:
+We again use the above combinator from lecture 13 together with composition to
+get:
 
 \[(\pset{\Varstar \to \Z}, \alpha^2, \gamma^2, \Varstar \to \Zext)\]
 
