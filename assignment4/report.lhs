@@ -209,8 +209,28 @@ Which gives us the final Galois connection:
 
 \[(\Labstar \to (\pset{\Varstar \to \Z}), \alpha^4, \gamma^4, \Varstar \to \Zext)\]
 
-\section{III}
-iii: Rui
+\section{Exercise 4.17}
+
+Let $(L_1,\alpha_1,\gamma_1,M_1)$ and 
+    $(L_2,\alpha_2,\gamma_2,M_2)$ be Galois insertions. First define
+
+\begin{eqnarray*}
+\alpha(l_1, l_2) & = & (\alpha_1(l_1), \alpha_2(l_2)) \\
+\gamma(m_1, m_2) & = & (\gamma_1(m_1), \gamma_2(m_2))
+\end{eqnarray*}
+
+And show that $(L_1 \times L_2,\alpha,\gamma,M_1 \times M_2)$ is a Galois
+insertion. Then define
+
+\begin{eqnarray*}
+\alpha(f) & = & \alpha_2 \compose f \compose \gamma_1 \\
+\gamma(g) & = & \gamma_2 \compose g \compose \alpha_1
+\end{eqnarray*}
+
+And show that $(L_1 \to L_2,\alpha,\gamma,M_1 \to M_2)$ is a Galois
+insertion.
+
+TODO: rui
 
 \section{Mini Project 4.1}
 iv: Chris, correction by Rui.
