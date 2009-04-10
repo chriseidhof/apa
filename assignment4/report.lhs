@@ -204,8 +204,6 @@ B\}\})\; B  \\
 \equiv & B \\
 \end{eqnarray*}
 
-(TODO: is non-surjectivity a problem for $\alpha \compose \gamma$?). 
-
 We also need to show that $\gamma \compose \alpha \sqsupseteq id$. If we expand
 the definitions of $\gamma$ we get the following equation:
 
@@ -214,8 +212,7 @@ the definitions of $\gamma$ we get the following equation:
 It can easily be seen from the definition of $compare$ that it is a
 non-injective function: there are inputs have the same output.  This means that the
 pairs $(x,y)$ in the underlined $compare$ function are a superset of $A$. Thus,
-the result is a superset of $A$ which gives us $\gamma \compose \alpha \sqsupseteq id$.
-(TODO: better explanation).
+the result is a superset of $A$ which means $\gamma \compose \alpha \sqsupseteq id$.
 
 Now we can define our Galois insertion:
 
