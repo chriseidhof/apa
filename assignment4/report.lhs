@@ -7,6 +7,7 @@
 \usepackage{enumerate}
 \usepackage{palatino}
 \usepackage{rotating}
+\usepackage{cp0708t}
  
 %\usepackage{prooftree}
 
@@ -48,6 +49,7 @@
 \def\N{\mathbb{N}}
 \def\Z{\mathbb{Z}}
 \def\compose{\circ}
+\def\comp{\circ}
 \def\Zext{\Z^\top_\bot}
  
 \def\pset#1{\mathcal{P}(#1)}
@@ -211,26 +213,71 @@ Which gives us the final Galois connection:
 
 \section{Exercise 4.17}
 
-Let $(L_1,\alpha_1,\gamma_1,M_1)$ and 
-    $(L_2,\alpha_2,\gamma_2,M_2)$ be Galois insertions. First define
+In this exercise, let $(L_1,\alpha_1,\gamma_1,M_1)$ and 
+    $(L_2,\alpha_2,\gamma_2,M_2)$ be Galois insertions.
 
+For the first part, let us define $\alpha$ and $\gamma$ as follows:
 \begin{eqnarray*}
 \alpha(l_1, l_2) & = & (\alpha_1(l_1), \alpha_2(l_2)) \\
 \gamma(m_1, m_2) & = & (\gamma_1(m_1), \gamma_2(m_2))
 \end{eqnarray*}
 
-And show that $(L_1 \times L_2,\alpha,\gamma,M_1 \times M_2)$ is a Galois
-insertion. Then define
+This corresponds to the independent attribute method presented in section 4.1.1 in 
+the book. There we can find a proof that
+$(L_1 \times L_2,\alpha,\gamma,M_1 \times M_2)$ is a Galois
+connection. We now need to show that it is a Galois insertion, that is to say
+that $\alpha \comp \gamma = id$. 
 
+As usual, given two functions $f:A \to B$ and $g: C \to D$, the product of
+the two functions $f \times g : A \times C \to B \times D$ is
+defined as
+$(f \times g) (a,c)  = (f(a),g(b))$.
+Note that $\times$ is a bifunctor.
+
+Thus, we can rewrite the definitions above as
+\begin{eqnarray*}
+\alpha & = & \alpha_1 \times \alpha_2 \\
+\gamma & = & \gamma_1 \times \gamma_2
+\end{eqnarray*}
+
+We use this notation in the proof of the desired property, presented below.
+\begin{calculation}
+\alpha \comp \gamma 
+\just={definition of $\alpha$ and $\gamma$}
+(\alpha_1 \times \alpha_2) \comp (\gamma_1 \times \gamma_2)
+\just={$\times$ is a bifunctor (preserves composition)}
+(\alpha_1 \times \gamma_1) \comp (\alpha_2 \times \gamma_2)
+\just={$(L_1,\alpha_1,\gamma_1,M_1)$ and $(L_2,alpha_2,\gamma_2,M_2)$ are Galois insertions}
+id \times id
+\just={$\times$ is a bifunctor (preserves identity)}
+id
+\end{calculation}
+
+Let us now turn our attention to the second construction:
 \begin{eqnarray*}
 \alpha(f) & = & \alpha_2 \compose f \compose \gamma_1 \\
 \gamma(g) & = & \gamma_2 \compose g \compose \alpha_1
 \end{eqnarray*}
 
-And show that $(L_1 \to L_2,\alpha,\gamma,M_1 \to M_2)$ is a Galois
-insertion.
+This corresponds to the monotone function space combinator also presented in the
+book, where it is proved that
+$(L_1 \to L_2,\alpha,\gamma,M_1 \to M_2)$ is a Galois
+connection. We now prove that it is also a Galois insertion.
 
-TODO: rui
+\begin{calculation}
+(\alpha \comp \gamma)(g)
+\just={definition of $\gamma$}
+\alpha(\gamma_2 \comp g \comp \alpha_1)
+\just={definition of $\alpha$}
+\alpha_2 \comp (\gamma_2 \comp g \comp \alpha_1) \comp \gamma_1
+\just={associativity of $\comp$}
+(\alpha_2 \comp \gamma_2) \comp g \comp (\alpha_1 \comp \gamma_1)
+\just={$(L_1,\alpha_1,\gamma_1,M_1)$ and $(L_2,alpha_2,\gamma_2,M_2)$ are Galois insertions}
+id \comp g \comp id
+\just={$id$ is unit for $\comp$}
+g
+\end{calculation}
+
 
 \section{Mini Project 4.1}
 iv: Chris, correction by Rui.
@@ -239,7 +286,7 @@ We assume the functions |isSuffix| and |sameHead| on lists (as described in the
 book). Now we can compare two lists and return the set $\pset{\{H,S\}}$.
 \[cmpParts(x,y) = \{S \mid isSuffix(x,y)\} \cup \{H \mid sameHead(x,y) \]
 
-To compute the range, we first compute the difference (with $diff : (V \prod V)
+To compute the range, we first compute the difference (with $diff : (V \times V)
 \to \Z$) and then apply the $range$ function as found in the book.
 
 \begin{eqnarray*}
