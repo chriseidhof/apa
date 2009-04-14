@@ -194,7 +194,7 @@ the Galois connection $(\alpha_3,\gamma_3)$.
 In the abstract lattice, we can have $\bot$
 associated to a variable. This situation can only arise from a $\emptyset$ in
 the concrete lattice. In that case,
-$\alpha(\emptyset)$ yields a funcion associating $\bot$
+$\alpha(\emptyset)$ yields a function associating $\bot$
 to every variable. Thus a function associating $\bot$ just to some variables
 never arises as a result of $\alpha$. So, taking such a function $f$, we have
 $(\alpha_3 \compose \gamma_3)(f) \neq f$.
@@ -212,7 +212,7 @@ Applying the abstraction function $\alpha_4$, we obtain the function described i
 2 & [x \mapsto 1, y \mapsto 3, z \mapsto 4]
 \end{eqnarray*}
 Note that in the second label, all the variables are attributed a (constant) value
-because there was only onepossible function. As for the first label, only the variable $z$
+because there was only one possible function. As for the first label, only the variable $z$
 gets mapped to $\top$ because it is the only one that does not have a constant
 value for all possible functions in that label. 
 
@@ -248,7 +248,7 @@ a new Galois connection
 \[(\Labstar \to \pset{\Varstar \to \Z}, \alpha_5, \gamma_5, \Varstar \to \Zext)\]
 
 Finally, we merge the information for all labels in $\alpha_5$,
-and replicate the same (safe) information to eery label in $\gamma_5$:
+and replicate the same (safe) information to every label in $\gamma_5$:
 
 \begin{align*}
 \alpha_5\, (f)  =& \bigsqcup \{\alpha_4(f)(l) \mid l \in \Labstar\} \\
@@ -256,7 +256,7 @@ and replicate the same (safe) information to eery label in $\gamma_5$:
 \end{align*}
 
 The join operation above is done in the lattice $\Varstar \to \Zext$.
-It corresponds to do the join (in $\Zext$) in a pointwise manner.
+It corresponds to do the join (in $\Zext$) in a point wise manner.
 
 
 %We can show that $\alpha_4 \compose \gamma_4 = id$:
@@ -276,8 +276,8 @@ It corresponds to do the join (in $\Zext$) in a pointwise manner.
 Considering again the same example, the result of applying $\alpha_5$ is now the function
 \[[x\mapsto 1, y\mapsto \top, z \mapsto \top]\]
 In this case, $y$ is mapped to $\top$ because it has a different (yet constant) value
-in each program label. So, only $x$ is mapped to a constant as it is the only varialbe
-mantaining a constant value throughout a program.
+in each program label. So, only $x$ is mapped to a constant as it is the only variable
+maintaining a constant value throughout a program.
 
 Applying $\gamma_5$ back, we loose all the specific information for each label (all get
 poisoned).
@@ -403,7 +403,7 @@ The aim of this exercise is to construct a Galois insertion of this kind:
 We will do this by defining a function
 \[compare : V \times V \to \mathbf{LR}\]
 and then lift it to power sets using the construction above. 
-To guarantee that weend up with a Galois insertion, we just need to show that $compare$ is
+To guarantee that we end up with a Galois insertion, we just need to show that $compare$ is
 surjective.
 
 We use the predicates |sameHead|
@@ -534,7 +534,7 @@ to show that $l_1 \sqsubseteq l_1 \nabla l_2 \land l_2 \sqsubseteq l_1 \nabla l_
 $l_1, l_2 \in L$.
 
 If either $l_1$ or $l_2$ is $\bot$ then it is straightforward
-to see that this holds by looking at the definiton of $\nabla$. We now show this for
+to see that this holds by looking at the definition of $\nabla$. We now show this for
 the cases where both $l_1$ and $l_2$ are not $\bot$.
 
 First, we show that $l_1 \sqsubseteq l_1 \nabla l_2$:
@@ -658,7 +658,7 @@ The following function describes how we do so.
 \end{align*}
 
 $\Ctxt$ is the lattice in our monotone framework (with the
-obvious pointwise set union as the join operation).
+obvious point wise set union as the join operation).
 We now give the transfer
 functions.
 \begin{align*}
