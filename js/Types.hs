@@ -3,10 +3,8 @@ module Types where
 import WebBits.JavaScript.Syntax
 import Control.Monad.State.Lazy
 
-data JsType = String | Numeral | Boolean {- | Array JsType | Object [Member] | Function [JsType] JsType | Poly TypeVar -}
+data JsType = String | Numeral | Boolean 
  deriving Show
--- data Member  = M {key :: String, value :: JsType}
---  deriving Show
 type TypeVar = Int
 
 class Infer a where

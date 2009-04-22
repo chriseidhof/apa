@@ -1,3 +1,4 @@
+{-# LANGUAGE StandaloneDeriving #-}
 module Finals where
 
 import BrownPLT.JavaScript.Syntax
@@ -10,22 +11,32 @@ import Label
 import qualified Data.Set as S
 import Prelude hiding (init)
 import Data.List (nub)
+import qualified Data.IntMap as M
+import Data.Generics (listify, Data)
+import Text.ParserCombinators.Parsec (SourcePos (..))
 
-test = case parseScriptFromString "" "if(x || y) { 5; } else { test; }" of
+test = case parseScriptFromString "" "if(x || y) { 5; } else { x = 5; y = 6; }" of
             Left e  -> print e
             Right x -> case (label x) of
                             (Script a s) -> do
-                              print (Script a s)
-                              let f = flow (BlockStmt a s)
-                              print $ nub (map fst f ++ map snd f)
-                              print $ finals (BlockStmt a s)
-                              print f
+                              print (assignments $ Script a s)
+                              -- print (Script a s)
+                              -- let f = flow (BlockStmt a s)
+                              -- print $ nub (map fst f ++ map snd f)
+                              -- print $ finals (BlockStmt a s)
+                              -- print f
 
+type Assignment a = Expression a
 
 class Finals f where
-  finals :: Show a => f (Labeled a) -> S.Set Label
-  init   :: Show a => f (Labeled a) -> Label
-  flow   :: Show a => f (Labeled a) -> Flow
+  finals      :: Show a => f (Labeled a) -> S.Set Label
+  init        :: Show a => f (Labeled a) -> Label
+  flow        :: Show a => f (Labeled a) -> Flow
+
+assignments :: (Data a) => JavaScript a -> [Assignment a]
+assignments = listify isAssignment
+ where isAssignment (AssignExpr _ _ _ _) = True
+       isAssignment _                    = False
 
 type Flow = [(Label, Label)]
 
@@ -57,7 +68,6 @@ instance Finals Statement where
                                ++ flow body
   flow (ExprStmt _ e) = flow e
   flow x = error $ "This flow is not supported yet: " ++ show x
-
 
 flowList :: (Show a, Finals f) => Label -> [f (Labeled a)] -> [(Label, Label)]
 flowList _ []     = []
