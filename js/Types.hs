@@ -57,7 +57,7 @@ instance Show a => Infer (Expression (Labeled a)) where
                                      case M.lookup n ctx of
                                           Nothing -> return []
                                           Just x  -> return x
-  infer (InfixExpr _ op l r)    = (pure . topLevel . head) <$>  infer op -- TODO
+  infer (InfixExpr _ op l r)    = (map topLevel) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
   infer x                       = error $ "Infer not supported for: " ++ show x
@@ -83,4 +83,7 @@ type Lattice = M.Map String [JsType]
 
 instance SemiLattice Lattice where
   bottom = M.empty
-  a \/ b = M.unionWith (\x y -> nub (x ++ y)) a b
+  a \/ b = M.unionWith (mergeType) a b
+
+-- TODO: this needs to be more advanced.
+mergeType l r = nub (l ++ r)

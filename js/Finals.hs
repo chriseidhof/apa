@@ -42,7 +42,8 @@ transferFunction p = f
   where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
         f lat = case lookup lat as of
                    Nothing -> id
-                   Just (AssignExpr _ _ l r) -> \x -> M.insertWith (++) (nameOf l) (typeOf x r) x
+                   Just (AssignExpr _ _ l r) -> \x -> M.insertWith mergeType (nameOf l) (typeOf x r) x
+                   -- TODO: should this be a ++ ?
 
 nameOf (VarRef _ (Id _ n)) = n
 nameOf x                   = error $ "Assignment lhs only supports variable names: " ++ show x
