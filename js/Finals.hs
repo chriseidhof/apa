@@ -22,26 +22,27 @@ import DataFlowAnalysis.SemiLattice
 import DataFlowAnalysis.Analysis
 import SourcePos
 
-test = case parseScriptFromString "" "if (true) { 5; } else { x = 5;y = x;}" of
+test = case parseScriptFromString "" "x = 5; if(true) {x = true;} else {x = 'hi';}; y = 7;" of
             Left e  -> print e
             Right x -> case (label x) of
-                            (Script a s) -> do
-                              print $ Script a s
-                              print $ P.labels (Script a s)
-                              print $ analyze ana (Script a s)
+                            script -> do
+                              print $ script
+                              print $ P.labels script
+                              print $ P.flow script
+                              print $ last $ analyze ana script
                               -- print (Script a s)
                               -- let f = flow (BlockStmt a s)
                               -- print $ finals (BlockStmt a s)
                               -- print f
 
-ana = createDataFlowAnalyser forward (createMeasureGen (const $ M.empty , coolFunction))
+ana = createDataFlowAnalyser forward (createMeasureGen (const M.empty , transferFunction))
 
-coolFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
-coolFunction p = f
+transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
+transferFunction p = f
   where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
         f lat = case lookup lat as of
                    Nothing -> id
-                   Just (AssignExpr _ _ l r) -> \x -> M.insert (nameOf l) (typeOf x r) x
+                   Just (AssignExpr _ _ l r) -> \x -> M.insertWith (++) (nameOf l) (typeOf x r) x
 
 nameOf (VarRef _ (Id _ n)) = n
 nameOf x                   = error $ "Assignment lhs only supports variable names: " ++ show x
@@ -108,7 +109,7 @@ instance Finals Expression where
   finals (IntLit a _)            = l a
   finals (BoolLit a _)           = l a
   finals (NullLit a)             = l a
-  finals (AssignExpr a op l r)   = finals r
+  finals (AssignExpr a op lhs r) = l a
   finals (VarRef a _     )       = l a
   finals (InfixExpr _ op l r)    = finalsOp op l r
   finals (ListExpr _ ls)         = finals (last ls) -- todo: last is dangerous

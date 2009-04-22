@@ -5,11 +5,11 @@ import qualified Data.Map as M
 
 import DataFlowAnalysis.MonotoneFramework
 
-chaotic_solving :: (Eq lat) => (IterationResult lat, Equations lat) -> IterationResult lat
+chaotic_solving :: (Eq lat) => (IterationResult lat, Equations lat) -> [IterationResult lat]
 chaotic_solving (st,eqs) = fixpoint (chaoticstep eqs) st
 
 fixpoint f x = let x' = f x in
-               if  x' == x then x else fixpoint f x'
+               if  x' == x then [x] else x:(fixpoint f x')
 
 chaoticstep :: Equations lat -> IterationResult lat -> IterationResult lat
 chaoticstep (op, cl) x = (appl op, appl cl)

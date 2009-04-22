@@ -38,12 +38,14 @@ equations mf = (M.fromAscList opened, M.fromAscList closed)
  where opened = map (\l -> (l, opened_eq mf l)) (vertices mf)
        closed = map (\l -> (l, closed_eq  mf l)) (vertices mf)
 
+fromJust' _ (Just x) = x
+fromJust' x _        = error (show x)
 
-opened_val :: SemiLattice lat => Label -> IterationResult lat -> lat
-opened_val l = maybe bottom id . M.lookup l . fst
+opened_val :: (Show lat, SemiLattice lat) => Label -> IterationResult lat -> lat
+opened_val l lat= fromJust' (l, lat) . lookup l . M.toList . fst $ lat
 
 closed_val :: (Show lat) => Label -> IterationResult lat -> lat
-closed_val l = fromJust . M.lookup l . M.fromList . M.toList . snd
+closed_val l = fromJust . lookup l . M.toList . snd
 
 opened_eq :: (SemiLattice lat, Show lat) => MonotoneFramework lat -> Label -> Equation lat 
 opened_eq mf label r  = join [closed_val l' r | (l', l) <- edges mf, l==label] \/ st

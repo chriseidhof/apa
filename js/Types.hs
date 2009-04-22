@@ -55,7 +55,7 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (AssignExpr a op l r)   = infer r
   infer v@(VarRef a (Id _ n))   = do ctx <- ask
                                      case M.lookup n ctx of
-                                          Nothing -> (pure . Var) <$> fresh
+                                          Nothing -> return []
                                           Just x  -> return x
   infer (InfixExpr _ op l r)    = (pure . topLevel . head) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
