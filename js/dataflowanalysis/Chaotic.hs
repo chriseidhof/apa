@@ -1,9 +1,9 @@
-module Chaotic where
+module DataFlowAnalysis.Chaotic where
 
 import qualified Data.Set as S
 import qualified Data.Map as M
 
-import MonotoneFramework
+import DataFlowAnalysis.MonotoneFramework
 
 chaotic_solving :: (Eq lat) => (IterationResult lat, Equations lat) -> IterationResult lat
 chaotic_solving (st,eqs) = fixpoint (chaoticstep eqs) st

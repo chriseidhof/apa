@@ -1,15 +1,15 @@
-module DataFlowAnalyser where
+module DataFlowAnalysis.DataFlowAnalyser where
 
 import Prelude hiding (init)
 import qualified Data.Set as S 
 import Data.Set ((\\))
 import qualified Data.Map as M
 import Maybe
-import Aux
+import DataFlowAnalysis.Aux
 
-import SemiLattice
-import MonotoneFramework
-import Program
+import DataFlowAnalysis.SemiLattice
+import DataFlowAnalysis.MonotoneFramework
+import DataFlowAnalysis.Program
 
 type DataFlowAnalyser prg lat = prg -> MonotoneFramework lat
 createDataFlowAnalyser :: (Program prg)=> FlowInfoGen prg -> MeasureGen prg lat -> DataFlowAnalyser prg lat

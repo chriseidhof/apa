@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
-module SemiLattice where
+module DataFlowAnalysis.SemiLattice where
 
 import qualified Data.Set as S
 import Data.List

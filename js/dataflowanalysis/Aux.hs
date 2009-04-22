@@ -1,4 +1,4 @@
-module Aux where
+module DataFlowAnalysis.Aux where
 import Control.Arrow
 
 singl :: a -> [a]

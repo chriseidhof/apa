@@ -1,11 +1,11 @@
-module MonotoneFramework where
+module DataFlowAnalysis.MonotoneFramework where
 
 import Data.Maybe (fromJust)
 import qualified Data.Set as S
 import qualified Data.Map as M
-import Aux
+import DataFlowAnalysis.Aux
 
-import SemiLattice
+import DataFlowAnalysis.SemiLattice
 
 
 data MonotoneFramework lat = MF FlowInfo (MeasureInfo lat)

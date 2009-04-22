@@ -1,7 +1,7 @@
-module Program where
+module DataFlowAnalysis.Program where
 
-import MonotoneFramework
-import Aux
+import DataFlowAnalysis.MonotoneFramework
+import DataFlowAnalysis.Aux
 
 class Program prg where
    labels :: prg -> [Label]
