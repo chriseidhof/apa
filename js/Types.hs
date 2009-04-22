@@ -1,10 +1,16 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Types where
 
-import WebBits.JavaScript.Syntax
+import BrownPLT.JavaScript.Syntax
 import Control.Monad.State.Lazy
+import Finals
+import Label (Labeled)
+import Control.Applicative
 
-data JsType = String | Numeral | Boolean 
+data JsType = String | Numeral | Boolean | Function [JsType] JsType | Var TypeVar
  deriving Show
+-- data Member  = M {key :: String, value :: JsType}
+--  deriving Show
 type TypeVar = Int
 
 class Infer a where
@@ -33,13 +39,30 @@ instance Infer InfixOp where
   infer OpLShift	   = arith
   infer OpSpRShift   = arith
   infer OpZfRShift	 = arith
-  infer OpAdd	       = arith
+  infer OpAdd	       = arith 
+
+instance Show a => Infer (Expression (Labeled a)) where
+  infer (StringLit a _)         = return [String]
+  infer (NumLit a _)            = return [Numeral]
+  infer (IntLit a _)            = return [Numeral]
+  infer (BoolLit a _)           = return [Boolean]
+  infer (AssignExpr a op l r)   = infer r
+  infer (VarRef a _     )       = error "variables not supported"
+  infer (InfixExpr _ op l r)    = (pure . topLevel . head) <$>  infer op -- TODO
+  infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
+  infer (ParenExpr _ e)         = infer e
+  infer x                       = error $ "Infer not supported for: " ++ show x
 
 numCond  = return [Function [Numeral, Numeral] Boolean]
 compCond = do t <- fresh
-              return [Function [Poly t, Poly t] Boolean]
+              return [Function [Var t, Var t] Boolean]
 boolCond = return [Function [Boolean, Boolean] Boolean]
 arith    = return [Function [Numeral, Numeral] Numeral]
+--str      = return [Function [String, String] String]
+
+topLevel :: JsType -> JsType
+topLevel (Function args res) = res
+topLevel x = x
 
 fresh :: State TypeVar TypeVar
 fresh = do x <- get
