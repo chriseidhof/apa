@@ -3,10 +3,10 @@ module Types where
 import WebBits.JavaScript.Syntax
 import Control.Monad.State.Lazy
 
-data JsType = String | Numeral | JsBool | List JsType | Object [Member] | Function [JsType] JsType | Poly TypeVar
+data JsType = String | Numeral | Boolean {- | Array JsType | Object [Member] | Function [JsType] JsType | Poly TypeVar -}
  deriving Show
-data Member  = M {key :: String, value :: JsType}
- deriving Show
+-- data Member  = M {key :: String, value :: JsType}
+--  deriving Show
 type TypeVar = Int
 
 class Infer a where
@@ -37,10 +37,10 @@ instance Infer InfixOp where
   infer OpZfRShift	 = arith
   infer OpAdd	       = arith
 
-numCond  = return [Function [Numeral, Numeral] JsBool]
+numCond  = return [Function [Numeral, Numeral] Boolean]
 compCond = do t <- fresh
-              return [Function [Poly t, Poly t] JsBool]
-boolCond = return [Function [JsBool, JsBool] JsBool]
+              return [Function [Poly t, Poly t] Boolean]
+boolCond = return [Function [Boolean, Boolean] Boolean]
 arith    = return [Function [Numeral, Numeral] Numeral]
 
 fresh :: State TypeVar TypeVar

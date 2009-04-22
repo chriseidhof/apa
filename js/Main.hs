@@ -1,17 +1,18 @@
 module Main where
 
-import WebBits.JavaScript.Parser (parseString)
-import WebBits.JavaScript.Syntax
-import WebBits.JavaScript.Environment
+import BrownPLT.JavaScript.Parser (parseString)
+import BrownPLT.JavaScript.Syntax
+import BrownPLT.JavaScript.Environment
 import System.Environment (getArgs)
 
 main = do
   [fileName] <- getArgs
   contents <- readFile fileName
-  let (ann, env1, env2, i) = staticEnvironment $ parseString contents
-  mapM_ print $ map (fmap fst3) ann
-  print env1
-  print env2
-  print i
+  let x = parseString contents
+  -- mapM_ print $ map (fmap fst3) ann
+  -- print env1
+  -- print env2
+  -- print i
+  print x
 
 fst3 (a,_,_) = a
