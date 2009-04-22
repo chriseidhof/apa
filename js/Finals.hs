@@ -1,4 +1,5 @@
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
 module Finals where
 
 import BrownPLT.JavaScript.Syntax
@@ -11,23 +12,50 @@ import Label
 import qualified Data.Set as S
 import Prelude hiding (init)
 import Data.List (nub)
-import qualified Data.IntMap as M
+import qualified Data.Map as M
 import Data.Generics (listify, Data)
 import Text.ParserCombinators.Parsec (SourcePos (..))
+import qualified DataFlowAnalysis.Program as P
+import DataFlowAnalysis.DataFlowAnalyser
+import Types
+import DataFlowAnalysis.SemiLattice
+import DataFlowAnalysis.Analysis
+import SourcePos
 
-test = case parseScriptFromString "" "if(x || y) { 5; } else { x = 5; y = 6; }" of
+test = case parseScriptFromString "" "if (true) { 5; } else { x = 5;y = x;}" of
             Left e  -> print e
             Right x -> case (label x) of
                             (Script a s) -> do
-                              print (assignments $ Script a s)
+                              print $ Script a s
+                              print $ P.labels (Script a s)
+                              print $ analyze ana (Script a s)
                               -- print (Script a s)
                               -- let f = flow (BlockStmt a s)
-                              -- print $ nub (map fst f ++ map snd f)
                               -- print $ finals (BlockStmt a s)
                               -- print f
 
+ana = createDataFlowAnalyser forward (createMeasureGen (const $ M.empty , coolFunction))
+
+coolFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
+coolFunction p = f
+  where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
+        f lat = case lookup lat as of
+                   Nothing -> id
+                   Just (AssignExpr _ _ l r) -> \x -> M.insert (nameOf l) (typeOf x r) x
+
+nameOf (VarRef _ (Id _ n)) = n
+nameOf x                   = error $ "Assignment lhs only supports variable names: " ++ show x
+
 type Assignment a = Expression a
 
+instance (Show a) => P.Program (JavaScript (Labeled a)) where
+  labels (Script a s) = nub $ map fst f ++ map snd f
+                       where f = flow (BlockStmt a s)
+  init  (Script a s)  = init (BlockStmt a s)
+  final (Script a s)  = S.toList $ finals (BlockStmt a s)
+  flow  (Script a s)  = flow (BlockStmt a s)
+
+-- TODO this should be Program
 class Finals f where
   finals      :: Show a => f (Labeled a) -> S.Set Label
   init        :: Show a => f (Labeled a) -> Label
