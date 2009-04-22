@@ -27,9 +27,8 @@ test = case parseScriptFromString "" "x = 5; if(true) {x = true;} else {x = 'hi'
             Right x -> case (label x) of
                             script -> do
                               print $ script
-                              print $ P.labels script
                               print $ P.flow script
-                              print $ last $ analyze ana script
+                              print $ snd $ last $ analyze ana script
                               -- print (Script a s)
                               -- let f = flow (BlockStmt a s)
                               -- print $ finals (BlockStmt a s)

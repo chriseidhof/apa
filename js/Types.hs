@@ -85,5 +85,5 @@ instance SemiLattice Lattice where
   bottom = M.empty
   a \/ b = M.unionWith (mergeType) a b
 
--- TODO: this needs to be more advanced.
+-- TODO: this probably needs to be more advanced.
 mergeType l r = nub (l ++ r)
