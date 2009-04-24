@@ -22,13 +22,13 @@ import DataFlowAnalysis.SemiLattice
 import DataFlowAnalysis.Analysis
 import SourcePos
 
-test = case parseScriptFromString "" "x = 5; if(true) {x = true;} else {x = 'hi';}; y = 7;" of
+test = case parseScriptFromString "" "x = {}; x.name = 'chris'; y = x.name; y" of
             Left e  -> print e
             Right x -> case (label x) of
                             script -> do
                               print $ script
                               print $ P.flow script
-                              print $ snd $ last $ analyze ana script
+                              print $ M.toAscList $ snd $ last $ analyze ana script
                               -- print (Script a s)
                               -- let f = flow (BlockStmt a s)
                               -- print $ finals (BlockStmt a s)
@@ -41,11 +41,19 @@ transferFunction p = f
   where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
         f lat = case lookup lat as of
                    Nothing -> id
-                   Just (AssignExpr _ _ l r) -> \x -> M.insertWith mergeType (nameOf l) (typeOf x r) x
-                   -- TODO: should this be a ++ ?
+                   Just (AssignExpr _ _ l r) -> \x -> let t = typeOf x r in 
+                                                      case toNameHierarchy l of
+                                                         [n]    -> M.insert n t x
+                                                         (n:ms) -> M.adjust (changeObject ms t) n x
 
-nameOf (VarRef _ (Id _ n)) = n
-nameOf x                   = error $ "Assignment lhs only supports variable names: " ++ show x
+changeObject :: [String] -> [JsType] -> [JsType] -> [JsType]
+changeObject []     newT curType = error "changeobject"
+changeObject [x]    newT curType = undefined -- this is what we need to change
+changeObject (x:xs) newT curType = undefined -- this is what we need to change
+
+toNameHierarchy (VarRef _ (Id _ n)) = [n]
+toNameHierarchy (DotRef _ l (Id _ n)) = toNameHierarchy l ++ [n]
+toNameHierarchy n = error $ "LHS of assignment not supported: " ++ show n
 
 type Assignment a = Expression a
 
@@ -109,40 +117,55 @@ instance Finals Expression where
   finals (IntLit a _)            = l a
   finals (BoolLit a _)           = l a
   finals (NullLit a)             = l a
+  finals (ObjectLit a [])        = l a
+  finals (ObjectLit a props)     = finals $ last $ map snd props
   finals (AssignExpr a op lhs r) = l a
   finals (VarRef a _     )       = l a
   finals (InfixExpr _ op l r)    = finalsOp op l r
   finals (ListExpr _ ls)         = finals (last ls) -- todo: last is dangerous
   finals (ParenExpr _ e)         = finals e
+  finals (DotRef a parent child) = l a
   finals x                       = error $ "Finals not supported for: " ++ show x
 
-  init (StringLit a _)      = labelOf a
-  init (NumLit a _)         = labelOf a
-  init (IntLit a _)         = labelOf a
-  init (BoolLit a _)        = labelOf a
-  init (NullLit a)          = labelOf a
-  init (AssignExpr _ _ _ r) = init r
-  init (VarRef a _     )    = labelOf a
-  init (InfixExpr _ _ l _)  = init l
-  init (ListExpr _ x)       = init $ head x
-  init (ParenExpr _ e)      = init e
-  init x                    = error $ "Init not supported for: " ++ show x
+  init (StringLit a _)         = labelOf a
+  init (NumLit a _)            = labelOf a
+  init (IntLit a _)            = labelOf a
+  init (BoolLit a _)           = labelOf a
+  init (NullLit a)             = labelOf a
+  init (ObjectLit a props)     = maybe (labelOf a) init $ maybeHead $ map snd props
+  init (AssignExpr _ _ _ r)    = init r
+  init (VarRef a _     )       = labelOf a
+  init (InfixExpr _ _ l _)     = init l
+  init (ListExpr _ x)          = init $ head x
+  init (ParenExpr _ e)         = init e
+  init (DotRef a parent child) = init parent
+  init x                       = error $ "Init not supported for: " ++ show x
 
   flow (StringLit a _)         = []
   flow (NumLit a _)            = []
   flow (IntLit a _)            = []
   flow (BoolLit a _)           = []
   flow (NullLit a)             = []
+  flow (ObjectLit a [])        = [(labelOf a, labelOf a)]
+  flow (ObjectLit _ props)     = flowList (init $ head ls) (tail ls) ++ concatMap flow ls
+                                   where ls = map snd props
   flow (AssignExpr a op l r)   = [(f, labelOf a) | f <- S.elems $ finals r] ++ flow r
   flow (VarRef a _     )       = []
   flow (InfixExpr _ op l r)    = [(f, init r) | f <- S.elems $ finals l] ++ flow l ++ flow r
   flow (ParenExpr _ e)         = flow e
+  flow (DotRef a parent child) = [(f, labelOf a) | f <- S.elems $ finals parent]
   flow (ListExpr _ ls)         = flowList (init $ head ls) (tail ls) ++ concatMap flow ls
 
 
 finalsOp :: (Show a) => InfixOp -> Expression (Labeled a) -> Expression (Labeled a) -> S.Set Label
 finalsOp o l r | isLazyOp o  = finals l `S.union` finals r
                | otherwise   = finals r
+
+head' x []     = x
+head' _ (x:xs) = x
+
+maybeHead []     = Nothing
+maybeHead (x:xs) = Just x
   
 isLazyOp OpMul  = False
 isLazyOp OpSub  = False
@@ -175,11 +198,9 @@ labelOf = fst
 --
 --
 --  finals (ThisRef a)             = finals a
---  finals (DotRef a parent child) = 
 --  finals (ParenExpr a (Expression a)	
 -- PostfixExpr a PostfixOp (Expression a)	
 --  finals (ArrayLit a exs) = undefined -- finals exs	(but exs is a list...)
--- ObjectLit a [(Prop a, Expression a)]	
 -- BracketRef a (Expression a) (Expression a)	
 -- NewExpr a (Expression a) [Expression a]	
 -- PrefixExpr a PrefixOp (Expression a)	

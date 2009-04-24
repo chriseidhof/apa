@@ -31,10 +31,10 @@ extremes (MF (_,_,e) (_,_))  = e
 iota     :: MonotoneFramework l -> l
 iota (MF (_,_,_) (i,_))   = i
 transf   :: Show l => MonotoneFramework l -> Label -> l -> l
-transf (MF (_,_,_) (_,t)) l = fromJust $ lookup l $ M.toList t
+transf (MF (_,_,_) (_,t)) l = fromJust $ M.lookup l t
 
 equations :: (Show lat, SemiLattice lat) => MonotoneFramework lat -> Equations lat
-equations mf = (M.fromAscList opened, M.fromAscList closed)
+equations mf = (M.fromList opened, M.fromList closed)
  where opened = map (\l -> (l, opened_eq mf l)) (vertices mf)
        closed = map (\l -> (l, closed_eq  mf l)) (vertices mf)
 
@@ -42,10 +42,10 @@ fromJust' _ (Just x) = x
 fromJust' x _        = error (show x)
 
 opened_val :: (Show lat, SemiLattice lat) => Label -> IterationResult lat -> lat
-opened_val l lat= fromJust' (l, lat) . lookup l . M.toList . fst $ lat
+opened_val l lat= fromJust' (l, lat) . M.lookup l . fst $ lat
 
 closed_val :: (Show lat) => Label -> IterationResult lat -> lat
-closed_val l = fromJust . lookup l . M.toList . snd
+closed_val l = fromJust . M.lookup l . snd
 
 opened_eq :: (SemiLattice lat, Show lat) => MonotoneFramework lat -> Label -> Equation lat 
 opened_eq mf label r  = join [closed_val l' r | (l', l) <- edges mf, l==label] \/ st
@@ -56,5 +56,5 @@ closed_eq :: (Show lat, SemiLattice lat) => MonotoneFramework lat -> Label -> Eq
 closed_eq mf label = transf mf label . opened_val label
 
 seedEqs :: (SemiLattice lat)=> MonotoneFramework lat -> IterationResult lat
-seedEqs mf = let bottomvector = M.fromAscList $ map (id`split`const bottom) (vertices mf)
+seedEqs mf = let bottomvector = M.fromList $ map (id`split`const bottom) (vertices mf)
              in (bottomvector,bottomvector)

@@ -16,7 +16,7 @@ createDataFlowAnalyser :: (Program prg)=> FlowInfoGen prg -> MeasureGen prg lat 
 createDataFlowAnalyser fg mg p = let flowinfo@(vert,_,_) = fg p
                                      (iota,trfOfLabel)   = mg p
                                     -- trfOflabel      = (trfOfstm.fromJust.block p)
-                                     trfunctions         = M.fromAscList $ map (id `split` trfOfLabel) vert
+                                     trfunctions         = M.fromList $ map (id `split` trfOfLabel) vert
                                  in MF flowinfo (iota, trfunctions)
        
 type FlowInfoGen prg = prg -> ([Label],FlowGraph,[Label])

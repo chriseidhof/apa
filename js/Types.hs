@@ -11,11 +11,12 @@ import DataFlowAnalysis.SemiLattice
 import Data.List (nub)
 import Control.Monad.Reader
 
-data JsType = String | Numeral | Boolean | Function [JsType] JsType | Var TypeVar
+data JsType = String | Numeral | Boolean | Null | Object {super :: String, prototypeProps :: PropertyMap, props :: PropertyMap} | Function [JsType] JsType | Var TypeVar
  deriving (Show, Eq)
 -- data Member  = M {key :: String, value :: JsType}
 --  deriving Show
 type TypeVar = Int
+type PropertyMap = M.Map String [JsType]
 
 class Infer a where
   infer :: a -> StateT TypeVar (Reader Lattice) [JsType]
@@ -52,6 +53,9 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (NumLit a _)            = return [Numeral]
   infer (IntLit a _)            = return [Numeral]
   infer (BoolLit a _)           = return [Boolean]
+  infer (ObjectLit a props)     = do props' <- mapM inferProp props -- todo this can be more efficient
+                                     return [Object "Object" M.empty (M.fromList props')]
+
   infer (AssignExpr a op l r)   = infer r
   infer v@(VarRef a (Id _ n))   = do ctx <- ask
                                      case M.lookup n ctx of
@@ -60,7 +64,18 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (InfixExpr _ op l r)    = (map topLevel) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
+  infer (DotRef a p  (Id _ n))  = do objectType <- infer p
+                                     case objectType of
+                                          [(Object prot _ props)] -> case M.lookup n props of
+                                                                          Just t  -> return t
+                                                                          Nothing -> return [Null] -- TODO lookup in the objects prototype
+                                          [] -> return [] -- is this correct?
+                                          t -> error $ "Invalid type: " ++ show p ++ " is not an object. (" ++ show t ++ ")"
+
   infer x                       = error $ "Infer not supported for: " ++ show x
+
+inferProp (n,e) = do ts <- infer e
+                     return (name n, ts)
 
 numCond  = return [Function [Numeral, Numeral] Boolean]
 compCond = do t <- fresh
@@ -73,6 +88,9 @@ arith    = return [Function [Numeral, Numeral] Numeral]
 topLevel :: JsType -> JsType
 topLevel (Function args res) = res
 topLevel x = x
+
+name :: Prop a -> String
+name (PropId _ (Id _ s)) = s
 
 fresh :: (Monad m) => StateT TypeVar m TypeVar
 fresh = do x <- get
