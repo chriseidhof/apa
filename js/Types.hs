@@ -12,7 +12,7 @@ import Data.List (nub)
 import Control.Monad.Reader
 import Label
 
-data PrimitiveType = String | Numeral | Boolean | Null | Undefined
+data PrimitiveType = String | Numeral | Boolean | Null | Function | Undefined
  deriving (Show, Eq)
 
 newtype Ref = Ref {address :: Int}
@@ -75,6 +75,7 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (InfixExpr _ op l r)    = (map topLevel) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
+  infer (FuncExpr a args body)  = return [Reference (Ref $ labelOf a)]
   infer (DotRef a p  (Id _ n))  = do objectType <- infer p    -- TODO: we don't do any prototype checking at all
                                      refs'      <- asks refs
                                      case objectType of

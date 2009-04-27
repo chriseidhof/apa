@@ -22,6 +22,8 @@ cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` 
         , simpleObject
         , objectAssignment
         , deepObjectAssignment
+        , functions
+        , prototyping
         ]
 
 simpleObject = ( "Simple object"
@@ -44,6 +46,18 @@ deepObjectAssignment = ( "Deep object assignment"
                           &&& 15  `hasField` ("name", string)
                            )
                    )
+
+functions   = ( "Functions"
+              , "MyClass = function(){}"
+              , at 7 (    "MyClass" `isReference` 5
+                      &&& 5         `hasValueType` Function
+                      )
+              )
+
+prototyping = ( "Prototyping"
+              , "MyClass = function(){}; MyClass.prototype.foo = 'hi'; x = new MyClass()"
+              , const (return False)
+              )
 
 testCase (name, prog, cond) = case parseScriptFromString "" (prog ++ ";;") of
             Left e  -> error $ "Parsing failed for case " ++ prog
@@ -79,6 +93,11 @@ hasField addr (prop,typ) lat = case M.lookup (Ref addr) (refs lat) of
                                     Just (Object _ props _ ) -> case M.lookup prop props of
                                                     Nothing -> err $ "No such field: " ++ prop
                                                     Just t  -> Right (t == [typ])
+
+hasValueType :: Int -> PrimitiveType -> Lattice -> Err Bool
+hasValueType addr typ lat = case M.lookup (Ref addr) (refs lat) of
+                                    Nothing -> err $ "No such reference in (hasValueType) scope : " ++ show addr
+                                    Just (Object t _ _ ) -> Right (t == Just typ)
 
 
 err x = Left [x]
