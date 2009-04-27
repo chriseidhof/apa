@@ -10,6 +10,7 @@ import qualified Data.Map as M
 import DataFlowAnalysis.SemiLattice
 import Data.List (nub)
 import Control.Monad.Reader
+import Label
 
 data PrimitiveType = String | Numeral | Boolean | Null | Undefined
  deriving (Show, Eq)
@@ -25,11 +26,11 @@ data Object = Object {valueType :: JsType, props :: PropertyMap, prototype :: Ma
 -- | Function [JsType] JsType | Var TypeVar
 -- data Member  = M {key :: String, value :: JsType}
 --  deriving Show
-type RefVar = Int
+type TypeVar = Int
 type PropertyMap = M.Map String [JsType]
 
 class Infer a where
-  infer :: a -> StateT RefVar (Reader Lattice) [JsType]
+  infer :: a -> StateT TypeVar (Reader Lattice) [JsType]
 
 typeOf l x = runReader (evalStateT (infer x) 0) l
 
@@ -63,8 +64,8 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (NumLit a _)            = return [numeral]
   infer (IntLit a _)            = return [numeral]
   infer (BoolLit a _)           = return [boolean]
-  infer (ObjectLit a props)     = do props' <- mapM inferProp props -- todo this can be more efficient
-                                     newObject
+  infer (ObjectLit a props)     = do --props' <- mapM inferProp props -- todo this can be more efficient
+                                     Reference (Ref $ labelOf a)
                                      -- return [object "Object" (M.fromList props') Nothing]
 
   infer (AssignExpr a op l r)   = infer r
@@ -105,10 +106,10 @@ topLevel = undefined
 name :: Prop a -> String
 name (PropId _ (Id _ s)) = s
 
-fresh :: (Monad m) => StateT RefVar m Ref
+fresh :: (Monad m) => StateT TypeVar m TypeVar
 fresh = do x <- get
            modify (+1)
-           return (Ref x)
+           return x
 
 type References = M.Map Ref Object
 
@@ -133,5 +134,3 @@ mergeObj  o1 o2 | (prototype o1 /= prototype o2) = error "mergeRefs: Prototypes 
 string     = Primitive String
 boolean    = Primitive Boolean
 numeral    = Primitive Numeral
-newObject  = do x <- fresh
-                return [Reference x]
