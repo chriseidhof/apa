@@ -18,23 +18,42 @@ transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> 
 transferFunction p = f
   where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p) 
         ns  = map (\e@(NewExpr    a _ _  ) -> (labelOf a, e)) (news p)
-        f lab = case lookup lab (as ++ ns) of
+        fs  = map (\e@(FuncExpr   a _ _  ) -> (labelOf a, e)) (news p)
+        f lab = case lookup lab (as ++ ns ++ fs) of
                    Nothing -> id
                    Just (AssignExpr _ _ l r)  -> \gamma -> let t = typeOf gamma r in 
                                                             case toNameHierarchy l of
                                                               [n]    -> gamma {types = M.insert n t (types gamma)}
                                                               (n:ms) -> let addrs = maybe [] id $ M.lookup n (types gamma) 
                                                                         in  gamma {refs  = compose [changeRefs addr ms t | (Reference addr) <- addrs] (refs gamma)}
-                   Just (NewExpr a clas args) -> \gamma -> gamma {refs = M.insert (Ref $ labelOf a) (newObject (constructorName clas) $ refs gamma) (refs gamma)} 
+                   Just (NewExpr  a clas args) -> \gamma -> gamma {refs = M.insert (Ref $ labelOf a) (newObject (constructorName clas) gamma) (refs gamma)} 
+                   Just (FuncExpr a args body) -> let fref = (Ref . labelOf) a
+                                                      pref = (Ref . negate . labelOf) a
+                                                  in \gamma -> gamma {refs =( M.insert fref (newFunction pref) 
+                                                                            . M.insert pref newPrototype 
+                                                                            ) (refs gamma) }
 
 compose = foldr (.) id
 
-newObject :: String -> References -> Object
-newObject clas refenv = Object { valueType = base clas , props = M.empty , prototype = Nothing} --TODO PROTOTYPE clas.prototype `mplus` Object.prototype
+
+newObject :: String -> Lattice -> Object
+newObject clas gamma = Object { valueType = base clas , props = M.empty , prototype = protOf} --TODO PROTOTYPE clas.prototype `mplus` Object.prototype
    where base "String"  = Just String
          base "Number"  = Just Numeral
          base "Boolean" = Just Boolean
          base _         = Nothing
+         protOf = let classobjsaddrs = M.lookup clas (types gamma) 
+                      classobjs      = [M.lookup classobjaddr (refs gamma) | Reference classobjaddr <- classobjsaddrs]
+                      prots          = [maybe refBuiltInObject  id $ M.lookup "prototype" (props classobj) | Just classobj <- classobjsaddrs]
+                  in case prots of [x] -> Just x
+                                   _   -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show gamma
+
+
+newFunction :: Ref -> Object
+newFunction protRef = Object {valueType = Just Function, prototype = Just refBuiltInFunction, props = [("prototype",protRef)]}
+
+newPrototype :: Object
+newPrototype = Object {valueType = Nothing, prototype = Just refBuiltInObject, props = []}
 
 -- TODO: this function is not total.
 changeRefs :: Ref -> [String] -> [JsType] -> References -> References

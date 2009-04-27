@@ -18,8 +18,14 @@ instance Applicative (State a) where
   (<*>) = ap
   pure  = return
 
+refBuiltInObject = 1
+refBuiltInFunction = 2
+-- refBuiltInString 
+-- ...
+startLabels = 10
+
 label :: JavaScript a -> JavaScript (Label, SourcePosition)
-label (Script a x) = flip evalState 0 $ do 
+label (Script a x) = flip evalState startLabels $ do 
           x' <- sequence $ map (sequenceA . fmap ann) x
           a' <- ann a
           return $ Script a' x'

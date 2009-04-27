@@ -39,6 +39,11 @@ news = listify isNewExpr
  where isNewExpr (NewExpr _ _ _) = True
        isNewExpr _               = False
 
+functiondecls :: (Data a) => JavaScript a -> [Assignment a]
+functiondecls = listify isFunctionExpr
+ where isFunctionExpr (FuncExpr _ _ _) = True
+       isFunctionExpr  _               = False
+
 type Flow = [(Label, Label)]
 
 instance Finals Statement where
