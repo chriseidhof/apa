@@ -26,7 +26,7 @@ transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> 
 transferFunction p = f
   where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p) 
         ns  = map (\e@(NewExpr    a _ _  ) -> (labelOf a, e)) (news p)
-        fs  = map (\e@(FuncExpr   a _ _  ) -> (labelOf a, e)) (news p)
+        fs  = map (\e@(FuncExpr   a _ _  ) -> (labelOf a, e)) (functiondecls p)
         f lab = case lookup lab (as ++ ns ++ fs) of
                    Nothing -> id
                    Just (AssignExpr _ _ l r)  -> \gamma -> let t = typeOf gamma r in 
@@ -50,11 +50,12 @@ newObject clas gamma = Object { valueType = base clas , props = M.empty , protot
          base "Number"  = Just Numeral
          base "Boolean" = Just Boolean
          base _         = Nothing
-         protOf = let classobjsaddrs = (fromJust$ M.lookup clas (types gamma) ) :: [JsType]
+         protOf = let classobjsaddrs = (maybe [] id $ M.lookup clas (types gamma) ) :: [JsType]
                       classobjs      = [M.lookup classobjaddr (refs gamma) | Reference classobjaddr <- classobjsaddrs] :: [Maybe Object]
                       prots          = concat [maybe [Reference refBuiltInObject]  id $ M.lookup "prototype" (props classobj) | Just classobj <- classobjs]
                   in case prots of [Reference x] -> Just x
-                                   _             -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show gamma
+                                   []            -> Nothing
+                                   _             -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show (gamma, classobjsaddrs, classobjs, prots)
 
 newFunction :: Ref -> Object
 newFunction protRef = Object {valueType = Just Function, prototype = Just refBuiltInFunction, props = M.singleton "prototype" [Reference protRef]}

@@ -17,8 +17,8 @@ import Control.Monad (ap)
 test = mapM_ testCase cases
 
 cases :: [(String, String, M.Map Label Lattice -> Err Bool)]
-cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` numeral))
-        , ("Strings",                  "x = 'test'",        at 2 ("x" `hasType` string))
+cases = [ ("Simple numbers",           "x = 5",             at 12 ("x" `hasType` numeral))
+        , ("Strings",                  "x = 'test'",        at 12 ("x" `hasType` string))
         , simpleObject
         , objectAssignment
         , deepObjectAssignment
@@ -28,30 +28,30 @@ cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` 
 
 simpleObject = ( "Simple object"
                , "x = new Object()"
-               ,  at 8 (    isReference "x" 5
-                        &&& 5 `references` Object Nothing M.empty Nothing
+               ,  at 18 (    isReference "x" 15
+                        &&& 15 `references` Object Nothing M.empty Nothing
                        )
                )
 
 objectAssignment = ( "Simple object"
                    , "x = new Object(); x.name = 'test'"
-                   ,  at 16 (    "x" `isReference` 5
-                             &&& 5   `hasField` ("name", string)
+                   ,  at 26 (    "x" `isReference` 15
+                             &&& 15   `hasField` ("name", string)
                             )
                    )
 deepObjectAssignment = ( "Deep object assignment"
                    , "x = new Object(); x.sub = new Object(); x.sub.name = 'test'"
-                   ,  at 28 ( "x" `isReference` 5
-                          &&& 5   `hasField` ("sub", ref 15)
-                          &&& 15  `hasField` ("name", string)
+                   ,  at 38 ( "x" `isReference` 15
+                          &&& 15   `hasField` ("sub", ref 25)
+                          &&& 25  `hasField` ("name", string)
                            )
                    )
 
 functions   = ( "Functions"
               , "MyClass = function(){}"
-              , at 7 (    "MyClass" `isReference` 5
-                      &&& 5         `hasValueType` Function
-                      &&& 5         `hasPrototype` refBuiltinFunction
+              , at 17 (    "MyClass" `isReference` 15
+                      &&& 15         `hasValueType` Function
+                      &&& 15         `hasPrototype` refBuiltInFunction
                       )
               )
 
