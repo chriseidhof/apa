@@ -2,7 +2,7 @@
 module Test where
 
 import Control.Applicative
-import Analysis
+import Analysis hiding (fromJust')
 import Label
 import Finals
 import Types
@@ -19,17 +19,34 @@ test = mapM_ testCase cases
 cases :: [(String, String, M.Map Label Lattice -> Err Bool)]
 cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` numeral))
         , ("Strings",                  "x = 'test'",        at 2 ("x" `hasType` string))
+        , simpleObject
+        , objectAssignment
         , deepObjectAssignment
-        , objectReferences
+        -- , deepObjectAssignment
+        -- , objectReferences
         ]
         -- TODO: operator tests
 
-deepObjectAssignment = ("Deep Object Assignment"
-                       , "x = {}; x.name = 'chris'; x.test = {age: 12}; x.test.age = '13 yrs'; y = x.name;"
-                       , at 44 (     "x" `hasField` ("name", string) 
-                                 &&& "y" `hasType` string
-                               )
+simpleObject = ( "Simple object"
+               , "x = new Object()"
+               ,  at 8 (    isReference "x" 5
+                        &&& 5 `references` Object Nothing M.empty Nothing
                        )
+               )
+
+objectAssignment = ( "Simple object"
+                   , "x = new Object(); x.name = 'test'"
+                   ,  at 16 (    "x" `isReference` 5
+                             &&& 5   `hasField` ("name", string)
+                            )
+                   )
+deepObjectAssignment = ( "Deep object assignment"
+                   , "x = new Object(); x.sub = new Object(); x.sub.name = 'test'"
+                   ,  at 28 ( "x" `isReference` 5
+                          &&& 5   `hasField` ("sub", ref 15)
+                          &&& 15  `hasField` ("name", string)
+                           )
+                   )
 
 objectReferences = ("Simple object references"
                    , "x = new Object()"
@@ -59,15 +76,19 @@ hasType name typ lat = (== [typ]) <$> (fromJust' ("Variable '" ++ name ++ "' doe
 
 type Err a = Either [String] a
 
-hasField :: [Char] -> (String, JsType) -> Lattice -> Err Bool
-hasField name (prop,typ) lat = undefined -- case M.lookup name lat of
-                                    -- Nothing -> err $ "No such variable in (hasField) scope : " ++ name
-                                    -- Just [Object _ _ props] -> case M.lookup prop props of
-                                    --                Nothing -> err $ "No such field: " ++ name
-                                    --                Just t  -> Right (t == [typ])
+isReference :: String -> Int -> Lattice -> Err Bool
+isReference s i = hasType s (Reference $ Ref i)
 
-fromJust' _ (Just x) = Right x
-fromJust' e Nothing  = Left [e]
+references :: Int -> Object -> Lattice -> Err Bool
+references x o lat = (== o) <$> (fromJust' ("Reference '" ++ show x ++ "' doesn't exist") $ M.lookup (Ref x) $ refs lat)
+
+hasField :: Int -> (String, JsType) -> Lattice -> Err Bool
+hasField addr (prop,typ) lat = case M.lookup (Ref addr) (refs lat) of
+                                    Nothing -> err $ "No such reference in (hasField) scope : " ++ show addr
+                                    Just (Object _ props _ ) -> case M.lookup prop props of
+                                                    Nothing -> err $ "No such field: " ++ prop
+                                                    Just t  -> Right (t == [typ])
+
 
 err x = Left [x]
 
@@ -85,3 +106,5 @@ instance Applicative (Either [String]) where
   _         <*> (Left l) = Left l
   (Right x) <*> Right y  = Right (x y)
 
+fromJust' _ (Just x) = Right x
+fromJust' e Nothing  = Left [e]

@@ -65,7 +65,7 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (NumLit a _)            = return [numeral]
   infer (IntLit a _)            = return [numeral]
   infer (BoolLit a _)           = return [boolean]
-  infer (ObjectLit a props)     = return [Reference (Ref $ labelOf a)]
+  infer (NewExpr a _ _ )        = return [Reference (Ref $ labelOf a)]
 
   infer (AssignExpr a op l r)   = infer r
   infer v@(VarRef a (Id _ n))   = do ctx <- asks types
@@ -136,3 +136,4 @@ string     = Primitive String
 boolean    = Primitive Boolean
 numeral    = Primitive Numeral
 tUndefined = Primitive Undefined
+ref        = Reference . Ref
