@@ -3,58 +3,16 @@
 module Finals where
 
 import BrownPLT.JavaScript.Syntax
-import BrownPLT.JavaScript.Instances
-import BrownPLT.JavaScript.Parser (parseScriptFromString) -- testing
-import Control.Monad.State.Lazy
 import Control.Applicative
+import Control.Monad.State.Lazy
+import Data.Generics (listify, Data)
+import Data.List (nub)
 import Data.Traversable hiding (sequence)
 import Label
-import qualified Data.Set as S
 import Prelude hiding (init)
-import Data.List (nub)
-import qualified Data.Map as M
-import Data.Generics (listify, Data)
-import Text.ParserCombinators.Parsec (SourcePos (..))
-import qualified DataFlowAnalysis.Program as P
-import DataFlowAnalysis.DataFlowAnalyser
 import Types
-import DataFlowAnalysis.SemiLattice
-import DataFlowAnalysis.Analysis
-import SourcePos
-
-test = case parseScriptFromString "" "x = {}; x.name = 'chris'; x.test = {age: 12}; x.test.age = '13 yrs'; y = x.name; y" of
-            Left e  -> print e
-            Right x -> case (label x) of
-                            script -> do
-                              print $ script
-                              print $ P.flow script
-                              print $ M.toAscList $ snd $ last $ analyze ana script
-                              -- print (Script a s)
-                              -- let f = flow (BlockStmt a s)
-                              -- print $ finals (BlockStmt a s)
-                              -- print f
-
-ana = createDataFlowAnalyser forward (createMeasureGen (const M.empty , transferFunction))
-
-transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
-transferFunction p = f
-  where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
-        f lat = case lookup lat as of
-                   Nothing -> id
-                   Just (AssignExpr _ _ l r) -> \x -> let t = typeOf x r in 
-                                                      case toNameHierarchy l of
-                                                         [n]    -> M.insert n t x
-                                                         (n:ms) -> M.adjust (changeObject ms t) n x
-
--- TODO: this function is not total.
-changeObject :: [String] -> [JsType] -> [JsType] -> [JsType]
-changeObject []     newT = error "changeobject"
-changeObject [x]    newT = map (\curType -> curType {props = M.insert x newT (props curType)})
-changeObject (x:xs) newT = map (\curType -> curType {props = M.adjust (changeObject xs newT) x (props curType)})
-
-toNameHierarchy (VarRef _ (Id _ n)) = [n]
-toNameHierarchy (DotRef _ l (Id _ n)) = toNameHierarchy l ++ [n]
-toNameHierarchy n = error $ "LHS of assignment not supported: " ++ show n
+import qualified Data.Set as S
+import qualified DataFlowAnalysis.Program as P
 
 type Assignment a = Expression a
 

@@ -2,8 +2,9 @@
 module Test where
 
 import Control.Applicative
+import Analysis
 import Label
-import Finals hiding (test)
+import Finals
 import Types
 import Data.Maybe (fromJust)
 import Data.List (intercalate)
@@ -23,6 +24,7 @@ cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` 
         , deepObjectAssignment
         , objectReferences
         ]
+        -- TODO: operator tests
 
 deepObjectAssignment = ("Deep Object Assignment"
                        , "x = {}; x.name = 'chris'; x.test = {age: 12}; x.test.age = '13 yrs'; y = x.name;"
@@ -32,8 +34,8 @@ deepObjectAssignment = ("Deep Object Assignment"
                        )
 
 objectReferences = ("Simple object references"
-                   , "x = new Object(10, 20); y = x; y.age = 1;"
-                   , at 24 undefined
+                   , "x = new Object()"
+                   , at 24 (const (return False))
                    )
 
 
