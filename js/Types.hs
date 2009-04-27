@@ -21,7 +21,8 @@ newtype Ref = Ref {address :: Int}
 data JsType = Primitive PrimitiveType | Reference Ref
  deriving (Show, Eq)
 
-data Object = Object {valueType :: JsType, props :: PropertyMap, prototype :: Maybe Ref} 
+data Object = Object {valueType :: Maybe PrimitiveType, props :: PropertyMap, prototype :: Maybe Ref} 
+ deriving (Show, Eq)
 
 -- | Function [JsType] JsType | Var TypeVar
 -- data Member  = M {key :: String, value :: JsType}
@@ -74,14 +75,14 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (InfixExpr _ op l r)    = (map topLevel) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
-  infer (DotRef a p  (Id _ n))  = do objectType <- infer p
+  infer (DotRef a p  (Id _ n))  = do objectType <- infer p    -- TODO: we don't do any prototype checking at all
                                      refs'      <- asks refs
                                      case objectType of
                                           [(Reference ref)] -> case M.lookup ref refs' of
                                              Nothing -> error "Reference not in scope"
                                              Just (Object _ props _)  -> case M.lookup n props of
                                                  Just t  -> return t
-                                                 Nothing -> return [tUndefined] -- TODO lookup in the objects prototype
+                                                 Nothing -> return [tUndefined]
                                           t -> error $ "Invalid type: " ++ show p ++ " is not an object. (" ++ show t ++ ")"
 
   infer x                       = error $ "Infer not supported for: " ++ show x
@@ -115,6 +116,7 @@ type References = M.Map Ref Object
 data Lattice = Lattice { types :: M.Map String [JsType]
                        , refs  :: References
                        }
+               deriving (Show, Eq)
 
 instance SemiLattice Lattice where
   bottom = Lattice M.empty M.empty

@@ -17,10 +17,8 @@ import Control.Monad (ap)
 test = mapM_ testCase cases
 
 cases :: [(String, String, M.Map Label Lattice -> Err Bool)]
-cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` Numeral))
-        , ("Strings",                  "x = 'test'",        at 2 ("x" `hasType` String))
-        , ("Empty object literal",     "x = {}",            at 2 ("x" `hasType` (Object "Object" M.empty M.empty)))
-        , ("Singleton object literal", "x = {name: 'str'}", at 9 ("x" `hasField` ("name", String)))
+cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` numeral))
+        , ("Strings",                  "x = 'test'",        at 2 ("x" `hasType` string))
         , deepObjectAssignment
         , objectReferences
         ]
@@ -28,8 +26,8 @@ cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` 
 
 deepObjectAssignment = ("Deep Object Assignment"
                        , "x = {}; x.name = 'chris'; x.test = {age: 12}; x.test.age = '13 yrs'; y = x.name;"
-                       , at 44 (     "x" `hasField` ("name", String) 
-                                 &&& "y" `hasType` String
+                       , at 44 (     "x" `hasField` ("name", string) 
+                                 &&& "y" `hasType` string
                                )
                        )
 
@@ -57,16 +55,16 @@ infixr 3 &&&
 (l &&& r) lat = (&&) <$> l lat <*> r lat
 
 hasType :: String -> JsType -> Lattice -> Err Bool
-hasType name typ lat = (== [typ]) <$> (fromJust' ("Variable '" ++ name ++ "' doesn't exist") $ M.lookup name lat)
+hasType name typ lat = (== [typ]) <$> (fromJust' ("Variable '" ++ name ++ "' doesn't exist") $ M.lookup name $ types lat)
 
 type Err a = Either [String] a
 
-hasField :: [Char] -> (String, JsType) -> M.Map [Char] [JsType] -> Err Bool
-hasField name (prop,typ) lat = case M.lookup name lat of
-                                    Nothing -> err $ "No such variable in (hasField) scope : " ++ name
-                                    Just [Object _ _ props] -> case M.lookup prop props of
-                                                   Nothing -> err $ "No such field: " ++ name
-                                                   Just t  -> Right (t == [typ])
+hasField :: [Char] -> (String, JsType) -> Lattice -> Err Bool
+hasField name (prop,typ) lat = undefined -- case M.lookup name lat of
+                                    -- Nothing -> err $ "No such variable in (hasField) scope : " ++ name
+                                    -- Just [Object _ _ props] -> case M.lookup prop props of
+                                    --                Nothing -> err $ "No such field: " ++ name
+                                    --                Just t  -> Right (t == [typ])
 
 fromJust' _ (Just x) = Right x
 fromJust' e Nothing  = Left [e]
