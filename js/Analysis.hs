@@ -12,6 +12,14 @@ import Data.Maybe (fromJust)
 import qualified Data.Map as M
 import Data.List (intercalate)
 
+refBuiltInObject = Ref 1
+refBuiltInFunction = Ref 2
+-- refBuiltInString 
+-- ...
+
+
+
+
 ana = createDataFlowAnalyser forward (createMeasureGen (const bottom, transferFunction))
 
 transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
@@ -42,18 +50,17 @@ newObject clas gamma = Object { valueType = base clas , props = M.empty , protot
          base "Number"  = Just Numeral
          base "Boolean" = Just Boolean
          base _         = Nothing
-         protOf = let classobjsaddrs = M.lookup clas (types gamma) 
-                      classobjs      = [M.lookup classobjaddr (refs gamma) | Reference classobjaddr <- classobjsaddrs]
-                      prots          = [maybe refBuiltInObject  id $ M.lookup "prototype" (props classobj) | Just classobj <- classobjsaddrs]
-                  in case prots of [x] -> Just x
-                                   _   -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show gamma
-
+         protOf = let classobjsaddrs = (fromJust$ M.lookup clas (types gamma) ) :: [JsType]
+                      classobjs      = [M.lookup classobjaddr (refs gamma) | Reference classobjaddr <- classobjsaddrs] :: [Maybe Object]
+                      prots          = concat [maybe [Reference refBuiltInObject]  id $ M.lookup "prototype" (props classobj) | Just classobj <- classobjs]
+                  in case prots of [Reference x] -> Just x
+                                   _             -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show gamma
 
 newFunction :: Ref -> Object
-newFunction protRef = Object {valueType = Just Function, prototype = Just refBuiltInFunction, props = [("prototype",protRef)]}
+newFunction protRef = Object {valueType = Just Function, prototype = Just refBuiltInFunction, props = M.singleton "prototype" [Reference protRef]}
 
 newPrototype :: Object
-newPrototype = Object {valueType = Nothing, prototype = Just refBuiltInObject, props = []}
+newPrototype = Object {valueType = Nothing, prototype = Just refBuiltInObject, props = M.empty}
 
 -- TODO: this function is not total.
 changeRefs :: Ref -> [String] -> [JsType] -> References -> References

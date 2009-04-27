@@ -10,6 +10,7 @@ import Data.Traversable hiding (sequence)
 import SourcePos
 import Text.ParserCombinators.Parsec.Pos (SourcePos)
 
+
 -- Utilities 
 type Label = Int
 type Labeled a = (Label, a)
@@ -18,10 +19,7 @@ instance Applicative (State a) where
   (<*>) = ap
   pure  = return
 
-refBuiltInObject = 1
-refBuiltInFunction = 2
--- refBuiltInString 
--- ...
+
 startLabels = 10
 
 label :: JavaScript a -> JavaScript (Label, SourcePosition)
