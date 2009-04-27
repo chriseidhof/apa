@@ -143,10 +143,6 @@ isLazy   x      = error $ "Not implemented isLazy for " ++ x
 l :: (Label, a) -> S.Set Label
 l = S.singleton . labelOf
 
-labelOf :: (Label, a) -> Label
-labelOf = fst
-
-
 -- TODO
 --  finals (VarDeclStmt a decls) = undefined -- finals decls
 --   finals (ReturnStmt a exp) = undefined

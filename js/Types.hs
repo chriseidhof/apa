@@ -64,9 +64,7 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (NumLit a _)            = return [numeral]
   infer (IntLit a _)            = return [numeral]
   infer (BoolLit a _)           = return [boolean]
-  infer (ObjectLit a props)     = do --props' <- mapM inferProp props -- todo this can be more efficient
-                                     Reference (Ref $ labelOf a)
-                                     -- return [object "Object" (M.fromList props') Nothing]
+  infer (ObjectLit a props)     = return [Reference (Ref $ labelOf a)]
 
   infer (AssignExpr a op l r)   = infer r
   infer v@(VarRef a (Id _ n))   = do ctx <- asks types
@@ -77,13 +75,14 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
   infer (DotRef a p  (Id _ n))  = do objectType <- infer p
-                                     undefined -- TODO
-                                     -- case objectType of
-                                     --      [(Object prot _ props)] -> case M.lookup n props of
-                                     --                                      Just t  -> return t
-                                     --                                      Nothing -> return [Null] -- TODO lookup in the objects prototype
-                                     --      [] -> return [] -- is this correct?
-                                     --      t -> error $ "Invalid type: " ++ show p ++ " is not an object. (" ++ show t ++ ")"
+                                     refs'      <- asks refs
+                                     case objectType of
+                                          [(Reference ref)] -> case M.lookup ref refs' of
+                                             Nothing -> error "Reference not in scope"
+                                             Just (Object _ props _)  -> case M.lookup n props of
+                                                 Just t  -> return t
+                                                 Nothing -> return [tUndefined] -- TODO lookup in the objects prototype
+                                          t -> error $ "Invalid type: " ++ show p ++ " is not an object. (" ++ show t ++ ")"
 
   infer x                       = error $ "Infer not supported for: " ++ show x
 
@@ -134,3 +133,4 @@ mergeObj  o1 o2 | (prototype o1 /= prototype o2) = error "mergeRefs: Prototypes 
 string     = Primitive String
 boolean    = Primitive Boolean
 numeral    = Primitive Numeral
+tUndefined = Primitive Undefined
