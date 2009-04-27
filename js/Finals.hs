@@ -22,7 +22,7 @@ import DataFlowAnalysis.SemiLattice
 import DataFlowAnalysis.Analysis
 import SourcePos
 
-test = case parseScriptFromString "" "x = {}; x.name = 'chris'; y = x.name; y" of
+test = case parseScriptFromString "" "x = {}; x.name = 'chris'; x.test = {age: 12}; x.test.age = '13 yrs'; y = x.name; y" of
             Left e  -> print e
             Right x -> case (label x) of
                             script -> do
@@ -46,10 +46,11 @@ transferFunction p = f
                                                          [n]    -> M.insert n t x
                                                          (n:ms) -> M.adjust (changeObject ms t) n x
 
+-- TODO: this function is not total.
 changeObject :: [String] -> [JsType] -> [JsType] -> [JsType]
-changeObject []     newT curType = error "changeobject"
-changeObject [x]    newT curType = undefined -- this is what we need to change
-changeObject (x:xs) newT curType = undefined -- this is what we need to change
+changeObject []     newT = error "changeobject"
+changeObject [x]    newT = map (\curType -> curType {props = M.insert x newT (props curType)})
+changeObject (x:xs) newT = map (\curType -> curType {props = M.adjust (changeObject xs newT) x (props curType)})
 
 toNameHierarchy (VarRef _ (Id _ n)) = [n]
 toNameHierarchy (DotRef _ l (Id _ n)) = toNameHierarchy l ++ [n]
@@ -125,6 +126,7 @@ instance Finals Expression where
   finals (ListExpr _ ls)         = finals (last ls) -- todo: last is dangerous
   finals (ParenExpr _ e)         = finals e
   finals (DotRef a parent child) = l a
+  finals e@(NewExpr a clas vars) = l a -- TODO
   finals x                       = error $ "Finals not supported for: " ++ show x
 
   init (StringLit a _)         = labelOf a
@@ -139,6 +141,7 @@ instance Finals Expression where
   init (ListExpr _ x)          = init $ head x
   init (ParenExpr _ e)         = init e
   init (DotRef a parent child) = init parent
+  init (NewExpr a clas  _)     = labelOf a
   init x                       = error $ "Init not supported for: " ++ show x
 
   flow (StringLit a _)         = []
@@ -155,6 +158,7 @@ instance Finals Expression where
   flow (ParenExpr _ e)         = flow e
   flow (DotRef a parent child) = [(f, labelOf a) | f <- S.elems $ finals parent]
   flow (ListExpr _ ls)         = flowList (init $ head ls) (tail ls) ++ concatMap flow ls
+  flow (NewExpr a clas _ )     = [] -- TODO
 
 
 finalsOp :: (Show a) => InfixOp -> Expression (Labeled a) -> Expression (Labeled a) -> S.Set Label
@@ -202,7 +206,6 @@ labelOf = fst
 -- PostfixExpr a PostfixOp (Expression a)	
 --  finals (ArrayLit a exs) = undefined -- finals exs	(but exs is a list...)
 -- BracketRef a (Expression a) (Expression a)	
--- NewExpr a (Expression a) [Expression a]	
 -- PrefixExpr a PrefixOp (Expression a)	
 -- CondExpr a (Expression a) (Expression a) (Expression a)	
 -- CallExpr a (Expression a) [Expression a]	
