@@ -32,3 +32,6 @@ freshLabel = do x <- get
 ann :: a -> State Label (Label, SourcePosition)
 ann a = do x <- freshLabel
            return (x, transformSourcePos a)
+
+labelOf :: (Label, a) -> Label
+labelOf = fst
