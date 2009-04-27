@@ -13,13 +13,22 @@ ana = createDataFlowAnalyser forward (createMeasureGen (const M.empty , transfer
 
 transferFunction :: JavaScript (Labeled SourcePosition) -> Label -> (Lattice -> Lattice)
 transferFunction p = f
-  where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p)
-        f lab = case lookup lab as of
+  where as  = map (\e@(AssignExpr a _ _ _) -> (labelOf a, e)) (assignments p) 
+        ns  = map (\e@(NewExpr    a _ _  ) -> (labelOf a, e)) (news p)
+        f lab = case lookup lab (as++ns) of
                    Nothing -> id
-                   Just (AssignExpr _ _ l r) -> \x -> let t = typeOf x r in 
-                                                      case toNameHierarchy l of
-                                                         [n]    -> M.insert n t x
-                                                         (n:ms) -> M.adjust (changeObject ms t) n x
+                   Just (AssignExpr _ _ l r)  -> \gamma -> let t = typeOf (types gamma) r in 
+                                                            case toNameHierarchy l of
+                                                              [n]    -> gamma{types = M.insert n t (types gamma)}
+                                               --               (n:ms) -> gamma{types = M.adjust (changeObject ms t) n (types gamma)}
+                   Just (NewExpr a clas args) -> \gamma -> gamma {refs = M.insert (Ref a) (newObject clas) (refs gamma)} 
+
+newObject :: String -> References -> Object
+newObject clas refenv = Object { valuetype = base clas , props = [] , prototype = Nothing} --TODO PROTOTYPE clas.prototype `mplus` Object.prototype
+   where base "String"  = String
+         base "Number"  = Num
+         base "Boolean" = Bool
+         base _         = Undefined
 
 -- TODO: this function is not total.
 changeObject :: [String] -> [JsType] -> [JsType] -> [JsType]

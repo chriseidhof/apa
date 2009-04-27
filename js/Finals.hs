@@ -34,6 +34,11 @@ assignments = listify isAssignment
  where isAssignment (AssignExpr _ _ _ _) = True
        isAssignment _                    = False
 
+news :: (Data a) => JavaScript a -> [Assignment a]
+news = listify isNewExpr
+ where isNewExpr (NewExpr _ _ _) = True
+       isNewExpr _               = False
+
 type Flow = [(Label, Label)]
 
 instance Finals Statement where
