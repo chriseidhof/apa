@@ -22,10 +22,7 @@ cases = [ ("Simple numbers",           "x = 5",             at 2 ("x" `hasType` 
         , simpleObject
         , objectAssignment
         , deepObjectAssignment
-        -- , deepObjectAssignment
-        -- , objectReferences
         ]
-        -- TODO: operator tests
 
 simpleObject = ( "Simple object"
                , "x = new Object()"
@@ -47,12 +44,6 @@ deepObjectAssignment = ( "Deep object assignment"
                           &&& 15  `hasField` ("name", string)
                            )
                    )
-
-objectReferences = ("Simple object references"
-                   , "x = new Object()"
-                   , at 24 (const (return False))
-                   )
-
 
 testCase (name, prog, cond) = case parseScriptFromString "" (prog ++ ";;") of
             Left e  -> error $ "Parsing failed for case " ++ prog

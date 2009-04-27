@@ -10,6 +10,7 @@ import Types
 import DataFlowAnalysis.SemiLattice (bottom)
 import Data.Maybe (fromJust)
 import qualified Data.Map as M
+import Data.List (intercalate)
 
 ana = createDataFlowAnalyser forward (createMeasureGen (const bottom, transferFunction))
 
@@ -44,8 +45,9 @@ changeRefs ref (x:xs) newT ctx = let obj   = M.lookup ref ctx
                                  in  compose [changeRefs addr xs newT | (Reference addr) <- addrs] ctx
 
 
--- todo: this is unsafe
-constructorName = head . toNameHierarchy
+constructorName x = case toNameHierarchy x of
+                         [n] -> n
+                         x -> error $ "constructorname error: " ++ intercalate "." x
 
 toNameHierarchy (VarRef _ (Id _ n)) = [n]
 toNameHierarchy (DotRef _ l (Id _ n)) = toNameHierarchy l ++ [n]
