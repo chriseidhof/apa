@@ -51,6 +51,7 @@ functions   = ( "Functions"
               , "MyClass = function(){}"
               , at 7 (    "MyClass" `isReference` 5
                       &&& 5         `hasValueType` Function
+                      &&& 5         `hasPrototype` refBuiltinFunction
                       )
               )
 
@@ -98,6 +99,11 @@ hasValueType :: Int -> PrimitiveType -> Lattice -> Err Bool
 hasValueType addr typ lat = case M.lookup (Ref addr) (refs lat) of
                                     Nothing -> err $ "No such reference in (hasValueType) scope : " ++ show addr
                                     Just (Object t _ _ ) -> Right (t == Just typ)
+
+hasPrototype :: Int -> Ref -> Lattice -> Err Bool
+hasPrototype addr ref lat = case M.lookup (Ref addr) (refs lat) of
+                                    Nothing -> err $ "No such reference in (hasPrototype) scope : " ++ show addr
+                                    Just (Object _ _ prot) -> Right (prot == Just ref)
 
 
 err x = Left [x]
