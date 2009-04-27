@@ -94,7 +94,8 @@ instance Finals Expression where
   finals (ListExpr _ ls)         = finals (last ls) -- todo: last is dangerous
   finals (ParenExpr _ e)         = finals e
   finals (DotRef a parent child) = l a
-  finals e@(NewExpr a clas vars) = l a -- TODO
+  finals (NewExpr a clas vars)   = l a -- TODO
+  finals (FuncExpr a args body)  = l a
   finals x                       = error $ "Finals not supported for: " ++ show x
 
   init (StringLit a _)         = labelOf a
@@ -110,6 +111,7 @@ instance Finals Expression where
   init (ParenExpr _ e)         = init e
   init (DotRef a parent child) = init parent
   init (NewExpr a clas  _)     = labelOf a
+  init (FuncExpr a args body)  = labelOf a
   init x                       = error $ "Init not supported for: " ++ show x
 
   flow (StringLit a _)         = []
@@ -126,6 +128,7 @@ instance Finals Expression where
   flow (ParenExpr _ e)         = flow e
   flow (DotRef a parent child) = [(f, labelOf a) | f <- S.elems $ finals parent]
   flow (ListExpr _ ls)         = flowList (init $ head ls) (tail ls) ++ concatMap flow ls
+  flow (FuncExpr a args body)  = []
   flow (NewExpr a clas _ )     = [] -- TODO
 
 
@@ -173,6 +176,5 @@ l = S.singleton . labelOf
 -- PrefixExpr a PrefixOp (Expression a)	
 -- CondExpr a (Expression a) (Expression a) (Expression a)	
 -- CallExpr a (Expression a) [Expression a]	
--- FuncExpr a [Id a] (Statement a)
 -- RegexpLit a String Bool Bool	
 --
