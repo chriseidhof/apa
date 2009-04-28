@@ -20,6 +20,7 @@ cases :: [(String, String, M.Map Label Lattice -> Err Bool)]
 cases = [ ("Simple numbers",           "x = 5",             at 12 ("x" `hasType` numeral))
         , ("Strings",                  "x = 'test'",        at 12 ("x" `hasType` string))
         , merging
+        , prototypeMerging
         , simpleObject
         , objectAssignment
         , deepObjectAssignment
@@ -61,6 +62,13 @@ loopObjectAssignment = ( "Loop object assignment"
 merging = ( "Merging in if/else"
           , "if(y) { x = 13;} else {x = 'hi';}"
           , at 30 ( "x" `hasTypes` [string, numeral])
+          )
+
+prototypeMerging = ( "Prototype merging"
+          , "if(y) { x = new Object();} else {x = new Object(); x.name = 'test';}"
+          , at 42 (    "x" `isReferences` [21, 30]
+                   &&& (const (return True)) -- TODO
+                  )
           )
 
 functions   = ( "Functions"
@@ -118,7 +126,10 @@ hasTypes name typ lat = (eq typ) <$> (fromJust' ("Variable '" ++ name ++ "' does
 type Err a = Either [String] a
 
 isReference :: String -> Int -> Lattice -> Err Bool
-isReference s i = hasType s (Reference $ Ref i)
+isReference s i = isReferences s [i]
+
+isReferences :: String -> [Int] -> Lattice -> Err Bool
+isReferences s i = hasTypes s (map (Reference . Ref) i)
 
 references :: Int -> Object -> Lattice -> Err Bool
 references x o lat = (== o) <$> (fromJust' ("Reference '" ++ show x ++ "' doesn't exist") $ M.lookup (Ref x) $ refs lat)
