@@ -7,7 +7,7 @@ import Label
 import Finals
 import Types
 import Data.Maybe (fromJust)
-import Data.List (intercalate)
+import Data.List (intercalate, sort)
 import qualified Data.Map as M
 import BrownPLT.JavaScript.Parser (parseScriptFromString) -- testing
 import DataFlowAnalysis.Analysis
@@ -19,11 +19,14 @@ test = mapM_ testCase cases
 cases :: [(String, String, M.Map Label Lattice -> Err Bool)]
 cases = [ ("Simple numbers",           "x = 5",             at 12 ("x" `hasType` numeral))
         , ("Strings",                  "x = 'test'",        at 12 ("x" `hasType` string))
+        , merging
         , simpleObject
         , objectAssignment
         , deepObjectAssignment
+        , loopObjectAssignment
         , functions
         , prototyping
+        , prototypeAccess
         ]
 
 simpleObject = ( "Simple object"
@@ -47,6 +50,19 @@ deepObjectAssignment = ( "Deep object assignment"
                            )
                    )
 
+loopObjectAssignment = ( "Loop object assignment"
+                   , "x = new Object(); x.sub = new Object(); x.sub.name = x"
+                   ,  at 39 ( "x" `isReference` 15
+                          &&& 15   `hasField` ("sub", ref 25)
+                          &&& 25  `hasField` ("name", ref 15)
+                           )
+                   )
+
+merging = ( "Merging in if/else"
+          , "if(y) { x = 13;} else {x = 'hi';}"
+          , at 30 ( "x" `hasTypes` [string, numeral])
+          )
+
 functions   = ( "Functions"
               , "MyClass = function(){}"
               , at 17 (    "MyClass" `isReference` 15
@@ -57,8 +73,22 @@ functions   = ( "Functions"
 
 prototyping = ( "Prototyping"
               , "MyClass = function(){}; MyClass.prototype.foo = 'hi'; x = new MyClass()"
-              , const (return False)
+              , at 35 (    "MyClass" `isReference` 15
+                       &&& "x"       `isReference` 32
+                       &&& 32        `hasPrototype` (Ref $ -15)
+                       &&& (-15)     `hasField`     ("foo", string)
+                      )
               )
+
+prototypeAccess = ( "Prototype access"
+                  , "MyClass = function(){}; MyClass.prototype.foo = 'hi'; x = new MyClass(); y = x.foo"
+                  , at 44 (    "MyClass" `isReference` 15
+                           &&& "x"       `isReference` 32
+                           &&& 32        `hasPrototype` (Ref $ -15)
+                           &&& (-15)     `hasField`     ("foo", string)
+                           &&& "y"       `hasType`      string
+                          )
+                  )
 
 testCase (name, prog, cond) = case parseScriptFromString "" (prog ++ ";;") of
             Left e  -> error $ "Parsing failed for case " ++ prog
@@ -78,7 +108,12 @@ infixr 3 &&&
 (l &&& r) lat = (&&) <$> l lat <*> r lat
 
 hasType :: String -> JsType -> Lattice -> Err Bool
-hasType name typ lat = (== [typ]) <$> (fromJust' ("Variable '" ++ name ++ "' doesn't exist") $ M.lookup name $ types lat)
+hasType name typ lat = hasTypes name [typ] lat
+
+hasTypes :: String -> [JsType] -> Lattice -> Err Bool
+hasTypes name typ lat = (eq typ) <$> (fromJust' ("Variable '" ++ name ++ "' doesn't exist") $ M.lookup name $ types lat)
+ where eq a b | sort a == sort b = True
+              | otherwise = error $ "/=" ++ show (a, b)
 
 type Err a = Either [String] a
 

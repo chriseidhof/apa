@@ -11,15 +11,16 @@ import DataFlowAnalysis.SemiLattice
 import Data.List (nub)
 import Control.Monad.Reader
 import Label
+import Debug.Trace (trace)
 
 data PrimitiveType = String | Numeral | Boolean | Null | Function | Undefined
- deriving (Show, Eq)
+ deriving (Show, Eq, Ord)
 
 newtype Ref = Ref {address :: Int}
  deriving (Show, Eq, Ord)
 
 data JsType = Primitive PrimitiveType | Reference Ref
- deriving (Show, Eq)
+ deriving (Show, Eq, Ord)
 
 data Object = Object {valueType :: Maybe PrimitiveType, props :: PropertyMap, prototype :: Maybe Ref} 
  deriving (Show, Eq)
@@ -77,14 +78,16 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (ParenExpr _ e)         = infer e
   infer (FuncExpr a args body)  = return [Reference (Ref $ labelOf a)]
   infer (DotRef a p  (Id _ n))  = do objectType <- infer p    -- TODO: we don't do any prototype checking at all
-                                     refs'      <- asks refs
-                                     case objectType of
-                                          [(Reference ref)] -> case M.lookup ref refs' of
-                                             Nothing -> error "Reference not in scope"
-                                             Just (Object _ props _)  -> case M.lookup n props of
-                                                 Just t  -> return t
-                                                 Nothing -> return [tUndefined]
-                                          t -> error $ "Invalid type: " ++ show p ++ " is not an object. (" ++ show t ++ ")"
+                                     refMap      <- asks refs
+                                     -- todo: this can be more clearly
+                                     let mUndefined = maybe [tUndefined]
+                                         lookupInPrototype = mUndefined (lookupRef . Reference) . prototype
+                                         lookupRef (Reference ref) = mUndefined f $ M.lookup ref refMap
+
+                                         lookupRef _               = [tUndefined]
+                                         f obj = maybe (lookupInPrototype obj) id $ M.lookup n $ props obj
+                                     types' <- asks types
+                                     return $ nub $ concatMap lookupRef objectType
 
   infer x                       = error $ "Infer not supported for: " ++ show x
 
