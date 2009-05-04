@@ -7,17 +7,21 @@ import Finals
 import Label
 import SourcePos
 import Types
+import DataFlowAnalysis.Analysis (analyze, scan_analyze)
 import DataFlowAnalysis.SemiLattice (bottom)
 import Data.Maybe (fromJust)
 import qualified Data.Map as M
 import Data.List (intercalate)
+import BrownPLT.JavaScript.Parser (parseScriptFromString) -- testing
 
 refBuiltInObject = Ref 1
 refBuiltInFunction = Ref 2
 -- refBuiltInString 
 -- ...
 
-
+myTest x = case parseScriptFromString "" (x ++ ";;") of
+              Left err -> error (show err)
+              Right x  -> scan_analyze ana $ label x
 
 
 ana = createDataFlowAnalyser forward (createMeasureGen (const bottom, transferFunction))
@@ -35,20 +39,32 @@ transferFunction p = f
                                                               (n:ms) -> let addrs = maybe [] id $ M.lookup n (types gamma) 
                                                                         in  gamma {refs  = compose [changeRefs addr ms t | (Reference addr) <- addrs] (refs gamma)}
                    Just (NewExpr  a clas args) -> \gamma -> gamma {refs = M.insert (Ref $ labelOf a) (newObject (constructorName clas) gamma) (refs gamma)} 
-                   Just (FuncExpr a args body) -> let fref = (Ref . labelOf) a
-                                                      pref = (Ref . negate . labelOf) a
-                                                  in \gamma -> gamma {refs =( M.insert fref (newFunction pref) 
+                   Just (FuncExpr a args body) -> let fref        = (Ref . labelOf) a
+                                                      pref        = (Ref . negate . labelOf) a
+                                                      script      = Script a [body]
+                                                      anaResult   = snd (analyze ana script)
+                                                      (ReturnStmt retLab (Just retExp)) = head'' (body) $ returns script -- todo
+                                                      retContext  = fromJust $ M.lookup (labelOf retLab) anaResult
+                                                      returnType  = typeOf retContext retExp
+                                                      -- TODO local variables
+                                                      baseType    = Function (map toName args) returnType
+                                                  in \gamma -> gamma {refs =( M.insert fref (newFunction pref baseType) 
                                                                             . M.insert pref newPrototype 
                                                                             ) (refs gamma) }
 
 compose = foldr (.) id
 
+toName (Id _ x) = x
+
+-- todo
+head'' _ (x:xs) = x
+head'' e _      = error $ show e
 
 newObject :: String -> Lattice -> Object
 newObject clas gamma = Object { valueType = base clas , props = M.empty , prototype = protOf} --TODO PROTOTYPE clas.prototype `mplus` Object.prototype
-   where base "String"  = Just String
-         base "Number"  = Just Numeral
-         base "Boolean" = Just Boolean
+   where base "String"  = Just $ Left String
+         base "Number"  = Just $ Left Numeral
+         base "Boolean" = Just $ Left Boolean
          base _         = Nothing
          protOf = let classobjsaddrs = (maybe [] id $ M.lookup clas (types gamma) ) :: [JsType]
                       classobjs      = [M.lookup classobjaddr (refs gamma) | Reference classobjaddr <- classobjsaddrs] :: [Maybe Object]
@@ -57,8 +73,8 @@ newObject clas gamma = Object { valueType = base clas , props = M.empty , protot
                                    []            -> Nothing
                                    _             -> error $ "newObject ("++clas++") : multiple prototypes. context:" ++ show (gamma, classobjsaddrs, classobjs, prots)
 
-newFunction :: Ref -> Object
-newFunction protRef = Object {valueType = Just Function, prototype = Just refBuiltInFunction, props = M.singleton "prototype" [Reference protRef]}
+newFunction :: Ref -> FunctionType -> Object
+newFunction protRef baseType = Object {valueType = Just (Right baseType), prototype = Just refBuiltInFunction, props = M.singleton "prototype" [Reference protRef]}
 
 newPrototype :: Object
 newPrototype = Object {valueType = Nothing, prototype = Just refBuiltInObject, props = M.empty}

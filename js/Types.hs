@@ -12,17 +12,23 @@ import Data.List (nub)
 import Control.Monad.Reader
 import Label
 import Debug.Trace (trace)
+import Data.Maybe (isJust, fromJust)
 
-data PrimitiveType = String | Numeral | Boolean | Null | Function | Undefined
+data PrimitiveType = String | Numeral | Boolean | Null | TypeOf String | Undefined
  deriving (Show, Eq, Ord)
 
-newtype Ref = Ref {address :: Int}
+data Ref = Ref {address :: Int} | Cloned {clonePosition :: Int, originalAddress :: Ref}
+ deriving (Show, Eq, Ord)
+
+data FunctionType = Function { args       :: [String]
+                             , resultType :: [JsType]
+                             }
  deriving (Show, Eq, Ord)
 
 data JsType = Primitive PrimitiveType | Reference Ref
  deriving (Show, Eq, Ord)
 
-data Object = Object {valueType :: Maybe PrimitiveType, props :: PropertyMap, prototype :: Maybe Ref} 
+data Object = Object {valueType :: Maybe (Either PrimitiveType FunctionType), props :: PropertyMap, prototype :: Maybe Ref} 
  deriving (Show, Eq)
 
 -- | Function [JsType] JsType | Var TypeVar
@@ -32,7 +38,10 @@ type TypeVar = Int
 type PropertyMap = M.Map String [JsType]
 
 class Infer a where
-  infer :: a -> StateT TypeVar (Reader Lattice) [JsType]
+  infer :: a -> InferMonad [JsType]
+
+
+type InferMonad a = StateT TypeVar (Reader Lattice) a
 
 typeOf l x = runReader (evalStateT (infer x) 0) l
 
@@ -69,15 +78,18 @@ instance Show a => Infer (Expression (Labeled a)) where
   infer (NewExpr a _ _ )        = return [Reference (Ref $ labelOf a)]
 
   infer (AssignExpr a op l r)   = infer r
-  infer v@(VarRef a (Id _ n))   = do ctx <- asks types
-                                     case M.lookup n ctx of
-                                          Nothing -> return []
-                                          Just x  -> return x
+  infer v@(VarRef a (Id _ n))   = inferVar n
   infer (InfixExpr _ op l r)    = (map topLevel) <$>  infer op -- TODO
   infer (ListExpr _ ls)         = infer (last ls) -- todo: what's the semantics here?
   infer (ParenExpr _ e)         = infer e
   infer (FuncExpr a args body)  = return [Reference (Ref $ labelOf a)]
-  infer (DotRef a p  (Id _ n))  = do objectType <- infer p    -- TODO: we don't do any prototype checking at all
+  infer (CallExpr a f args)     = do ctx <- asks types
+                                     lhs <- infer f
+                                     argTypes <- mapM infer args
+                                     typs <- mapM (inferCall (labelOf a) argTypes) lhs -- TODO: do we need all combinations?
+                                     return $ concat typs
+
+  infer (DotRef a p  (Id _ n))  = do objectType <- infer p
                                      refMap      <- asks refs
                                      -- todo: this can be more clearly
                                      let mUndefined = maybe [tUndefined]
@@ -94,6 +106,11 @@ instance Show a => Infer (Expression (Labeled a)) where
 inferProp (n,e) = do ts <- infer e
                      return (name n, ts)
 
+inferVar n = do ctx <- asks types
+                case M.lookup n ctx of
+                     Nothing -> return [Primitive $ TypeOf n]
+                     Just x  -> return x
+
 numCond  = undefined -- return [Function [Numeral, Numeral] Boolean]
 compCond = undefined -- do t <- fresh
               --return undefined -- [Function [Var t, Var t] Boolean]
@@ -102,10 +119,38 @@ arith    = undefined -- return [Function [Numeral, Numeral] Numeral]
 --str      = return [Function [String, String] String]
 --
 
+inferCall :: Label -> [[JsType]] -> JsType -> InferMonad [JsType]
+inferCall lab args p@(Primitive (TypeOf _)) = return []
+inferCall lab args p@(Primitive _) = error $ "Exception: inferCall: " ++ show p
+inferCall lab args p@(Reference r) = do refMap <- asks refs
+                                        case M.lookup r refMap of
+                                             Nothing -> return [tUndefined]
+                                             Just o  -> case valueType o of
+                                                             Just (Right (Function argNames resultType)) -> do
+                                                                let substList = safeZip argNames args
+                                                                resultT <- mapM (subst lab substList) resultType
+                                                                return $ concat resultT
+                                                             _ -> error $ "Not a function type (inferCall)"
+
+subst :: Label -> [(String, [JsType])] -> JsType -> InferMonad [JsType]
+subst label substList (Primitive (TypeOf x)) | isJust l  = return $ fromJust l
+                                             | otherwise = inferVar x
+                                               where l = lookup x substList
+subst label substList (Primitive p         ) = return [Primitive p]
+subst label substList (Reference r)          = return [Reference (Cloned label r)]
+
+
+safeZip [] [] = []
+safeZip (x:xs) (y:ys) = (x,y):(safeZip xs ys)
+safeZip _ _ = error "safeZip: lists of unequal length"
+
 topLevel :: JsType -> JsType
 topLevel = undefined
 -- topLevel (Function args res) = res
 -- topLevel x = x
+
+fromId :: Id a -> String
+fromId (Id _ s) = s
 
 name :: Prop a -> String
 name (PropId _ (Id _ s)) = s

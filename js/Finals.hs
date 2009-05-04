@@ -39,6 +39,11 @@ news = listify isNewExpr
  where isNewExpr (NewExpr _ _ _) = True
        isNewExpr _               = False
 
+returns :: (Data a) => JavaScript a -> [Statement a]
+returns = listify isReturnStmt
+ where isReturnStmt (ReturnStmt _ _) = True
+       isReturnStmt _                = False
+
 functiondecls :: (Data a) => JavaScript a -> [Assignment a]
 functiondecls = listify isFunctionExpr
  where isFunctionExpr (FuncExpr _ _ _) = True
@@ -52,6 +57,7 @@ instance Finals Statement where
   finals (IfStmt _ cond e1 e2) = finals e1 `S.union` finals e2
   finals (WhileStmt _ cond body) = finals cond
   finals (ExprStmt a e) = finals e
+  finals (ReturnStmt a exp) = S.empty
   finals x = error $ "This statement is not supported yet: " ++ show x
 
   init (BlockStmt a ls) = labelOf a
@@ -59,6 +65,7 @@ instance Finals Statement where
   init (IfStmt _ cond e1 e2) = init cond
   init (WhileStmt _ cond body) = init cond
   init (ExprStmt _ e) = init e
+  init (ReturnStmt _ (Just e)) = init e
   init x = error $ "This statement is not supported yet: " ++ show x
 
   flow (BlockStmt a ls)        = flowList (labelOf a) ls ++ (concatMap flow ls)
@@ -72,6 +79,7 @@ instance Finals Statement where
                                ++ [(b, init cond) | b <- S.elems (finals body)]
                                ++ flow cond
                                ++ flow body
+  flow (ReturnStmt a (Just r))   = [(f, labelOf a) | f <- S.elems $ finals r] ++ flow r
   flow (ExprStmt _ e) = flow e
   flow x = error $ "This flow is not supported yet: " ++ show x
 
@@ -96,6 +104,7 @@ instance Finals Expression where
   finals (DotRef a parent child) = l a
   finals (NewExpr a clas vars)   = l a -- TODO
   finals (FuncExpr a args body)  = l a
+  finals (CallExpr a f args)     = l a
   finals x                       = error $ "Finals not supported for: " ++ show x
 
   init (StringLit a _)         = labelOf a
@@ -112,6 +121,7 @@ instance Finals Expression where
   init (DotRef a parent child) = init parent
   init (NewExpr a clas  _)     = labelOf a
   init (FuncExpr a args body)  = labelOf a
+  init (CallExpr a f args)     = init f
   init x                       = error $ "Init not supported for: " ++ show x
 
   flow (StringLit a _)         = []
@@ -129,7 +139,10 @@ instance Finals Expression where
   flow (DotRef a parent child) = [(f, labelOf a) | f <- S.elems $ finals parent]
   flow (ListExpr _ ls)         = flowList (init $ head ls) (tail ls) ++ concatMap flow ls
   flow (FuncExpr a args body)  = []
+  flow (CallExpr a f [])       = [(finalF, labelOf a) | finalF <- S.elems $ finals f] ++ flow f
+  flow (CallExpr a f args)     = concat [flowList finalF args | finalF <- S.elems $ finals f] ++ flow f ++ concatMap flow args  ++ [(f, labelOf a) | f <- S.elems $ finals (last args)]
   flow (NewExpr a clas _ )     = [] -- TODO
+  flow x                       = error $ "Flow not supported for: " ++ show x
 
 
 finalsOp :: (Show a) => InfixOp -> Expression (Labeled a) -> Expression (Labeled a) -> S.Set Label

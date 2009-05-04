@@ -25,9 +25,12 @@ cases = [ ("Simple numbers",           "x = 5",             at 12 ("x" `hasType`
         , objectAssignment
         , deepObjectAssignment
         , loopObjectAssignment
-        , functions
-        , prototyping
-        , prototypeAccess
+        , idFunction
+        , functionWithGlobalVariable
+        , functionApplication
+        -- , prototyping
+        -- , prototypeAccess
+        -- , functionType
         ]
 
 simpleObject = ( "Simple object"
@@ -71,13 +74,33 @@ prototypeMerging = ( "Prototype merging"
                   )
           )
 
-functions   = ( "Functions"
-              , "MyClass = function(){}"
-              , at 17 (    "MyClass" `isReference` 15
-                      &&& 15         `hasValueType` Function
-                      &&& 15         `hasPrototype` refBuiltInFunction
-                      )
+idFunction   = ( "Identity function"
+              , "f = function (x){ return x; }"
+              , at 22 (    "f" `isReference` 15
+                       &&& 15         `hasValueType` (Right $ Function ["x"] [Primitive $ TypeOf "x"])
+                       &&& 15         `hasPrototype` refBuiltInFunction
+                       )
               )
+
+functionWithGlobalVariable   = ( "Function with a global variable"
+              , "f = function (x){ return y; }"
+              , at 22 (    "f" `isReference` 15
+                       &&& 15         `hasValueType` (Right $ Function ["x"] [Primitive $ TypeOf "y"])
+                       &&& 15         `hasPrototype` refBuiltInFunction
+                       )
+              )
+
+functionApplication   = ( "Function application"
+              , "f = function (x){ return x; }; y = f(10)"
+              --, const (return False)
+              , at 31 (    "f" `isReference` 15
+                      &&& 15         `hasValueType` (Right $ Function ["x"] [Primitive $ TypeOf "x"])
+                      &&& 15         `hasPrototype` refBuiltInFunction
+                      &&& "y"        `hasTypes`     [numeral]
+                       )
+              )
+
+-- todo: next: function application with cloning
 
 prototyping = ( "Prototyping"
               , "MyClass = function(){}; MyClass.prototype.foo = 'hi'; x = new MyClass()"
@@ -98,9 +121,15 @@ prototypeAccess = ( "Prototype access"
                           )
                   )
 
+functionType = ("Polymorphic functions"
+               ,"f = function (x){ return x; }"
+               , at 22 ("x" `hasType` undefined
+                       )
+               )
+
 testCase (name, prog, cond) = case parseScriptFromString "" (prog ++ ";;") of
             Left e  -> error $ "Parsing failed for case " ++ prog
-            Right x -> case (cond $ snd $ last $ analyze ana $ label x) of
+            Right x -> case (cond $ snd $ analyze ana $ label x) of
                             Left err     -> do putStrLn $ "Test failed: " ++ name ++ ": " ++ intercalate ";" err
                                                print (label x)
                             Right False  -> do putStrLn $ "Test failed: " ++ name
@@ -141,7 +170,7 @@ hasField addr (prop,typ) lat = case M.lookup (Ref addr) (refs lat) of
                                                     Nothing -> err $ "No such field: " ++ prop
                                                     Just t  -> Right (t == [typ])
 
-hasValueType :: Int -> PrimitiveType -> Lattice -> Err Bool
+hasValueType :: Int -> Either PrimitiveType FunctionType -> Lattice -> Err Bool
 hasValueType addr typ lat = case M.lookup (Ref addr) (refs lat) of
                                     Nothing -> err $ "No such reference in (hasValueType) scope : " ++ show addr
                                     Just (Object t _ _ ) -> Right (t == Just typ)
